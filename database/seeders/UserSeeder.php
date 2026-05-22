@@ -3,9 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
@@ -20,7 +18,7 @@ class UserSeeder extends Seeder
                 'name' => 'Super Admin',
                 'email' => 'superadmin@example.com',
                 'username' => 'superadmin',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'is_active' => true,
                 'role' => 'super-admin',
             ],
@@ -28,7 +26,7 @@ class UserSeeder extends Seeder
                 'name' => 'Auditor',
                 'email' => 'auditor@example.com',
                 'username' => 'auditor',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'is_active' => true,
                 'role' => 'auditor',
             ],
@@ -36,7 +34,7 @@ class UserSeeder extends Seeder
                 'name' => 'Fakultas',
                 'email' => 'fakultas@example.com',
                 'username' => 'fakultas',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'is_active' => true,
                 'role' => 'fakultas',
             ],
@@ -44,7 +42,7 @@ class UserSeeder extends Seeder
                 'name' => 'Prodi',
                 'email' => 'prodi@example.com',
                 'username' => 'prodi',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'is_active' => true,
                 'role' => 'prodi',
             ],
@@ -52,7 +50,7 @@ class UserSeeder extends Seeder
                 'name' => 'Unit Penunjang',
                 'email' => 'unitpenunjang@example.com',
                 'username' => 'unitpenunjang',
-                'password' => Hash::make('password'),
+                'password' => 'password',
                 'is_active' => true,
                 'role' => 'unit-penunjang',
             ],
@@ -63,8 +61,9 @@ class UserSeeder extends Seeder
                 'name' => $item['name'],
                 'email' => $item['email'],
                 'username' => $item['username'],
-                'password' => Hash::make($item['password']),
+                'password' => $item['password'],
                 'is_active' => $item['is_active'],
+                'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
             ]);
 
