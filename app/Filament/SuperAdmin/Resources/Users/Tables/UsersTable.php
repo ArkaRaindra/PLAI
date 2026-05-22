@@ -20,14 +20,14 @@ class UsersTable
                     ->label('Email address')
                     ->searchable(),
                 TextColumn::make('email_verified_at')
-                    ->dateTime()
+                    ->state(fn ($record) => $record->email_verified_at?->translatedFormat('d F Y H:i'))
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d F Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d F Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
