@@ -1,10 +1,15 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\Filament\AuditorPanelProvider;
+use App\Providers\Filament\FakultasPanelProvider;
+use App\Providers\Filament\ProdiPanelProvider;
+use App\Providers\Filament\SuperAdminPanelProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\AuditeePanelProvider::class,
-    App\Providers\Filament\AuditorPanelProvider::class,
-    App\Providers\Filament\FakultasPanelProvider::class,
-    App\Providers\Filament\ProdiPanelProvider::class,
-    App\Providers\Filament\SuperAdminPanelProvider::class,
+    AppServiceProvider::class,
+    AuditorPanelProvider::class,
+    FakultasPanelProvider::class,
+    ProdiPanelProvider::class,
+    SuperAdminPanelProvider::class,
 ];
