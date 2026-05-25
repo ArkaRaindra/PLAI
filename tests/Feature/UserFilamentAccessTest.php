@@ -91,7 +91,7 @@ class UserFilamentAccessTest extends TestCase
 
         $this->actingAs($user)
             ->get('/prodi')
-            ->assertForbidden();
+            ->assertNotFound();
     }
 
     public function test_prodi_user_can_access_prodi_panel_via_http(): void
