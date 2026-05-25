@@ -35,7 +35,15 @@
 >
     <main class="w-full max-w-4xl">
         <div class="mb-8 text-center">
-            <h1 class="text-2xl font-semibold tracking-tight">SPMI PLAI</h1>
+            <img
+                src="assets/images/logo/PLAI-BMD - HORIZONTAL.webp"
+                alt="Logo SPMI PLAI"
+                class="mx-auto mb-4 h-14 w-auto"
+            />
+            <h1 class="text-2xl font-semibold tracking-tight">SPMI</h1>
+            <p class="mt-2 text-xl">
+                Sistem Penjaminan Mutu Internal
+            </p>
             <p class="mt-2 text-sm text-[#706f6c] dark:text-[#A1A09A]">
                 Pilih portal sesuai peran Anda untuk masuk ke sistem.
             </p>
@@ -63,7 +71,7 @@
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 20 20"
                             fill="currentColor"
-                            class="ml-1 h-4 w-4 transition group-hover:translate-x-0.5"
+                            class="ml-1 h-4 w-4 transition group-hover:translate-x-1"
                         >
                             <path
                                 fill-rule="evenodd"
