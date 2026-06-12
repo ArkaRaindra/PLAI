@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Auth\Login;
+use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
+use App\Filament\Prodi\Widgets\RadarScoreWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -27,6 +29,9 @@ class ProdiPanelProvider extends PanelProvider
         return $panel
             ->id('prodi')
             ->path('prodi')
+            ->resources([
+                AuditEvidenceResource::class,
+            ])
             ->globalSearch(false)
             ->login(Login::class)
             ->colors([
@@ -41,6 +46,7 @@ class ProdiPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                RadarScoreWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

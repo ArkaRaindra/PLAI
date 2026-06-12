@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Filament\SuperAdmin\Resources\Users\Tables;
+namespace App\Filament\SuperAdmin\Resources\Periods\Tables;
 
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\BooleanColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UsersTable
+class PeriodsTable
 {
     public static function configure(Table $table): Table
     {
@@ -18,21 +17,20 @@ class UsersTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('roles.name')
-                    ->badge(),
-                BooleanColumn::make('is_active'),
-                TextColumn::make('email_verified_at')
-                    ->state(fn ($record) => $record->email_verified_at?->translatedFormat('d F Y H:i'))
+                TextColumn::make('start_date')
+                    ->date()
                     ->sortable(),
+                TextColumn::make('end_date')
+                    ->date()
+                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->boolean(),
                 TextColumn::make('created_at')
-                    ->dateTime('d F Y H:i')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime('d F Y H:i')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -41,7 +39,6 @@ class UsersTable
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

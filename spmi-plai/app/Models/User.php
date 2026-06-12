@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'username', 'password', 'is_active'])]
+#[Fillable(['name', 'email', 'username', 'password', 'is_active', 'faculty', 'study_program', 'period_id'])]
 #[Hidden(['password', 'remember_token', 'is_active'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -53,5 +53,20 @@ class User extends Authenticatable implements FilamentUser
         $roles = $this->getPanelRoles()[$panel->getId()] ?? [];
 
         return $this->hasRole($roles);
+    }
+
+    public function evidences()
+    {
+        return $this->hasMany(AuditEvidence::class);
+    }
+
+    public function scores()
+    {
+        return $this->hasMany(AuditScore::class);
+    }
+
+    public function period()
+    {
+        return $this->belongsTo(Period::class);
     }
 }

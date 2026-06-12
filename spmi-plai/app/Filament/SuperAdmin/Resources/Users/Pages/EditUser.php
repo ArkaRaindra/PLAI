@@ -16,4 +16,9 @@ class EditUser extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+{
+    return UserResource::getUrl('index');
+}
 }
