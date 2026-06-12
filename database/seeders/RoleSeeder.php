@@ -13,30 +13,18 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            [
-                'name' => 'super-admin',
-                'guard_name' => 'web',
-            ],
-            [
-                'name' => 'auditor',
-                'guard_name' => 'web',
-            ],
-            [
-                'name' => 'fakultas',
-                'guard_name' => 'web',
-            ],
-            [
-                'name' => 'prodi',
-                'guard_name' => 'web',
-            ],
-            [
-                'name' => 'unit-penunjang',
-                'guard_name' => 'web',
-            ],
+            ['name' => 'super-admin', 'guard_name' => 'web'],
+            ['name' => 'auditor', 'guard_name' => 'web'],
+            ['name' => 'fakultas', 'guard_name' => 'web'],
+            ['name' => 'prodi', 'guard_name' => 'web'],
+            ['name' => 'unit-penunjang', 'guard_name' => 'web'],
         ];
 
         foreach ($data as $item) {
-            Role::create($item);
+            Role::firstOrCreate(
+                ['name' => $item['name'], 'guard_name' => $item['guard_name']],
+                $item
+            );
         }
     }
 }

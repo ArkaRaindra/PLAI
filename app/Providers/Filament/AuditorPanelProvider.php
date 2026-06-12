@@ -19,6 +19,8 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Auditor\Resources\AuditEvidence\AuditEvidenceResource as AuditorResource;
+use App\Filament\Auditor\Widgets\AverageScorePerProdiWidget;
 
 class AuditorPanelProvider extends PanelProvider
 {
@@ -27,6 +29,9 @@ class AuditorPanelProvider extends PanelProvider
         return $panel
             ->id('auditor')
             ->path('auditor')
+            ->resources([
+                AuditorResource::class,
+            ])
             ->globalSearch(false)
             ->login(Login::class)
             ->colors([
@@ -41,6 +46,7 @@ class AuditorPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                AverageScorePerProdiWidget::class
             ])
             ->middleware([
                 EncryptCookies::class,
