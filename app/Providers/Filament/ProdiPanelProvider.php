@@ -29,18 +29,20 @@ class ProdiPanelProvider extends PanelProvider
         return $panel
             ->id('prodi')
             ->path('prodi')
+            ->viteTheme('resources/css/filament/prodi/theme.css')
+            ->brandName('Prodi Panel')
             ->resources([
                 AuditEvidenceResource::class,
             ])
             ->globalSearch(false)
             ->login(Login::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Green,
             ])
             ->discoverResources(in: app_path('Filament/Prodi/Resources'), for: 'App\Filament\Prodi\Resources')
             ->discoverPages(in: app_path('Filament/Prodi/Pages'), for: 'App\Filament\Prodi\Pages')
             ->pages([
-                Dashboard::class,
+                // Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Prodi/Widgets'), for: 'App\Filament\Prodi\Widgets')
             ->widgets([
@@ -61,6 +63,7 @@ class ProdiPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/prodi/theme.css');
     }
 }
