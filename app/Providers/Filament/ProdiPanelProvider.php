@@ -87,6 +87,8 @@ class ProdiPanelProvider extends PanelProvider
                     ->label('Pengaturan')
                     ->collapsible(true),
             ])
+            // ->topNavigation()
+            // ->sidebarFullyCollapsibleOnDesktop(true)
             ->viteTheme('resources/css/filament/prodi/theme.css');
     }
 }
