@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Periods\Schemas;
 
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -19,7 +20,7 @@ class PeriodForm
                     ->required(),
                 DatePicker::make('end_date')
                     ->required(),
-                Toggle::make('is_active')
+                Checkbox::make('is_active')
                     ->required(),
             ]);
     }

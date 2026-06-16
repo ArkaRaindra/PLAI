@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Period;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -13,6 +14,8 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $activePeriod = Period::where('is_active', true)->first();
+
         $data = [
             [
                 'name' => 'Super Admin',
@@ -21,6 +24,9 @@ class UserSeeder extends Seeder
                 'password' => 'password',
                 'is_active' => true,
                 'role' => 'super-admin',
+                'faculty' => null,
+                'study_program' => null,
+                'period_id' => null,
             ],
             [
                 'name' => 'Auditor',
@@ -29,6 +35,9 @@ class UserSeeder extends Seeder
                 'password' => 'password',
                 'is_active' => true,
                 'role' => 'auditor',
+                'faculty' => null,
+                'study_program' => null,
+                'period_id' => $activePeriod?->id,
             ],
             [
                 'name' => 'Fakultas',
@@ -37,6 +46,9 @@ class UserSeeder extends Seeder
                 'password' => 'password',
                 'is_active' => true,
                 'role' => 'fakultas',
+                'faculty' => 'Fakultas Teknik',
+                'study_program' => null,
+                'period_id' => $activePeriod?->id,
             ],
             [
                 'name' => 'Prodi',
@@ -45,6 +57,9 @@ class UserSeeder extends Seeder
                 'password' => 'password',
                 'is_active' => true,
                 'role' => 'prodi',
+                'faculty' => 'Fakultas Teknik',
+                'study_program' => 'Teknik Informatika',
+                'period_id' => $activePeriod?->id,
             ],
             [
                 'name' => 'Unit Penunjang',
@@ -53,6 +68,9 @@ class UserSeeder extends Seeder
                 'password' => 'password',
                 'is_active' => true,
                 'role' => 'unit-penunjang',
+                'faculty' => null,
+                'study_program' => null,
+                'period_id' => $activePeriod?->id,
             ],
         ];
 
@@ -63,11 +81,16 @@ class UserSeeder extends Seeder
                 'username' => $item['username'],
                 'password' => $item['password'],
                 'is_active' => $item['is_active'],
+                'faculty' => $item['faculty'] ?? null,
+                'study_program' => $item['study_program'] ?? null,
+                'period_id' => $item['period_id'] ?? null,
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
             ]);
 
+            if (method_exists($user, 'assignRole')) {
             $user->assignRole($item['role']);
+            }
         }
     }
 }

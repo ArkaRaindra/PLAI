@@ -20,6 +20,8 @@ class PeriodResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+
     public static function form(Schema $schema): Schema
     {
         return PeriodForm::configure($schema);
