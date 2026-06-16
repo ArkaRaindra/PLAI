@@ -20,7 +20,7 @@
                 </div>
             @empty
                 <div class="bg-gray-50 dark:bg-white/5 text-gray-400 italic text-xs text-center" style="grid-column: 1 / -1; padding: 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06);">
-                    Belum ada data program studi di database. Silakan jalankan seeder terlebih dahulu.
+                    Belum ada data program studi di database.
                 </div>
             @endforelse
         </div>
@@ -38,7 +38,7 @@
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400" style="margin: 0;">
                     Kamu dapat melakukan pemberkasan dengan lebih mudah dan untuk saat ini terdapat 
-                    <span class="font-bold text-2xl mx-0.5">
+                    <span class="font-bold text-xl mx-0.5">
                         {{ $programs->count() }}
                     </span> 
                     Program Studi yang terdaftar pada sistem.

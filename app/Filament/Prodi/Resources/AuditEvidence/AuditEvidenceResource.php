@@ -26,9 +26,9 @@ class AuditEvidenceResource extends Resource
 
     protected static ?string $pluralLabel = 'Bukti Audit';
 
-     protected static string|\UnitEnum|null $navigationGroup = 'MASTER MENU';
+    protected static string|\UnitEnum|null $navigationGroup = 'Element & Berkas';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 3; 
 
     #[Override]
     public static function canViewAny(): bool

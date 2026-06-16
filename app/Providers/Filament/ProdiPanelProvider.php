@@ -3,12 +3,14 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Auth\Login;
+use App\Filament\Prodi\Pages\HomePage;
 use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
 use App\Filament\Prodi\Widgets\RadarScoreWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -43,6 +45,7 @@ class ProdiPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Prodi/Pages'), for: 'App\Filament\Prodi\Pages')
             ->pages([
                 // Dashboard::class,
+                HomePage::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Prodi/Widgets'), for: 'App\Filament\Prodi\Widgets')
             ->widgets([
@@ -63,6 +66,26 @@ class ProdiPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Penilaian & Diagram')
+                    ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Butir Kriteria')
+                    ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Sub Butir Kriteria')
+                    ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Indikator Penilaian')
+                    ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Element & Berkas')
+                    ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Pengaturan')
+                    ->collapsible(true),
             ])
             ->viteTheme('resources/css/filament/prodi/theme.css');
     }
