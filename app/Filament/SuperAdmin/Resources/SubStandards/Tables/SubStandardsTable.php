@@ -18,7 +18,8 @@ class SubStandardsTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('code')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('max_score')
                     ->numeric()
                     ->sortable(),

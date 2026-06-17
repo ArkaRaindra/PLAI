@@ -18,7 +18,7 @@ class PeriodResource extends Resource
 {
     protected static ?string $model = Period::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDateRange;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Masters';
 

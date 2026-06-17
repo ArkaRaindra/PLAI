@@ -18,7 +18,7 @@ class SubStandardResource extends Resource
 {
     protected static ?string $model = SubStandard::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::QueueList;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Masters';
 

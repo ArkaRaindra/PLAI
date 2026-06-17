@@ -11,6 +11,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentIcon;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -22,12 +23,20 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class SuperAdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        FilamentIcon::register([
+            'panels::sidebar.group.collapse-button' => 'heroicon-m-chevron-left',
+        ]);
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
             ->default()
             ->id('super-admin')
             ->path('super-admin')
+            ->viteTheme('resources/css/filament/super-admin/theme.css')
             ->globalSearch(false)
             ->login(Login::class)
             ->colors([
