@@ -2,3 +2,13 @@
 
 @source '../../../../app/Filament/Prodi/**/*.php';
 @source '../../../../resources/views/filament/**/*.blade.php';
+
+
+.fi-sidebar-group-collapse-btn svg {
+    transition: transform 0.3s ease;
+    transform: rotate(0deg);
+}
+
+.fi-sidebar-group-collapse-btn[aria-expanded="true"] svg {
+    transform: rotate(-90deg);
+}

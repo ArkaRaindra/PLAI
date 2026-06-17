@@ -16,6 +16,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -28,8 +29,16 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class ProdiPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        FilamentIcon::register([
+            'panels::sidebar.group.collapse-button' => 'heroicon-m-chevron-left',
+        ]);
+    }
+
     public function panel(Panel $panel): Panel
     {
+
         return $panel
             ->id('prodi')
             ->path('prodi')
