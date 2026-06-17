@@ -2,6 +2,8 @@
 
 @source '../../../../app/Filament/Prodi/**/*.php';
 @source '../../../../resources/views/filament/**/*.blade.php';
+@source '../../../../vendor/diogogpinto/filament-auth-ui-enhancer/resources/**/*.blade.php';
+
 
 
 .fi-sidebar-group-collapse-btn svg {

@@ -7,6 +7,7 @@ use App\Filament\Prodi\Pages\HomePage;
 use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
 use App\Filament\Prodi\Widgets\AchievementScorePerProdiWidget;
 use App\Filament\Prodi\Widgets\RadarScoreWidget;
+use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -42,7 +43,8 @@ class ProdiPanelProvider extends PanelProvider
         return $panel
             ->id('prodi')
             ->path('prodi')
-            ->viteTheme('resources/css/filament/prodi/theme.css')
+            ->login()
+            ->registration()
             ->brandName('Prodi Panel')
             ->resources([
                 AuditEvidenceResource::class,
@@ -107,6 +109,14 @@ class ProdiPanelProvider extends PanelProvider
             ])
             // ->topNavigation()
             // ->sidebarFullyCollapsibleOnDesktop(true)
+            ->plugins([
+                AuthUIEnhancerPlugin::make()
+                    ->formPanelPosition('right')
+                    ->showEmptyPanelOnMobile(false)
+                    ->formPanelWidth('40%')
+                    ->emptyPanelBackgroundImageUrl('https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+
+            ])
             ->viteTheme('resources/css/filament/prodi/theme.css');
     }
 }
