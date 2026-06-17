@@ -12,7 +12,6 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Override;
 
 class AuditScoreResource extends Resource
 {
@@ -24,7 +23,7 @@ class AuditScoreResource extends Resource
 
     protected static ?string $pluralLabel = 'Diagram Pencapaian';
 
-    protected static ?string $navigationLabel = 'Penilaian & Diagram';
+    protected static ?string $navigationLabel = 'Diagram Pencapaian';
 
     public static function canViewAny(): bool
     {

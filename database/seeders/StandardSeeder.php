@@ -32,6 +32,36 @@ class StandardSeeder extends Seeder
                 'description' => 'Kriteria minimal tentang pelaksanaan pembelajaran pada program studi.',
                 'weight' => 4,
             ],
+            [
+                'code' => 'STD-004',
+                'name' => 'Standar Penilaian Pembelajaran',
+                'description' => 'Kriteria minimal tentang penilaian hasil belajar mahasiswa.',
+                'weight' => 4,
+            ],
+            [
+                'code' => 'STD-005',
+                'name' => 'Standar Dosen dan Tenaga Kependidikan',
+                'description' => 'Kriteria minimal kualifikasi dan kompetensi dosen serta tenaga kependidikan.',
+                'weight' => 5,
+            ],
+            [
+                'code' => 'STD-006',
+                'name' => 'Standar Sarana dan Prasarana',
+                'description' => 'Kriteria minimal tentang fasilitas pembelajaran dan penunjang.',
+                'weight' => 3,
+            ],
+            [
+                'code' => 'STD-007',
+                'name' => 'Standar Pengelolaan',
+                'description' => 'Kriteria minimal tentang perencanaan, pelaksanaan, dan pengawasan kegiatan pendidikan.',
+                'weight' => 4,
+            ],
+            [
+                'code' => 'STD-008',
+                'name' => 'Standar Pembiayaan',
+                'description' => 'Kriteria minimal tentang komponen dan besaran biaya penyelenggaraan pendidikan.',
+                'weight' => 3,
+            ],
         ];
 
         foreach ($data as $item) {

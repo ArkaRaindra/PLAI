@@ -2,6 +2,8 @@
 
 namespace App\Filament\Prodi\Pages;
 
+use App\Filament\Prodi\Widgets\AchievementScorePerProdiWidget;
+use App\Filament\Prodi\Widgets\RadarScoreWidget;
 use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -25,6 +27,22 @@ class Dashboard extends Page
                 ->select('study_program')
                 ->distinct()
                 ->get(),
+        ];
+    }
+
+    // protected function getHeaderWidgets(): array
+    // {
+    //     return [
+    //         AchievementScorePerProdiWidget::class,
+    //         RadarScoreWidget::class,
+    //     ];
+    // }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return [
+            'md' => 1,
+            'xl' => 2,
         ];
     }
 }

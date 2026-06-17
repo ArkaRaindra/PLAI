@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Auth\Login;
 use App\Filament\Prodi\Pages\HomePage;
 use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
+use App\Filament\Prodi\Widgets\AchievementScorePerProdiWidget;
 use App\Filament\Prodi\Widgets\RadarScoreWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -52,6 +53,7 @@ class ProdiPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                AchievementScorePerProdiWidget::class,
                 RadarScoreWidget::class,
             ])
             ->middleware([
