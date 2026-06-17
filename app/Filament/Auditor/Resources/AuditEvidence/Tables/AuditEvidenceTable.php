@@ -20,7 +20,7 @@ class AuditEvidenceTable
                 TextColumn::make('user.studyProgramName')
                     ->label('Prodi'),
                 TextColumn::make('subStandard.code')
-                    ->label('Sub Standar'),
+                    ->label('Sub Standard'),
                 TextColumn::make('created_at')
                     ->dateTime(),
                 TextColumn::make('status')
