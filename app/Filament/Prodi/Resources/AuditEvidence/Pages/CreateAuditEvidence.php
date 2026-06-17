@@ -9,14 +9,16 @@ class CreateAuditEvidence extends CreateRecord
 {
     protected static string $resource = AuditEvidenceResource::class;
 
-     protected function mutateFormDataBeforeCreate(array $data): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();
+        $data['status'] = 'draft';
+
         return $data;
     }
 
     protected function getRedirectUrl(): string
-{
-    return $this->getResource()::getUrl('index');
-}
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

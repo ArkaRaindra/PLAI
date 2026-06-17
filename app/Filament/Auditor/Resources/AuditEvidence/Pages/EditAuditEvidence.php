@@ -17,16 +17,18 @@ class EditAuditEvidence extends EditRecord
     {
         AuditScore::updateOrCreate(
             [
+                'audit_evidence_id' => $this->record->id,
+            ],
+            [
                 'user_id' => $this->record->user_id,
                 'sub_standard_id' => $this->record->sub_standard_id,
                 'period_id' => $this->record->period_id,
-            ],
-            [
                 'score' => $data['score'],
                 'comment' => $data['auditor_note'],
                 'auditor_id' => auth()->id(),
             ]
         );
+
         return $data;
     }
 

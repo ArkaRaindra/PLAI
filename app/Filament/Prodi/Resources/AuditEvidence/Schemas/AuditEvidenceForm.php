@@ -7,7 +7,6 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -23,7 +22,7 @@ class AuditEvidenceForm
                     ->label('Sub Standar'),
                 Select::make('period_id')
                     ->relationship('period', 'name')
-                    ->default(fn() => Period::where('is_active', true)->first()?->id)
+                    ->default(fn () => Period::where('is_active', true)->first()?->id)
                     ->required()
                     ->label('Periode'),
                 TextInput::make('title')
@@ -39,22 +38,21 @@ class AuditEvidenceForm
                     ->url()
                     ->regex('/^https:\/\/drive\.google\.com\/.*$/')
                     ->label('Link Google Drive'),
-                Select::make('status')
-                    ->options([
-            'draft' => 'Draft',
-            'submitted' => 'Submitted',
-            'approved' => 'Approved',
-            'rejected' => 'Rejected',
-        ])
-                    ->default('draft')
-                    ->required()
-                    ->disabled(fn($record) => $record && $record->status === 'submitted' ),
+                Placeholder::make('status')
+                    ->label('Status')
+                    ->content(fn ($record) => match ($record?->status) {
+                        'draft' => 'Draft',
+                        'submitted' => 'Dikirim ke auditor',
+                        'approved' => 'Diterima',
+                        'returned' => 'Ditolak',
+                        default => $record?->status ?? 'Draft',
+                    }),
                 Placeholder::make('current_score')
                     ->label('Nilai')
-                    ->content(fn($record) => $record?->scores->first()?->score ?? '-'),
+                    ->content(fn ($record) => $record?->score?->score ?? '-'),
                 Placeholder::make('auditor_note')
                     ->label('Note')
-                    ->content(fn($record) => $record?->auditor_note ?? '-')
+                    ->content(fn ($record) => $record?->auditor_note ?? '-')
                     ->columnSpanFull(),
             ]);
     }

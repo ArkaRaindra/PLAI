@@ -2,10 +2,13 @@
 
 namespace App\Filament\Prodi\Resources\AuditEvidence\Tables;
 
+use App\Models\AuditEvidence;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -21,13 +24,16 @@ class AuditEvidenceTable
                     ->label('Sub Standar'),
                 TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'draft' => 'gray',
                         'submitted' => 'warning',
                         'approved' => 'success',
-                        'rejected' => 'danger',
+                        'returned' => 'danger',
                     })
                     ->label('Status'),
+                TextColumn::make('score.score')
+                    ->label('Nilai')
+                    ->default('-'),
                 TextColumn::make('auditor_note')
                     ->limit(50)
                     ->label('Note'),
@@ -36,8 +42,21 @@ class AuditEvidenceTable
                 //
             ])
             ->recordActions([
+                Action::make('submitToAuditor')
+                    ->label('Kirim ke auditor')
+                    ->requiresConfirmation()
+                    ->modalHeading('Kirim bukti audit ke auditor?')
+                    ->visible(fn (?AuditEvidence $record): bool => in_array($record?->status, ['draft', 'returned'], true))
+                    ->action(function (AuditEvidence $record): void {
+                        $record->update(['status' => 'submitted']);
+
+                        Notification::make()
+                            ->title('Bukti audit berhasil dikirim ke auditor.')
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
-                DeleteAction::make()
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

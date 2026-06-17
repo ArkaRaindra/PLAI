@@ -50,7 +50,7 @@ class AuditEvidencePolicy
     public function update(User $user, AuditEvidence $evidence): bool
     {
         if ($user->hasRole('prodi')) {
-            return $user->id === $evidence->user_id && $evidence->status === 'draft';
+            return $user->id === $evidence->user_id && in_array($evidence->status, ['draft', 'returned'], true);
         }
         if ($user->hasRole('auditor')) {
             return $evidence->status === 'submitted';

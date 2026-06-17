@@ -11,8 +11,8 @@ use App\Models\AuditScore;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Override;
 
 class AuditScoreResource extends Resource
 {
@@ -25,6 +25,11 @@ class AuditScoreResource extends Resource
     protected static ?string $pluralLabel = 'Diagram Pencapaian';
 
     protected static ?string $navigationLabel = 'Penilaian & Diagram';
+
+    public static function canViewAny(): bool
+    {
+        return true;
+    }
 
     public static function form(Schema $schema): Schema
     {

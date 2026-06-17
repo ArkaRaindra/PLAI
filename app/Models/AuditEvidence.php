@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AuditEvidence extends Model
 {
@@ -42,15 +43,18 @@ class AuditEvidence extends Model
         return $this->belongsTo(Period::class);
     }
 
-    public function scores()
+    public function score(): HasOne
     {
-        return $this->hasMany(AuditScore::class, 'sub_standard_id', 'sub_standard_id')
-            ->where('user_id', $this->user_id)
-            ->where('period_id', $this->period_id);
+        return $this->hasOne(AuditScore::class);
     }
 
-    public function getAuditorScoreAttribute()
+    public function scores(): HasOne
     {
-        return $this->scores()->first()?->score;
+        return $this->score();
+    }
+
+    public function getAuditorScoreAttribute(): ?int
+    {
+        return $this->score?->score;
     }
 }

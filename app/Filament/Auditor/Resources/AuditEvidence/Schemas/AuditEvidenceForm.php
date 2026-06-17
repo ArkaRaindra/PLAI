@@ -22,7 +22,8 @@ class AuditEvidenceForm
                 Placeholder::make('description')
                     ->label('Deskripsi')
                     ->columnSpanFull()
-                    ->content(fn ($record) => $record->description),
+                    ->content(fn ($record) => $record->description)
+                    ->html(),
                 Placeholder::make('file_path')
                     ->label('file')
                     ->content(fn ($record) => $record->file_path
@@ -47,8 +48,8 @@ class AuditEvidenceForm
                     ->columnSpanFull(),
                 Select::make('status')
                     ->options([
-                        'approved' => 'Approved',
-                        'rejected' => 'Returned',
+                        'approved' => 'Diterima',
+                        'returned' => 'Ditolak',
                     ])
                     ->required(),
             ]);
