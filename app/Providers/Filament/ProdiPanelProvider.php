@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Auth\Login;
+use App\Filament\Auth\Register;
 use App\Filament\Prodi\Pages\HomePage;
 use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
 use App\Filament\Prodi\Widgets\AchievementScorePerProdiWidget;
@@ -44,7 +45,7 @@ class ProdiPanelProvider extends PanelProvider
             ->id('prodi')
             ->path('prodi')
             ->login()
-            ->registration()
+            ->registration(Register::class)
             ->brandName('Prodi Panel')
             ->resources([
                 AuditEvidenceResource::class,
@@ -93,15 +94,15 @@ class ProdiPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Sub Butir Kriteria')
                     ->collapsible(true)
-                     ->icon(Heroicon::QueueList),
+                    ->icon(Heroicon::QueueList),
                 NavigationGroup::make()
                     ->label('Indikator Penilaian')
                     ->collapsible(true)
-                     ->icon(Heroicon::ClipboardDocumentCheck),
+                    ->icon(Heroicon::ClipboardDocumentCheck),
                 NavigationGroup::make()
                     ->label('Element & Berkas')
                     ->collapsible(true)
-                     ->icon(Heroicon::DocumentText),
+                    ->icon(Heroicon::DocumentText),
                 NavigationGroup::make()
                     ->label('Pengaturan')
                     ->collapsible(true)
@@ -110,11 +111,11 @@ class ProdiPanelProvider extends PanelProvider
             // ->topNavigation()
             // ->sidebarFullyCollapsibleOnDesktop(true)
             ->plugins([
-                AuthUIEnhancerPlugin::make()
-                    ->formPanelPosition('right')
-                    ->showEmptyPanelOnMobile(false)
-                    ->formPanelWidth('40%')
-                    ->emptyPanelBackgroundImageUrl('https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+                // AuthUIEnhancerPlugin::make()
+                //     ->formPanelPosition('right')
+                //     ->showEmptyPanelOnMobile(false)
+                //     ->formPanelWidth('40%')
+                //     ->emptyPanelBackgroundImageUrl('https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
 
             ])
             ->viteTheme('resources/css/filament/prodi/theme.css');
