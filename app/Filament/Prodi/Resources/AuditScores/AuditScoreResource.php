@@ -18,9 +18,11 @@ class AuditScoreResource extends Resource
 {
     protected static ?string $model = AuditScore::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::ChartPie;
+    protected static string|BackedEnum|null $navigationIcon = null;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Penilaian & Diagram';
+
+    protected static ?string $pluralLabel = 'Diagram Pencapaian';
 
     protected static ?string $navigationLabel = 'Penilaian & Diagram';
 

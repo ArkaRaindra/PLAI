@@ -18,9 +18,11 @@ class StandardResource extends Resource
 {
     protected static ?string $model = Standard::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Folder;
+    protected static string|BackedEnum|null $navigationIcon = null;
 
      protected static string|\UnitEnum|null $navigationGroup = 'Butir Kriteria';
+
+     protected static ?string $pluralLabel = 'Kriteria';
 
     protected static ?string $navigationLabel = 'Butir Kriteria';
 

@@ -15,6 +15,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -70,22 +71,28 @@ class ProdiPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Penilaian & Diagram')
-                    ->collapsible(true),
+                    ->collapsible(true)
+                    ->icon(Heroicon::ChartPie),
                 NavigationGroup::make()
                     ->label('Butir Kriteria')
-                    ->collapsible(true),
+                    ->collapsible(true)
+                    ->icon(Heroicon::Folder),
                 NavigationGroup::make()
                     ->label('Sub Butir Kriteria')
-                    ->collapsible(true),
+                    ->collapsible(true)
+                     ->icon(Heroicon::QueueList),
                 NavigationGroup::make()
                     ->label('Indikator Penilaian')
-                    ->collapsible(true),
+                    ->collapsible(true)
+                     ->icon(Heroicon::ClipboardDocumentCheck),
                 NavigationGroup::make()
                     ->label('Element & Berkas')
-                    ->collapsible(true),
+                    ->collapsible(true)
+                     ->icon(Heroicon::DocumentText),
                 NavigationGroup::make()
                     ->label('Pengaturan')
-                    ->collapsible(true),
+                    ->collapsible(true)
+                    ->icon(Heroicon::Cog6Tooth),
             ])
             // ->topNavigation()
             // ->sidebarFullyCollapsibleOnDesktop(true)

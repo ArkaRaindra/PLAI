@@ -20,7 +20,7 @@ class AuditEvidenceResource extends Resource
 {
     protected static ?string $model = AuditEvidence::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Document;
+    protected static string|BackedEnum|null $navigationIcon = null;
 
     protected static ?string $navigationLabel = 'Bukti Audit';
 

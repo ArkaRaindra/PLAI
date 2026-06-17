@@ -17,7 +17,7 @@ class AuditEvidenceTable
             ->columns([
                 TextColumn::make('title')
                     ->searchable(),
-                TextColumn::make('subStandard.indicator')
+                TextColumn::make('subStandard.code')
                     ->label('Sub Standar'),
                 TextColumn::make('status')
                     ->badge()

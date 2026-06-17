@@ -18,7 +18,7 @@ class AuditEvidenceForm
         return $schema
             ->components([
                 Select::make('sub_standard_id')
-                    ->relationship('subStandard', 'indicator')
+                    ->relationship('subStandard', 'code')
                     ->required()
                     ->label('Sub Standar'),
                 Select::make('period_id')

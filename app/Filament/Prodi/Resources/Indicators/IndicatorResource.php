@@ -18,9 +18,11 @@ class IndicatorResource extends Resource
 {
     protected static ?string $model = Indicator::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocumentCheck;
+    protected static string|BackedEnum|null $navigationIcon = null;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Indikator Penilaian';
+
+    protected static ?string $pluralLabel = 'Indikator Penilaian';
 
     protected static ?string $navigationLabel = 'Indikator Penilaian';
 

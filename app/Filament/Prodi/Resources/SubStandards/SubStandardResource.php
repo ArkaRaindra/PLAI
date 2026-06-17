@@ -18,9 +18,11 @@ class SubStandardResource extends Resource
 {
     protected static ?string $model = SubStandard::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::QueueList;
+    protected static string|BackedEnum|null $navigationIcon = null;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Sub Butir Kriteria';
+
+    protected static ?string $pluralLabel = 'Sub Kriteria';
 
     protected static ?string $navigationLabel = 'Sub Butir Kriteria';
 
