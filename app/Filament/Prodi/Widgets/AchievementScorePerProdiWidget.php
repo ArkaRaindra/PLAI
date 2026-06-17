@@ -11,7 +11,7 @@ class AchievementScorePerProdiWidget extends ChartWidget
 {
     protected ?string $heading = 'Pencapaian Nilai per Program Studi';
 
-    protected int | string | array $columnSpan = 6;
+    protected int|string|array $columnSpan = 6;
 
     protected static ?int $sort = 1;
 
@@ -22,7 +22,7 @@ class AchievementScorePerProdiWidget extends ChartWidget
 
         $prodis = User::whereHas('roles', fn ($query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
             ->where('is_active', true)
-            ->orderBy('study_program')
+            ->orderBy('studyProgram.name')
             ->orderBy('name')
             ->get();
 
@@ -41,7 +41,7 @@ class AchievementScorePerProdiWidget extends ChartWidget
         $achieved = [];
 
         foreach ($prodis as $prodi) {
-            $labels[] = $prodi->study_program ?: $prodi->name;
+            $labels[] = $prodi->studyProgramName ?: $prodi->name;
             $achieved[] = round($averageScores[$prodi->id] ?? 0, 2);
         }
 

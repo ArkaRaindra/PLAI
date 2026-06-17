@@ -23,9 +23,10 @@ class Dashboard extends Page
     {
         return [
             'programs' => User::query()
-                ->whereNotNull('study_program')
-                ->select('study_program')
+                ->join('study_programs', 'users.study_program_id', '=', 'study_programs.id')
+                ->select('study_programs.name as study_program')
                 ->distinct()
+                ->orderBy('study_programs.name')
                 ->get(),
         ];
     }

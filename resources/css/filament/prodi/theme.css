@@ -14,3 +14,12 @@
 .fi-sidebar-group-collapse-btn[aria-expanded="true"] svg {
     transform: rotate(-90deg);
 }
+
+.fi-sidebar-item-grouped-border-part {
+    opacity: 0;
+}
+
+.fi-sidebar-item .fi-sidebar-item-label:active {
+    font-size:1,1rem;
+    font-weight:700
+}

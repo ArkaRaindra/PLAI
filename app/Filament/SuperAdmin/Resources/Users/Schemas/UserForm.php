@@ -23,18 +23,27 @@ class UserForm
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()
-                    ->dehydrated(fn($state) => filled($state))
+                    ->dehydrated(fn ($state) => filled($state))
                     ->required(),
                 Select::make('roles')
                     ->multiple()
                     ->relationship('roles', 'name')
                     ->preload(),
-                TextInput::make('faculty'),
-                TextInput::make('study_program'),
+                Select::make('faculty_id')
+                    ->label('Fakultas')
+                    ->relationship('faculty', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->live(),
+                Select::make('study_program_id')
+                    ->label('Program Studi')
+                    ->relationship('studyProgram', 'name')
+                    ->searchable()
+                    ->preload(),
                 Select::make('period_id')
                     ->relationship('period', 'name'),
                 Toggle::make('is_active')
-                    ->default(true)
+                    ->default(true),
             ]);
     }
 }

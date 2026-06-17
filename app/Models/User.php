@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'username', 'password', 'is_active', 'faculty', 'study_program', 'period_id'])]
+#[Fillable(['name', 'email', 'username', 'password', 'is_active', 'faculty', 'study_program', 'faculty_id', 'study_program_id', 'period_id'])]
 #[Hidden(['password', 'remember_token', 'is_active'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -65,8 +65,28 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(AuditScore::class);
     }
 
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class);
+    }
+
+    public function studyProgram()
+    {
+        return $this->belongsTo(StudyProgram::class);
+    }
+
     public function period()
     {
         return $this->belongsTo(Period::class);
+    }
+
+    public function getStudyProgramNameAttribute(): ?string
+    {
+        return $this->studyProgram?->name ?? $this->study_program;
+    }
+
+    public function getFacultyNameAttribute(): ?string
+    {
+        return $this->faculty?->name ?? $this->faculty;
     }
 }

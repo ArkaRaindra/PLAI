@@ -6,7 +6,6 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
-use Override;
 
 class HomePage extends Page
 {
@@ -22,9 +21,11 @@ class HomePage extends Page
     {
         return [
             'programs' => User::query()
-                ->whereNotNull('study_program')
-                ->select('study_program', 'faculty')
+                ->join('study_programs', 'users.study_program_id', '=', 'study_programs.id')
+                ->leftJoin('faculties', 'users.faculty_id', '=', 'faculties.id')
+                ->select('study_programs.name as study_program', 'faculties.name as faculty')
                 ->distinct()
+                ->orderBy('study_programs.name')
                 ->get(),
         ];
     }

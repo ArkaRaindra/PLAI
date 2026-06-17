@@ -17,7 +17,7 @@ class AuditEvidenceTable
                 TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('user.study_program')
+                TextColumn::make('user.studyProgramName')
                     ->label('Prodi'),
                 TextColumn::make('subStandard.code')
                     ->label('Sub Standar'),
