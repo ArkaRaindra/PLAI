@@ -4,17 +4,18 @@ namespace App\Policies;
 
 use App\Models\AuditEvidence;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class AuditEvidencePolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if($user->hasRole('super-admin')) {
+        if ($user->hasRole('super-admin')) {
             return true;
         }
+
         return null;
     }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -28,10 +29,11 @@ class AuditEvidencePolicy
      */
     public function view(User $user, AuditEvidence $evidence): bool
     {
-       if ($user->hasRole('prodi')) {
+        if ($user->hasRole('prodi')) {
             return $user->id === $evidence->user_id;
-       }
-       return $user->hasRole(['auditor', 'fakultas']);
+        }
+
+        return $user->hasRole(['auditor', 'fakultas']);
     }
 
     /**
@@ -48,11 +50,12 @@ class AuditEvidencePolicy
     public function update(User $user, AuditEvidence $evidence): bool
     {
         if ($user->hasRole('prodi')) {
-            return $user->id === $evidence->user_id && in_array($evidence->status, ['draft'. 'returned', 'rejected']);
-        };
+            return $user->id === $evidence->user_id && $evidence->status === 'draft';
+        }
         if ($user->hasRole('auditor')) {
             return $evidence->status === 'submitted';
         }
+
         return false;
     }
 

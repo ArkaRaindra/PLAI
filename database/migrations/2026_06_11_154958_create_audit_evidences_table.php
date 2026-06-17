@@ -24,9 +24,9 @@ return new class extends Migration
             $table->string('google_drive_link')
                 ->nullable();
             $table->enum('status', [
-                'draft', 'submitted', 'approved', 'rejected'
+                'draft', 'submitted', 'approved', 'rejected',
             ])
-            ->default('draft');
+                ->default('draft');
             $table->text('auditor_note')->nullable();
             $table->timestamps();
         });

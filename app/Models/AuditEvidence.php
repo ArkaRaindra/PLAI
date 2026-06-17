@@ -15,7 +15,7 @@ class AuditEvidence extends Model
         'file_path',
         'google_drive_link',
         'status',
-        'auditor_note'
+        'auditor_note',
     ];
 
     protected $table = 'audit_evidences';
@@ -40,6 +40,13 @@ class AuditEvidence extends Model
     public function period()
     {
         return $this->belongsTo(Period::class);
+    }
+
+    public function scores()
+    {
+        return $this->hasMany(AuditScore::class, 'sub_standard_id', 'sub_standard_id')
+            ->where('user_id', $this->user_id)
+            ->where('period_id', $this->period_id);
     }
 
     public function getAuditorScoreAttribute()
