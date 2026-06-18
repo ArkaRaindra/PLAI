@@ -16,4 +16,9 @@ class EditFaculty extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return FacultyResource::getUrl('index');
+    }
 }

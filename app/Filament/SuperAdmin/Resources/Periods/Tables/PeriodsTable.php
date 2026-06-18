@@ -23,6 +23,10 @@ class PeriodsTable
                 TextColumn::make('end_date')
                     ->date()
                     ->sortable(),
+                TextColumn::make('users-count')
+                    ->state(fn ($record) => $record->users()->count())
+                    ->label('Jumlah User')
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('created_at')

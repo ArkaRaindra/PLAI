@@ -3,7 +3,9 @@
 namespace App\Filament\Prodi\Resources\AuditEvidence\Pages;
 
 use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
+use Override;
 
 class CreateAuditEvidence extends CreateRecord
 {
@@ -20,5 +22,18 @@ class CreateAuditEvidence extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+
+     protected function getCreateAnotherFormAction(): Action
+    {
+        return parent::getCreateAnotherFormAction()
+        ->visible(false);
+    }
+
+    #[Override]
+    protected function getCreateFormAction(): Action
+    {
+        return parent::getCreateFormAction()
+        ->label('Simpan');
     }
 }

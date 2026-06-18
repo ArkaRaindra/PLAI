@@ -7,13 +7,20 @@ use Filament\Widgets\ChartWidget;
 
 class AverageScorePerProdiWidget extends ChartWidget
 {
-    protected ?string $heading = 'Average Score Per Prodi Widget';
+    protected ?string $heading = 'Rata-rata nilai per Prodi';
 
     protected static ?int $sort = 1;
 
     protected function getData(): array
     {
-        $prodis = User::role('prodi')->with(['scores', 'studyProgram'])->orderBy('studyProgram.name')->get();
+        $prodis = User::query()
+            ->role('prodi')
+            ->leftJoin('study_programs', 'users.study_program_id', '=', 'study_programs.id')
+            ->orderBy('study_programs.name')
+            ->orderBy('users.name')
+            ->with(['scores', 'studyProgram'])
+            ->select('users.*')
+            ->get();
         $labels = [];
         $data = [];
 

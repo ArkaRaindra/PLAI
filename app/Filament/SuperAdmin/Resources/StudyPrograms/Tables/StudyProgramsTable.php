@@ -14,13 +14,17 @@ class StudyProgramsTable
     {
         return $table
             ->columns([
+                TextColumn::make('name')
+                    ->label('Program Studi')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('faculty.name')
                     ->label('Fakultas')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('name')
-                    ->label('Program Studi')
-                    ->searchable()
+                TextColumn::make('users-count')
+                    ->state(fn ($record) => $record->users()->count())
+                    ->label('Jumlah User')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('audit_evidences', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
+            $table->foreignId('standard_id')->constrained();
             $table->foreignId('sub_standard_id')->constrained();
             $table->foreignId('period_id')->constrained();
             $table->string('title');

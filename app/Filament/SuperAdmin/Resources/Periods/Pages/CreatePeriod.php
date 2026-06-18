@@ -10,7 +10,8 @@ class CreatePeriod extends CreateRecord
     protected static string $resource = PeriodResource::class;
 
     protected function getRedirectUrl(): string
-{
-    return $this->getResource()::getUrl('index');
-}
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
 }

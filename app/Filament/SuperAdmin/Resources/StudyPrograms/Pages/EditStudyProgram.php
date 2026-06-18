@@ -16,4 +16,9 @@ class EditStudyProgram extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return StudyProgramResource::getUrl('index');
+    }
 }

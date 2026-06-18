@@ -3,6 +3,7 @@
 namespace App\Filament\Prodi\Resources\AuditEvidence\Schemas;
 
 use App\Models\Period;
+use App\Models\SubStandard;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
@@ -16,13 +17,25 @@ class AuditEvidenceForm
     {
         return $schema
             ->components([
+                Select::make('standard_id')
+                    ->relationship('standard', 'code')
+                    ->reactive()
+                    ->afterStateUpdated(fn ($set) => $set('sub_standard_id', null)),
                 Select::make('sub_standard_id')
-                    ->relationship('subStandard', 'code')
+                    ->options(function (callable $get) {
+                        $standardId = $get('standard_id');
+                        if (!$standardId) {
+                            return SubStandard::pluck('code', 'id');
+                        }
+                        return SubStandard::where('standard_id', $standardId)
+                        ->pluck('code', 'id');
+                    })
                     ->required()
                     ->label('Sub Standar'),
                 Select::make('period_id')
                     ->relationship('period', 'name')
                     ->default(fn () => Period::where('is_active', true)->first()?->id)
+                    ->disabled()
                     ->required()
                     ->label('Periode'),
                 TextInput::make('title')

@@ -20,10 +20,13 @@ class AchievementScorePerProdiWidget extends ChartWidget
         $periodId = auth()->user()->period_id;
         $target = SubStandard::avg('max_score') ?? 0;
 
-        $prodis = User::whereHas('roles', fn ($query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
-            ->where('is_active', true)
-            ->orderBy('studyProgram.name')
-            ->orderBy('name')
+        $prodis = User::query()
+            ->whereHas('roles', fn ($query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
+            ->leftJoin('study_programs', 'users.study_program_id', '=', 'study_programs.id')
+            ->where('users.is_active', true)
+            ->orderBy('study_programs.name')
+            ->orderBy('users.name')
+            ->select('users.*')
             ->get();
 
         $prodiIds = $prodis->pluck('id');

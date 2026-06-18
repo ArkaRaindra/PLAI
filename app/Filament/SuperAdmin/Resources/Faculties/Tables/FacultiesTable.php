@@ -18,6 +18,13 @@ class FacultiesTable
                     ->label('Fakultas')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('studyProgram-count')
+                    ->state(fn ($record) => $record->studyPrograms()->count())
+                    ->label('Program Studi'),
+                TextColumn::make('users-count')
+                    ->state(fn ($record) => $record->users()->count())
+                    ->label('Jumlah User')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

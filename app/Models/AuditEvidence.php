@@ -9,6 +9,7 @@ class AuditEvidence extends Model
 {
     protected $fillable = [
         'user_id',
+        'standard',
         'sub_standard_id',
         'period_id',
         'title',
@@ -31,6 +32,11 @@ class AuditEvidence extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function Standard()
+    {
+        return $this->belongsTo(Standard::class);
     }
 
     public function subStandard()
