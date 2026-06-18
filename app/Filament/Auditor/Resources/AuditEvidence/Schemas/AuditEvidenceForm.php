@@ -17,8 +17,11 @@ class AuditEvidenceForm
                 Placeholder::make('title')
                     ->label('Judul')
                     ->content(fn ($record) => $record->title),
-                Placeholder::make('sub_standard_id')
-                    ->label('Sub Standar'),
+                Placeholder::make('sub_standard_ids')
+                    ->label('Sub Standar')
+                    ->content(fn ($record) => $record->subStandards
+                        ->pluck('code')
+                        ->implode(', ') ?: ($record->subStandard?->code ?? '-')),
                 Placeholder::make('description')
                     ->label('Deskripsi')
                     ->columnSpanFull()
@@ -27,14 +30,14 @@ class AuditEvidenceForm
                 Placeholder::make('file_path')
                     ->label('file')
                     ->content(fn ($record) => $record->file_path
-                     ? "<a href='".asset('storage/'.$record->file_path)."' target='_blank'> Download</a>"
-                     : 'Tidak ada')
+                        ? "<a href='".asset('storage/'.$record->file_path)."' target='_blank'> Download</a>"
+                        : 'Tidak ada')
                     ->html(),
                 Placeholder::make('google_drive_link')
                     ->label('Google Drive')
                     ->content(fn ($record) => $record->google_drive_link
-                     ? "a href='{$record->google_drive_link}' target='_blank'> Buka di Drive</a>"
-                     : 'Tidak ada')
+                        ? "<a href='{$record->google_drive_link}' target='_blank'> Buka di Drive</a>"
+                        : 'Tidak ada')
                     ->html(),
                 TextInput::make('score')
                     ->label('Nilai')

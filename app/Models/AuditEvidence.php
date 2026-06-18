@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AuditEvidence extends Model
 {
@@ -29,38 +31,38 @@ class AuditEvidence extends Model
         ];
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function Standard()
+    public function standard(): BelongsTo
     {
         return $this->belongsTo(Standard::class);
     }
 
-    public function subStandard()
+    public function subStandard(): BelongsTo
     {
         return $this->belongsTo(SubStandard::class);
     }
 
-    public function period()
+    public function subStandards(): BelongsToMany
+    {
+        return $this->belongsToMany(SubStandard::class, 'audit_evidence_sub_standard');
+    }
+
+    public function period(): BelongsTo
     {
         return $this->belongsTo(Period::class);
     }
 
-    public function score(): HasOne
+    public function scores(): HasMany
     {
-        return $this->hasOne(AuditScore::class);
+        return $this->hasMany(AuditScore::class);
     }
 
-    public function scores(): HasOne
+    public function getAuditorScoreAttribute(): ?float
     {
-        return $this->score();
-    }
-
-    public function getAuditorScoreAttribute(): ?int
-    {
-        return $this->score?->score;
+        return $this->scores()->avg('score');
     }
 }

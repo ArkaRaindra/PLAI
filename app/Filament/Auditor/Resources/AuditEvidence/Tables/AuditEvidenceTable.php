@@ -2,6 +2,7 @@
 
 namespace App\Filament\Auditor\Resources\AuditEvidence\Tables;
 
+use App\Models\AuditEvidence;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -19,8 +20,12 @@ class AuditEvidenceTable
                     ->searchable(),
                 TextColumn::make('user.studyProgramName')
                     ->label('Prodi'),
-                TextColumn::make('subStandard.code')
-                    ->label('Sub Standard'),
+                TextColumn::make('subStandards.code')
+                    ->label('Sub Standard')
+                    ->getStateUsing(fn (AuditEvidence $record): string => $record->subStandards
+                        ->pluck('code')
+                        ->implode(', ') ?: ($record->subStandard?->code ?? '-'))
+                    ->limitList(3),
                 TextColumn::make('created_at')
                     ->dateTime(),
                 TextColumn::make('status')

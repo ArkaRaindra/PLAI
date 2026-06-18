@@ -20,8 +20,12 @@ class AuditEvidenceTable
             ->columns([
                 TextColumn::make('title')
                     ->searchable(),
-                TextColumn::make('subStandard.code')
-                    ->label('Sub Standar'),
+                TextColumn::make('subStandards.code')
+                    ->label('Sub Standar')
+                    ->getStateUsing(fn (AuditEvidence $record): string => $record->subStandards
+                        ->pluck('code')
+                        ->implode(', ') ?: ($record->subStandard?->code ?? '-'))
+                    ->limitList(3),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -31,7 +35,7 @@ class AuditEvidenceTable
                         'returned' => 'danger',
                     })
                     ->label('Status'),
-                TextColumn::make('score.score')
+                TextColumn::make('auditor_score')
                     ->label('Nilai')
                     ->default('-'),
                 TextColumn::make('auditor_note')

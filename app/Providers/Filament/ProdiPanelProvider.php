@@ -8,6 +8,7 @@ use App\Filament\Prodi\Pages\HomePage;
 use App\Filament\Prodi\Resources\AuditEvidence\AuditEvidenceResource;
 use App\Filament\Prodi\Widgets\AchievementScorePerProdiWidget;
 use App\Filament\Prodi\Widgets\RadarScoreWidget;
+use App\Filament\Prodi\Widgets\StatusKeberhasilanWidget;
 use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -67,6 +68,7 @@ class ProdiPanelProvider extends PanelProvider
                 FilamentInfoWidget::class,
                 AchievementScorePerProdiWidget::class,
                 RadarScoreWidget::class,
+                StatusKeberhasilanWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

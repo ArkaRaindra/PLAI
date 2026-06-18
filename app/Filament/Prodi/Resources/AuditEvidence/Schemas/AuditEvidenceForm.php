@@ -20,16 +20,18 @@ class AuditEvidenceForm
                 Select::make('standard_id')
                     ->relationship('standard', 'code')
                     ->reactive()
-                    ->afterStateUpdated(fn ($set) => $set('sub_standard_id', null)),
-                Select::make('sub_standard_id')
+                    ->afterStateUpdated(fn ($set) => $set('sub_standard_ids', null)),
+                Select::make('sub_standard_ids')
                     ->options(function (callable $get) {
                         $standardId = $get('standard_id');
-                        if (!$standardId) {
+                        if (! $standardId) {
                             return SubStandard::pluck('code', 'id');
                         }
+
                         return SubStandard::where('standard_id', $standardId)
-                        ->pluck('code', 'id');
+                            ->pluck('code', 'id');
                     })
+                    ->multiple()
                     ->required()
                     ->label('Sub Standar'),
                 Select::make('period_id')
@@ -62,7 +64,7 @@ class AuditEvidenceForm
                     }),
                 Placeholder::make('current_score')
                     ->label('Nilai')
-                    ->content(fn ($record) => $record?->score?->score ?? '-'),
+                    ->content(fn ($record) => $record?->auditor_score ? number_format($record?->auditor_score, 2, ',', '.') : '-'),
                 Placeholder::make('auditor_note')
                     ->label('Note')
                     ->content(fn ($record) => $record?->auditor_note ?? '-')

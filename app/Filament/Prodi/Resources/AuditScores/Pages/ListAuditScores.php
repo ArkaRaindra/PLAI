@@ -5,9 +5,9 @@ namespace App\Filament\Prodi\Resources\AuditScores\Pages;
 use App\Filament\Prodi\Resources\AuditScores\AuditScoreResource;
 use App\Filament\Prodi\Widgets\AchievementScorePerProdiWidget;
 use App\Filament\Prodi\Widgets\RadarScoreWidget;
+use App\Filament\Prodi\Widgets\StatusKeberhasilanWidget;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Override;
 
 class ListAuditScores extends ListRecords
 {
@@ -22,9 +22,15 @@ class ListAuditScores extends ListRecords
 
     protected function getHeaderWidgets(): array
     {
-        return[
+        return [
             AchievementScorePerProdiWidget::class,
             RadarScoreWidget::class,
+            StatusKeberhasilanWidget::class,
         ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
     }
 }

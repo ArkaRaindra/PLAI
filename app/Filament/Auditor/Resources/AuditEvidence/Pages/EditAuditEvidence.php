@@ -15,19 +15,26 @@ class EditAuditEvidence extends EditRecord
     #[Override]
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        AuditScore::updateOrCreate(
-            [
-                'audit_evidence_id' => $this->record->id,
-            ],
-            [
-                'user_id' => $this->record->user_id,
-                'sub_standard_id' => $this->record->sub_standard_id,
-                'period_id' => $this->record->period_id,
-                'score' => $data['score'],
-                'comment' => $data['auditor_note'],
-                'auditor_id' => auth()->id(),
-            ]
-        );
+        $fallbackSubStandards = collect([$this->record->subStandard])->filter();
+        $subStandards = $this->record->subStandards->isNotEmpty()
+            ? $this->record->subStandards
+            : $fallbackSubStandards;
+
+        foreach ($subStandards as $subStandard) {
+            AuditScore::updateOrCreate(
+                [
+                    'audit_evidence_id' => $this->record->id,
+                    'sub_standard_id' => $subStandard->id,
+                ],
+                [
+                    'user_id' => $this->record->user_id,
+                    'period_id' => $this->record->period_id,
+                    'score' => $data['score'],
+                    'comment' => $data['auditor_note'],
+                    'auditor_id' => auth()->id(),
+                ]
+            );
+        }
 
         return $data;
     }
