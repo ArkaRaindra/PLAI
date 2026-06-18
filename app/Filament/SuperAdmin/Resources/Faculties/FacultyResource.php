@@ -20,7 +20,7 @@ class FacultyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingLibrary;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data';
 
     protected static ?string $navigationLabel = 'Fakultas';
 

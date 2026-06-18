@@ -20,7 +20,7 @@ class StandardResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Folder;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data';
 
     public static function form(Schema $schema): Schema
     {

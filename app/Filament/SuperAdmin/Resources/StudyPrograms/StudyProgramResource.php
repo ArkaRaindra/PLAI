@@ -20,7 +20,7 @@ class StudyProgramResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::AcademicCap;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data';
 
     protected static ?string $navigationLabel = 'Program Studi';
 

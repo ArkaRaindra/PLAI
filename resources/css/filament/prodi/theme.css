@@ -19,7 +19,17 @@
     opacity: 0;
 }
 
-.fi-sidebar-item .fi-sidebar-item-label:active {
-    font-size:1,1rem;
-    font-weight:700
+.fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    font-size: 1rem;
+    font-weight: 600;
+    transform: none;
+    cursor: default;
+}
+
+.fi-sidebar-item .fi-sidebar-item-label{
+    transition:all 0.3s ease-out;
+}
+
+.fi-sidebar-item:not(.fi-active):hover .fi-sidebar-item-label {
+    transform:scale(1.03);  
 }
