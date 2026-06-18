@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Periods;
 use App\Filament\SuperAdmin\Resources\Periods\Pages\CreatePeriod;
 use App\Filament\SuperAdmin\Resources\Periods\Pages\EditPeriod;
 use App\Filament\SuperAdmin\Resources\Periods\Pages\ListPeriods;
+use App\Filament\SuperAdmin\Resources\Periods\RelationManagers\UsersRelationManager;
 use App\Filament\SuperAdmin\Resources\Periods\Schemas\PeriodForm;
 use App\Filament\SuperAdmin\Resources\Periods\Tables\PeriodsTable;
 use App\Models\Period;
@@ -35,7 +36,7 @@ class PeriodResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UsersRelationManager::class,
         ];
     }
 

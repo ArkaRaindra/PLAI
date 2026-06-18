@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Faculties;
 use App\Filament\SuperAdmin\Resources\Faculties\Pages\CreateFaculty;
 use App\Filament\SuperAdmin\Resources\Faculties\Pages\EditFaculty;
 use App\Filament\SuperAdmin\Resources\Faculties\Pages\ListFaculties;
+use App\Filament\SuperAdmin\Resources\Faculties\RelationManagers\UsersRelationManager;
 use App\Filament\SuperAdmin\Resources\Faculties\Schemas\FacultyForm;
 use App\Filament\SuperAdmin\Resources\Faculties\Tables\FacultiesTable;
 use App\Models\Faculty;
@@ -39,7 +40,7 @@ class FacultyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UsersRelationManager::class,
         ];
     }
 

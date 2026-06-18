@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Period extends Model
 {
@@ -13,7 +14,7 @@ class Period extends Model
         'name',
         'start_date',
         'end_date',
-        'is_active'
+        'is_active',
     ];
 
     protected function casts(): array
@@ -21,21 +22,21 @@ class Period extends Model
         return [
             'start_date' => 'date',
             'end_date' => 'date',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
         ];
     }
 
-    public function users()
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    public function auditEvidences()
+    public function auditEvidences(): HasMany
     {
         return $this->hasMany(AuditEvidence::class);
     }
 
-    public function auditScores()
+    public function auditScores(): HasMany
     {
         return $this->hasMany(AuditScore::class);
     }

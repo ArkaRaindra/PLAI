@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\StudyPrograms;
 use App\Filament\SuperAdmin\Resources\StudyPrograms\Pages\CreateStudyProgram;
 use App\Filament\SuperAdmin\Resources\StudyPrograms\Pages\EditStudyProgram;
 use App\Filament\SuperAdmin\Resources\StudyPrograms\Pages\ListStudyPrograms;
+use App\Filament\SuperAdmin\Resources\StudyPrograms\RelationManagers\UsersRelationManager;
 use App\Filament\SuperAdmin\Resources\StudyPrograms\Schemas\StudyProgramForm;
 use App\Filament\SuperAdmin\Resources\StudyPrograms\Tables\StudyProgramsTable;
 use App\Models\StudyProgram;
@@ -39,7 +40,7 @@ class StudyProgramResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UsersRelationManager::class,
         ];
     }
 
