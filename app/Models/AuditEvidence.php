@@ -9,7 +9,7 @@ class AuditEvidence extends Model
 {
     protected $fillable = [
         'user_id',
-        'standard',
+        'standard_id',
         'sub_standard_id',
         'period_id',
         'title',

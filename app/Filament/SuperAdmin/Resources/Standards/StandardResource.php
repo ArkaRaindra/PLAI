@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Standards;
 use App\Filament\SuperAdmin\Resources\Standards\Pages\CreateStandard;
 use App\Filament\SuperAdmin\Resources\Standards\Pages\EditStandard;
 use App\Filament\SuperAdmin\Resources\Standards\Pages\ListStandards;
+use App\Filament\SuperAdmin\Resources\Standards\RelationManagers\SubStandardsRelationManager;
 use App\Filament\SuperAdmin\Resources\Standards\Schemas\StandardForm;
 use App\Filament\SuperAdmin\Resources\Standards\Tables\StandardsTable;
 use App\Models\Standard;
@@ -35,7 +36,7 @@ class StandardResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SubStandardsRelationManager::class,
         ];
     }
 

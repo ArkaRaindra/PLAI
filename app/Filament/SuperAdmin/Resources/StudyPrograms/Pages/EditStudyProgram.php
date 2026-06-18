@@ -4,11 +4,9 @@ namespace App\Filament\SuperAdmin\Resources\StudyPrograms\Pages;
 
 use App\Filament\SuperAdmin\Resources\StudyPrograms\StudyProgramResource;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
-use Override;
 
 class EditStudyProgram extends EditRecord
 {
@@ -34,13 +32,11 @@ class EditStudyProgram extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return StudyProgramResource::getUrl('index');
+        return $this->getResource()::getUrl('index');
     }
 
-    #[Override]
     protected function getFormActions(): array
     {
         return [];
     }
-
 }

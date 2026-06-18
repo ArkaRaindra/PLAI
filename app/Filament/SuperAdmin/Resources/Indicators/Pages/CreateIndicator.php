@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\SuperAdmin\Resources\Faculties\Pages;
+namespace App\Filament\SuperAdmin\Resources\Indicators\Pages;
 
-use App\Filament\SuperAdmin\Resources\Faculties\FacultyResource;
+use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
 use Override;
 
-class CreateFaculty extends CreateRecord
+class CreateIndicator extends CreateRecord
 {
-    protected static string $resource = FacultyResource::class;
+    protected static string $resource = IndicatorResource::class;
 
     protected function getHeaderActions(): array
     {

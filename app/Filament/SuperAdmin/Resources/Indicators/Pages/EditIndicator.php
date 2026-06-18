@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filament\SuperAdmin\Resources\Standards\Pages;
+namespace App\Filament\SuperAdmin\Resources\Indicators\Pages;
 
-use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
+use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-class EditStandard extends EditRecord
+class EditIndicator extends EditRecord
 {
-    protected static string $resource = StandardResource::class;
+    protected static string $resource = IndicatorResource::class;
 
     protected function getHeaderActions(): array
     {

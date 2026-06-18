@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\SubStandards;
 use App\Filament\SuperAdmin\Resources\SubStandards\Pages\CreateSubStandard;
 use App\Filament\SuperAdmin\Resources\SubStandards\Pages\EditSubStandard;
 use App\Filament\SuperAdmin\Resources\SubStandards\Pages\ListSubStandards;
+use App\Filament\SuperAdmin\Resources\SubStandards\RelationManagers\IndicatorsRelationManager;
 use App\Filament\SuperAdmin\Resources\SubStandards\Schemas\SubStandardForm;
 use App\Filament\SuperAdmin\Resources\SubStandards\Tables\SubStandardsTable;
 use App\Models\SubStandard;
@@ -35,7 +36,7 @@ class SubStandardResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            IndicatorsRelationManager::class,
         ];
     }
 

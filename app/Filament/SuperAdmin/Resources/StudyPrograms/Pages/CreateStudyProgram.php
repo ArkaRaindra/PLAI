@@ -4,7 +4,6 @@ namespace App\Filament\SuperAdmin\Resources\StudyPrograms\Pages;
 
 use App\Filament\SuperAdmin\Resources\StudyPrograms\StudyProgramResource;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
 use Override;
@@ -22,8 +21,9 @@ class CreateStudyProgram extends CreateRecord
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            CreateAction::make('save')
+            Action::make('save')
                 ->label('Simpan')
+                ->action(fn () => $this->create())
                 ->color('success'),
         ];
     }
@@ -37,7 +37,7 @@ class CreateStudyProgram extends CreateRecord
     protected function getCreateFormAction(): Action
     {
         return parent::getCreateFormAction()
-        ->visible(false);
+            ->visible(false);
     }
 
     #[Override]

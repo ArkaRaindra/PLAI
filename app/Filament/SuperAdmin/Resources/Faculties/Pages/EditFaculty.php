@@ -21,12 +21,22 @@ class EditFaculty extends EditRecord
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            DeleteAction::make(),
+            Action::make('save')
+                ->label('Simpan Perubahan')
+                ->action(fn () => $this->save())
+                ->color('success'),
+            DeleteAction::make()
+                ->label('Hapus'),
         ];
     }
 
     protected function getRedirectUrl(): string
     {
-        return FacultyResource::getUrl('index');
+        return $this->getResource()::getUrl('index');
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
     }
 }

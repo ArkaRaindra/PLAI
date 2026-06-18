@@ -3,9 +3,11 @@
 namespace App\Filament\Prodi\Widgets;
 
 use App\Models\AuditScore;
+use App\Models\StudyProgram;
 use App\Models\SubStandard;
 use App\Models\User;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 class AchievementScorePerProdiWidget extends ChartWidget
 {
@@ -20,32 +22,41 @@ class AchievementScorePerProdiWidget extends ChartWidget
         $periodId = auth()->user()->period_id;
         $target = SubStandard::avg('max_score') ?? 0;
 
-        $prodis = User::query()
-            ->whereHas('roles', fn ($query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
-            ->leftJoin('study_programs', 'users.study_program_id', '=', 'study_programs.id')
-            ->where('users.is_active', true)
+        $studyPrograms = StudyProgram::query()
+            ->whereHas('users', fn (Builder $query) => $this->scopeActiveProdiUsers($query, $periodId))
             ->orderBy('study_programs.name')
-            ->orderBy('users.name')
-            ->select('users.*')
             ->get();
 
-        $prodiIds = $prodis->pluck('id');
+        $prodiIds = User::query()
+            ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
+            ->where('users.is_active', true)
+            ->when($periodId, fn (Builder $query) => $query->where('users.period_id', $periodId))
+            ->pluck('users.id');
 
-        $averageScores = AuditScore::query()
+        $prodiScores = AuditScore::query()
             ->join('audit_evidences', 'audit_scores.audit_evidence_id', '=', 'audit_evidences.id')
             ->selectRaw('audit_evidences.user_id, AVG(audit_scores.score) as average_score')
             ->whereIn('audit_evidences.user_id', $prodiIds)
             ->where('audit_evidences.status', 'approved')
-            ->when($periodId, fn ($query) => $query->where('audit_evidences.period_id', $periodId))
+            ->when($periodId, fn (Builder $query) => $query->where('audit_evidences.period_id', $periodId))
             ->groupBy('audit_evidences.user_id')
             ->pluck('average_score', 'audit_evidences.user_id');
 
         $labels = [];
         $achieved = [];
 
-        foreach ($prodis as $prodi) {
-            $labels[] = $prodi->studyProgramName ?: $prodi->name;
-            $achieved[] = round($averageScores[$prodi->id] ?? 0, 2);
+        foreach ($studyPrograms as $studyProgram) {
+            $studyProgramProdiIds = User::query()
+                ->where('study_program_id', $studyProgram->id)
+                ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
+                ->where('is_active', true)
+                ->when($periodId, fn (Builder $query) => $query->where('period_id', $periodId))
+                ->pluck('id');
+
+            $studyProgramScores = $studyProgramProdiIds->map(fn (int $prodiId): float => $prodiScores[$prodiId] ?? 0);
+
+            $labels[] = $studyProgram->name;
+            $achieved[] = round($studyProgramScores->isEmpty() ? 0 : $studyProgramScores->average(), 2);
         }
 
         return [
@@ -65,6 +76,14 @@ class AchievementScorePerProdiWidget extends ChartWidget
             ],
             'labels' => $labels,
         ];
+    }
+
+    private function scopeActiveProdiUsers(Builder $query, ?int $periodId): Builder
+    {
+        return $query
+            ->whereHas('roles', fn (Builder $query) => $query->whereIn('name', ['prodi', 'unit-penunjang']))
+            ->where('users.is_active', true)
+            ->when($periodId, fn (Builder $query) => $query->where('users.period_id', $periodId));
     }
 
     protected function getType(): string
