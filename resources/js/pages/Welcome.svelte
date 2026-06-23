@@ -53,10 +53,10 @@
             {#each portals as portal (portal.href)}
                 <a
                     href={portal.href}
-                    class="group rounded-xl border border-[#e3e3e0] bg-white p-6 shadow-sm transition hover:border-[#f53003] hover:shadow-md dark:border-[#3E3E3A] dark:bg-[#161615] dark:hover:border-[#FF4433]"
+                    class="group rounded-xl border border-[#e3e3e0] bg-white p-6 shadow-sm transition hover:border-[#e4a226] hover:shadow-md dark:border-[#3E3E3A] dark:bg-[#161615] dark:hover:border-[#FF4433]"
                 >
                     <h2
-                        class="text-lg font-medium text-[#1b1b18] group-hover:text-[#f53003] dark:text-[#EDEDEC] dark:group-hover:text-[#FF4433]"
+                        class="text-lg font-medium text-[#1b1b18] group-hover:text-[#e4a226] dark:text-[#EDEDEC] dark:group-hover:text-[#FF4433]"
                     >
                         {portal.title}
                     </h2>
@@ -64,7 +64,7 @@
                         {portal.description}
                     </p>
                     <span
-                        class="mt-4 inline-flex items-center text-sm font-medium text-[#f53003] dark:text-[#FF4433]"
+                        class="mt-4 inline-flex items-center text-sm font-medium text-[#f8b22a]"
                     >
                         Masuk
                         <svg
