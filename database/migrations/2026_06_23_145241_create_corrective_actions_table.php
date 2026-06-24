@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('owner_position_id')->constrained('user_positions');
             $table->date('due_date');
             $table->text('plan');
-            $table->string('status');
+            $table->enum('status', ['draft', 'submitted', 'approved', 'in_progress', 'completed', 'closed'])->default('draft');
             $table->timestamps();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');

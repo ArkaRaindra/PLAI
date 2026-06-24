@@ -13,13 +13,13 @@ return new class extends Migration
             $table->foreignId('audit_assignment_id')->constrained('audit_assignments');
             $table->foreignId('indicator_id')->nullable()->constrained('indicators');
             $table->string('title');
-            $table->string('category');
+            $table->enum('category', ['minor', 'major', 'observation', 'ofi'])->nullable();
             $table->string('severity');
             $table->text('description');
             $table->text('root_cause')->nullable();
             $table->text('recommendation')->nullable();
             $table->date('due_date')->nullable();
-            $table->string('status');
+            $table->enum('status', ['open', 'followup', 'closed'])->default('open');
             $table->timestamps();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');

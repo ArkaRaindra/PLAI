@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('status');
+            $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
             $table->boolean('is_active');
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->decimal('actual_value', 18, 2);
             $table->decimal('score', 8, 2)->nullable();
             $table->text('notes')->nullable();
-            $table->string('status');
+            $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
             $table->foreignId('submitted_by')->nullable()->constrained('users');
             $table->timestamp('submitted_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users');
