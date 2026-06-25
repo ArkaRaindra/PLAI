@@ -33,7 +33,7 @@ class SuperAdminPanelProvider extends PanelProvider
             ->globalSearch(false)
             ->login(Login::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#ffb92d',
             ])
             ->discoverResources(in: app_path('Filament/SuperAdmin/Resources'), for: 'App\Filament\SuperAdmin\Resources')
             ->discoverPages(in: app_path('Filament/SuperAdmin/Pages'), for: 'App\Filament\SuperAdmin\Pages')
