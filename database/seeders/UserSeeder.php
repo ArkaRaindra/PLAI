@@ -23,6 +23,22 @@ class UserSeeder extends Seeder
                 'role' => 'super-admin',
             ],
             [
+                'name' => 'Ketua LPM',
+                'email' => 'ketualpm@example.com',
+                'username' => 'ketualpm',
+                'password' => 'password',
+                'is_active' => true,
+                'role' => 'ketua-lpm',
+            ],
+            [
+                'name' => 'Admin Mutu',
+                'email' => 'adminmutu@example.com',
+                'username' => 'adminmutu',
+                'password' => 'password',
+                'is_active' => true,
+                'role' => 'admin-mutu',
+            ],
+            [
                 'name' => 'Auditor',
                 'email' => 'auditor@example.com',
                 'username' => 'auditor',
@@ -31,43 +47,61 @@ class UserSeeder extends Seeder
                 'role' => 'auditor',
             ],
             [
-                'name' => 'Fakultas',
-                'email' => 'fakultas@example.com',
-                'username' => 'fakultas',
+                'name' => 'Kaprodi',
+                'email' => 'kaprodi@example.com',
+                'username' => 'kaprodi',
                 'password' => 'password',
                 'is_active' => true,
-                'role' => 'fakultas',
+                'role' => 'kaprodi',
             ],
             [
-                'name' => 'Prodi',
-                'email' => 'prodi@example.com',
-                'username' => 'prodi',
+                'name' => 'Sekprodi',
+                'email' => 'sekprodi@example.com',
+                'username' => 'sekprodi',
                 'password' => 'password',
                 'is_active' => true,
-                'role' => 'prodi',
+                'role' => 'sekprodi',
             ],
             [
-                'name' => 'Unit Penunjang',
-                'email' => 'unitpenunjang@example.com',
-                'username' => 'unitpenunjang',
+                'name' => 'Kepala Unit',
+                'email' => 'kepalaunit@example.com',
+                'username' => 'kepalaunit',
                 'password' => 'password',
                 'is_active' => true,
-                'role' => 'unit-penunjang',
+                'role' => 'kepala-unit',
+            ],
+            [
+                'name' => 'Dosen',
+                'email' => 'dosen@example.com',
+                'username' => 'dosen',
+                'password' => 'password',
+                'is_active' => true,
+                'role' => 'dosen',
+            ],
+            [
+                'name' => 'Tendik',
+                'email' => 'tendik@example.com',
+                'username' => 'tendik',
+                'password' => 'password',
+                'is_active' => true,
+                'role' => 'tendik',
             ],
         ];
 
         foreach ($data as $item) {
-            $user = User::create([
-                'name' => $item['name'],
-                'email' => $item['email'],
-                'username' => $item['username'],
-                'password' => $item['password'],
-                'is_active' => $item['is_active'],
-                'email_verified_at' => now(),
-                'remember_token' => Str::random(10),
-            ]);
+            $user = User::query()->firstOrCreate(
+                ['email' => $item['email']],
+                [
+                    'name' => $item['name'],
+                    'username' => $item['username'],
+                    'password' => $item['password'],
+                    'is_active' => $item['is_active'],
+                    'email_verified_at' => now(),
+                    'remember_token' => Str::random(10),
+                ],
+            );
 
-            $user->assignRole($item['role']);
+            $user->syncRoles([$item['role']]);
         }
     }
 }
