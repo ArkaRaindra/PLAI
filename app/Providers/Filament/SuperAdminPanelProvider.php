@@ -28,6 +28,8 @@ class SuperAdminPanelProvider extends PanelProvider
             ->default()
             ->id('super-admin')
             ->path('super-admin')
+            ->brandLogo(asset('assets/images/logo/logo.png'))
+            ->brandLogoHeight('3rem')
             ->globalSearch(false)
             ->login(Login::class)
             ->colors([
