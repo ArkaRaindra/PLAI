@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class UserFilamentAccessTest extends TestCase
@@ -16,7 +18,10 @@ class UserFilamentAccessTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(RoleSeeder::class);
+        $this->seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
     }
 
     public function test_super_admin_can_only_access_super_admin_panel(): void
@@ -41,10 +46,10 @@ class UserFilamentAccessTest extends TestCase
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('prodi')));
     }
 
-    public function test_fakultas_can_only_access_fakultas_panel(): void
+    public function test_ketua_lpm_can_access_fakultas_panel(): void
     {
         $user = User::factory()->create(['is_active' => true]);
-        $user->assignRole('fakultas');
+        $user->assignRole('ketua-lpm');
 
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('super-admin')));
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('auditor')));
@@ -52,10 +57,22 @@ class UserFilamentAccessTest extends TestCase
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('prodi')));
     }
 
-    public function test_prodi_role_can_access_prodi_panel(): void
+    public function test_admin_mutu_can_access_fakultas_panel(): void
     {
         $user = User::factory()->create(['is_active' => true]);
-        $user->assignRole('prodi');
+        $user->assignRole('admin-mutu');
+
+        $this->assertFalse($user->canAccessPanel(Filament::getPanel('super-admin')));
+        $this->assertFalse($user->canAccessPanel(Filament::getPanel('auditor')));
+        $this->assertTrue($user->canAccessPanel(Filament::getPanel('fakultas')));
+        $this->assertFalse($user->canAccessPanel(Filament::getPanel('prodi')));
+    }
+
+    #[DataProvider('prodiPanelRolesProvider')]
+    public function test_prodi_panel_roles_can_access_prodi_panel(string $role): void
+    {
+        $user = User::factory()->create(['is_active' => true]);
+        $user->assignRole($role);
 
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('super-admin')));
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('auditor')));
@@ -63,15 +80,18 @@ class UserFilamentAccessTest extends TestCase
         $this->assertTrue($user->canAccessPanel(Filament::getPanel('prodi')));
     }
 
-    public function test_unit_penunjang_role_can_access_prodi_panel(): void
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function prodiPanelRolesProvider(): array
     {
-        $user = User::factory()->create(['is_active' => true]);
-        $user->assignRole('unit-penunjang');
-
-        $this->assertFalse($user->canAccessPanel(Filament::getPanel('super-admin')));
-        $this->assertFalse($user->canAccessPanel(Filament::getPanel('auditor')));
-        $this->assertFalse($user->canAccessPanel(Filament::getPanel('fakultas')));
-        $this->assertTrue($user->canAccessPanel(Filament::getPanel('prodi')));
+        return [
+            'kaprodi' => ['kaprodi'],
+            'sekprodi' => ['sekprodi'],
+            'kepala unit' => ['kepala-unit'],
+            'dosen' => ['dosen'],
+            'tendik' => ['tendik'],
+        ];
     }
 
     public function test_inactive_user_cannot_access_any_panel(): void
@@ -94,10 +114,10 @@ class UserFilamentAccessTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_prodi_user_can_access_prodi_panel_via_http(): void
+    public function test_kaprodi_user_can_access_prodi_panel_via_http(): void
     {
         $user = User::factory()->create(['is_active' => true]);
-        $user->assignRole('prodi');
+        $user->assignRole('kaprodi');
 
         $this->actingAs($user)
             ->get('/prodi')
