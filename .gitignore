@@ -1,3 +1,4 @@
+
 /.phpunit.cache
 /bootstrap/ssr
 /node_modules
@@ -29,3 +30,35 @@ yarn-error.log
 *.zip
 *.rar
 *.dbml
+
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+
+# Laravel 5 & Lumen specific with changed public path
+public_html/storage
+public_html/hot
+
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+/public/build
+/storage/pail
+.env.backup
+.env.production
+.phpactor.json
+auth.json
+7e5d9bebac995c6c8c278d32df6453d9ce0ead27
