@@ -39,8 +39,8 @@ class User extends Authenticatable implements FilamentUser
         return [
             'super-admin' => ['super-admin'],
             'auditor' => ['auditor'],
-            'fakultas' => ['fakultas'],
-            'prodi' => ['prodi', 'unit-penunjang'],
+            'fakultas' => ['ketua-lpm', 'admin-mutu'],
+            'prodi' => ['kaprodi', 'sekprodi', 'kepala-unit', 'dosen', 'tendik'],
         ];
     }
 
