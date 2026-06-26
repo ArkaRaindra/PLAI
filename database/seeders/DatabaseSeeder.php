@@ -15,13 +15,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
             PeriodSeeder::class,
             StandardSeeder::class,
             SubStandardSeeder::class,
-            RoleSeeder::class,
             UserSeeder::class,
             AuditEvidenceSeeder::class,
-            AuditScoreSeeder::class
+            AuditScoreSeeder::class,
         ]);
     }
 }

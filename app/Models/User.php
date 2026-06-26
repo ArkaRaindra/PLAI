@@ -39,8 +39,8 @@ class User extends Authenticatable implements FilamentUser
         return [
             'super-admin' => ['super-admin'],
             'auditor' => ['auditor'],
-            'fakultas' => ['fakultas'],
-            'prodi' => ['prodi', 'unit-penunjang'],
+            'fakultas' => ['ketua-lpm', 'admin-mutu'],
+            'prodi' => ['kaprodi', 'sekprodi', 'kepala-unit', 'dosen', 'tendik'],
         ];
     }
 
@@ -55,7 +55,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasRole($roles);
     }
 
-    public function evidences()
+    public function auditEvidences()
     {
         return $this->hasMany(AuditEvidence::class);
     }
@@ -88,5 +88,60 @@ class User extends Authenticatable implements FilamentUser
     public function getFacultyNameAttribute(): ?string
     {
         return $this->faculty?->name ?? $this->faculty;
+    }
+
+    public function userPositions()
+    {
+        return $this->hasMany(UserPosition::class, 'user_id');
+    }
+
+    public function lecturerQualification()
+    {
+        return $this->hasOne(LecturerQualification::class, 'user_id');
+    }
+
+    public function qualityDocuments()
+    {
+        return $this->hasMany(QualityDocument::class, 'created_by');
+    }
+
+    public function evidences()
+    {
+        return $this->hasMany(Evidence::class, 'created_by');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    public function auditTrails()
+    {
+        return $this->hasMany(AuditTrail::class, 'user_id');
+    }
+
+    public function meetingParticipants()
+    {
+        return $this->hasMany(MeetingParticipant::class, 'user_id');
+    }
+
+    public function submittedRealizations()
+    {
+        return $this->hasMany(Realization::class, 'submitted_by');
+    }
+
+    public function approvedRealizations()
+    {
+        return $this->hasMany(Realization::class, 'approved_by');
+    }
+
+    public function submittedSelfAssessments()
+    {
+        return $this->hasMany(SelfAssessment::class, 'submitted_by');
+    }
+
+    public function approvedSelfAssessments()
+    {
+        return $this->hasMany(SelfAssessment::class, 'approved_by');
     }
 }

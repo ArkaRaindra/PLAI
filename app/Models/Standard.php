@@ -2,22 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Standard extends Model
 {
-    use HasFactory;
-
-    public $fillable = [
-        'code',
-        'name',
-        'description',
-        'weight',
+    protected $fillable = [
+        'code', 'name', 'category', 'source_type', 'is_active',
+        'created_by', 'updated_by',
     ];
 
-    public function subStandards()
+    protected function casts(): array
     {
-        return $this->hasMany(SubStandard::class);
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
+
+    public function standardVersions()
+    {
+        return $this->hasMany(StandardVersion::class, 'standard_id');
     }
 }
