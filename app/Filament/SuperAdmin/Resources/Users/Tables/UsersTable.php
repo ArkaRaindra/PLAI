@@ -3,37 +3,60 @@
 namespace App\Filament\SuperAdmin\Resources\Users\Tables;
 
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\BooleanColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UsersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
+                'roles',
+                'userPositions.position',
+                'userPositions.organizationUnit',
+            ]))
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->label('nama')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('username')
-                    ->searchable(),
+                    ->label('Username')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('Alamat Email')
                     ->searchable(),
                 TextColumn::make('roles.name')
-                    ->badge(),
-                BooleanColumn::make('is_active'),
-                TextColumn::make('facultyName')
-                    ->label('Fakultas')
-                    ->searchable(),
-                TextColumn::make('studyProgramName')
-                    ->label('Program Studi')
-                    ->searchable(),
-                TextColumn::make('email_verified_at')
-                    ->state(fn ($record) => $record->email_verified_at?->translatedFormat('d F Y H:i'))
+                    ->label('Role')
+                    ->badge()
+                    ->separator(','),
+                TextColumn::make('active_positions')
+                    ->label('Jabatan')
+                    ->state(fn ($record): string => $record->userPositions
+                        ->where('is_active', true)
+                        ->pluck('position.name')
+                        ->filter()
+                        ->unique()
+                        ->join(', '))
+                    ->placeholder('-'),
+                TextColumn::make('active_units')
+                    ->label('Unit Organisasi')
+                    ->state(fn ($record): string => $record->userPositions
+                        ->where('is_active', true)
+                        ->pluck('organizationUnit.name')
+                        ->filter()
+                        ->unique()
+                        ->join(', '))
+                    ->placeholder('-'),
+                IconColumn::make('is_active')
+                    ->label('Status')
+                    ->boolean()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime('d F Y H:i')
@@ -49,7 +72,6 @@ class UsersTable
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

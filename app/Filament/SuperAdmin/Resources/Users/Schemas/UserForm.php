@@ -2,14 +2,12 @@
 
 namespace App\Filament\SuperAdmin\Resources\Users\Schemas;
 
-use App\Models\Faculty;
-use App\Models\StudyProgram;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Collection;
 
 class UserForm
 {
@@ -18,44 +16,80 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
+                    ->label('nama')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('username')
+                    ->label('Username')
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
-                    ->required(),
-                TextInput::make('username')
-                    ->label('Username')
-                    ->required(),
-                DateTimePicker::make('email_verified_at')
-                    ->default(now())
-                    ->disabled()
-                    ->hidden(),
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
                 TextInput::make('password')
                     ->password()
-                    ->dehydrated(fn ($state) => filled($state))
+                    ->revealable()
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->minLength(8)
+                    ->dehydrated(fn (?string $state): bool => filled($state)),
+                Toggle::make('is_active')
+                    ->label('Active Status')
+                    ->default(true)
                     ->required(),
                 Select::make('roles')
+                    ->label('Role')
                     ->relationship('roles', 'name')
+                    ->multiple()
                     ->preload()
+                    ->searchable()
                     ->required(),
-                Select::make('faculty_id')
-                    ->label('Fakultas')
-                    ->options(fn () => Faculty::pluck('name', 'id'))
-                    ->searchable()
-                    ->preload()
-                    ->live(),
-                Select::make('study_program_id')
-                    ->label('Program Studi')
-                    ->options(fn (callable $get): Collection => StudyProgram::query()
-                        ->when($get('faculty_id'), fn ($query) => $query->where('faculty_id', $get('faculty_id')))
-                        ->pluck('name', 'id'))
-                    ->searchable()
-                    ->preload(),
-                Select::make('period_id')
-                    ->label('Periode')
-                    ->relationship('period', 'name'),
-                Checkbox::make('is_active')
-                    ->default(true),
+                Repeater::make('userPositions')
+                    ->label('User Position')
+                    ->relationship('userPositions')
+                    ->schema([
+                        Select::make('position_id')
+                            ->label('Jabatan')
+                            ->relationship('position', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->required(),
+                        Select::make('organization_unit_id')
+                            ->label('Unit Organisasi')
+                            ->relationship('organizationUnit', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->required(),
+                        DatePicker::make('start_date')
+                            ->label('Start Date')
+                            ->default(now())
+                            ->displayFormat('d/m/Y')
+                            ->required(),
+                        DatePicker::make('end_date')
+                            ->label('End Date')
+                            ->displayFormat('d/m/Y')
+                            ->afterOrEqual('start_date'),
+                        Toggle::make('is_active')
+                            ->label('Active')
+                            ->default(true)
+                            ->required(),
+                    ])
+                    ->columns(2)
+                    ->addActionLabel('Add User Position')
+                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                        $data['created_by'] = auth()->id();
+                        $data['updated_by'] = auth()->id();
+
+                        return $data;
+                    })
+                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                        $data['updated_by'] = auth()->id();
+
+                        return $data;
+                    }),
             ]);
     }
 }

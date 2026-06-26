@@ -21,10 +21,14 @@ class AuditScoreSeeder extends Seeder
         $subStandard = SubStandard::where('code', 'SUB-001.A')->first();
         $activePeriod = Period::where('is_active', true)->first();
 
-        $evidence = AuditEvidence::where('user_id', $prodiUser->id)
-            ->where('sub_standard_id', $subStandard->id)
-            ->where('period_id', $activePeriod->id)
-            ->first();
+        $evidence = null;
+
+        if ($prodiUser && $auditorUser && $subStandard && $activePeriod) {
+            $evidence = AuditEvidence::where('user_id', $prodiUser->id)
+                ->where('sub_standard_id', $subStandard->id)
+                ->where('period_id', $activePeriod->id)
+                ->first();
+        }
 
         if ($prodiUser && $auditorUser && $subStandard && $activePeriod && $evidence) {
             $data = [
