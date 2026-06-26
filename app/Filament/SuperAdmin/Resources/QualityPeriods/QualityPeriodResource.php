@@ -18,11 +18,11 @@ class QualityPeriodResource extends Resource
 {
     protected static ?string $model = QualityPeriod::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Masters';
 
-    protected static ?string $navigationLabel = 'Kualitas Periode';
+    protected static ?string $navigationLabel = 'Kelola Periode Mutu';
 
     protected static ?string $pluralLabel = 'Kualitas Periode';
 

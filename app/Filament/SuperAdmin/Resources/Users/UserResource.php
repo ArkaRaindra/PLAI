@@ -22,6 +22,8 @@ class UserResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Masters';
 
+    protected static ?string $navigationLabel = 'Kelola User & Role';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema

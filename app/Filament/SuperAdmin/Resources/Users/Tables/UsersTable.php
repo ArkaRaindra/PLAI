@@ -22,7 +22,7 @@ class UsersTable
             ]))
             ->columns([
                 TextColumn::make('name')
-                    ->label('nama')
+                    ->label('Nama')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('username')

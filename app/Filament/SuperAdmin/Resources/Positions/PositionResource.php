@@ -18,9 +18,11 @@ class PositionResource extends Resource
 {
     protected static ?string $model = Position::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+
+     protected static ?string $navigationLabel = 'Kelola Institusi & Unit';
 
     protected static ?string $recordTitleAttribute = 'name';
 
