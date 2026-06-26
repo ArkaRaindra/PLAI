@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Users\Schemas;
 
+use App\Models\Position;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -84,7 +85,12 @@ class UserForm
                                 ->required(),
                         ])
                         ->columns(2)
-                        ->addActionLabel('Add User Position')
+                        ->addActionLabel('Tambah Jabatan')
+                        ->collapsible()
+                        ->defaultItems(0)
+                        ->itemLabel(fn (array $state): ?string => isset($state['position_id'])
+                                ? (Position::find($state['position_id'])?->name ?? 'Jabatan Baru')
+                                : 'Jabatan Baru')
                         ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                             $data['created_by'] = auth()->id();
                             $data['updated_by'] = auth()->id();

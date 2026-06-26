@@ -33,14 +33,14 @@ class EditUser extends EditRecord
                 ->color('warning')
                 ->schema([
                     TextInput::make('password')
-                        ->label('New Password')
+                        ->label('Password Baru')
                         ->password()
                         ->revealable()
                         ->required()
                         ->minLength(8)
                         ->confirmed(),
                     TextInput::make('password_confirmation')
-                        ->label('Confirm Password')
+                        ->label('Konfirmasi Password')
                         ->password()
                         ->revealable()
                         ->required(),
@@ -51,7 +51,7 @@ class EditUser extends EditRecord
                     ])->save();
 
                     Notification::make()
-                        ->title('Password has been reset')
+                        ->title('Password berhasil direset')
                         ->success()
                         ->send();
                 }),
@@ -63,5 +63,10 @@ class EditUser extends EditRecord
     protected function getRedirectUrl(): string
     {
         return UserResource::getUrl('index');
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
     }
 }

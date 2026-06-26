@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Users\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -15,7 +16,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
+            ->modifyQueryUsing(fn(Builder $query): Builder => $query->with([
                 'roles',
                 'userPositions.position',
                 'userPositions.organizationUnit',
@@ -38,7 +39,7 @@ class UsersTable
                     ->separator(','),
                 TextColumn::make('active_positions')
                     ->label('Jabatan')
-                    ->state(fn ($record): string => $record->userPositions
+                    ->state(fn($record): string => $record->userPositions
                         ->where('is_active', true)
                         ->pluck('position.name')
                         ->filter()
@@ -47,7 +48,7 @@ class UsersTable
                     ->placeholder('-'),
                 TextColumn::make('active_units')
                     ->label('Unit Organisasi')
-                    ->state(fn ($record): string => $record->userPositions
+                    ->state(fn($record): string => $record->userPositions
                         ->where('is_active', true)
                         ->pluck('organizationUnit.name')
                         ->filter()
@@ -71,6 +72,7 @@ class UsersTable
                 //
             ])
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
