@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\QualityPeriodStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +22,7 @@ class QualityPeriod extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'is_active' => 'boolean',
+            'status' => QualityPeriodStatus::class,
         ];
     }
 

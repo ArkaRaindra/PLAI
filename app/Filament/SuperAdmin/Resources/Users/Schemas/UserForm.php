@@ -34,11 +34,13 @@ class UserForm
                         ->maxLength(255)
                         ->unique(ignoreRecord: true),
                     TextInput::make('password')
+                        ->label('Password')
                         ->password()
                         ->revealable()
-                        ->required(fn(string $operation): bool => $operation === 'create')
+                        ->default('password')
+                        ->required(fn (string $operation): bool => $operation === 'create')
                         ->minLength(8)
-                        ->dehydrated(fn(?string $state): bool => filled($state)),
+                        ->dehydrated(fn (?string $state): bool => filled($state)),
                     Toggle::make('is_active')
                         ->label('Active Status')
                         ->default(true)
