@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\OrganizationUnit;
 use App\Models\Position;
 use App\Models\User;
 use App\Models\UserPosition;
@@ -119,7 +120,7 @@ class PositionTest extends TestCase
         ]);
 
         $this->assertEquals($admin->id, $position->createdBy->id);
-        $this->assertEquals('superadmin', $position->createdBy->username);
+        $this->assertEquals($admin->username, $position->createdBy->username);
     }
 
     public function test_position_belongs_to_updated_by_user(): void
@@ -162,10 +163,19 @@ class PositionTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('dosen');
 
+        $organizationUnit = OrganizationUnit::create([
+            'code' => 'UPM',
+            'name' => 'Unit Penjaminan Mutu',
+            'type' => 'UPM',
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
         $userPosition = UserPosition::create([
             'user_id' => $user->id,
             'position_id' => $position->id,
-            'organization_unit_id' => 1,
+            'organization_unit_id' => $organizationUnit->id,
             'start_date' => now()->toDateString(),
             'is_active' => true,
             'created_by' => $admin->id,
