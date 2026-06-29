@@ -8,23 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('standard_versions', function (Blueprint $table) {
+        Schema::create('standards', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('standard_id')->constrained('standards');
-            $table->foreignId('quality_period_id')->constrained('quality_periods');
-            $table->integer('version_no');
-            $table->text('description');
-            $table->date('effective_date');
-            $table->boolean('is_active');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('code');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('weight', 5, 2)->default(0);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('standard_versions');
+        Schema::dropIfExists('standards');
     }
 
 };
