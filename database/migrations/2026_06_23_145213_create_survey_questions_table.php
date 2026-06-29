@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('survey_id')->constrained('surveys');
             $table->text('question_text');
             $table->integer('sequence');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

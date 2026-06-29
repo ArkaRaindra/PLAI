@@ -38,8 +38,8 @@ return new class extends Migration {
                 ]);
             $table->text('notes')->nullable();
             $table->timestamp('created_at');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

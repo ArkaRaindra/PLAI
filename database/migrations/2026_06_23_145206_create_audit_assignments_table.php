@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('auditor_position_id')->constrained('user_positions');
             $table->foreignId('organization_unit_id')->constrained('organization_units');
             $table->timestamp('assigned_at');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

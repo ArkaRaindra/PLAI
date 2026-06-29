@@ -12,8 +12,8 @@ return new class extends Migration {
             $table->foreignId('evidence_id')->constrained('evidences');
             $table->enum('reference_type', ['indicator', 'finding', 'risk', 'document'])->nullable();
             $table->bigInteger('reference_id');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

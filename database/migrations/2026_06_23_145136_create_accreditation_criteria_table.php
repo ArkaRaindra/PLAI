@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('framework_id')->constrained('accreditation_frameworks');
             $table->string('code');
             $table->string('name');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

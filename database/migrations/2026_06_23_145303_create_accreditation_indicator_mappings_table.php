@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('indicator_id')->constrained('indicators');
             $table->unsignedBigInteger('accreditation_criteria_id');
             $table->foreign('accreditation_criteria_id', 'fk_a_i_m_criteria')->references('id')->on('accreditation_criteria');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

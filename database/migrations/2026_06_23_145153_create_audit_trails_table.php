@@ -18,8 +18,8 @@ return new class extends Migration
             $table->json('new_values')->nullable();
             $table->string('ip_address')->nullable();
             $table->timestamp('created_at');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

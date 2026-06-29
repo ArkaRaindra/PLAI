@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('score');
             $table->foreignId('assessed_by')->constrained('users');
             $table->timestamp('assessment_date');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

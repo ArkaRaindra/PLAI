@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type',['POLITEKNIK', 'JURUSAN', 'PROGRAM STUDI', 'UPM', 'GKM', 'P3M', 'SPI', 'CDC', 'UNIT'])->default('PROGRAM STUDI');
             $table->boolean('is_active')->default(true);
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

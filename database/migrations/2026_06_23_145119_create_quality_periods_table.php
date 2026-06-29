@@ -16,8 +16,8 @@ return new class extends Migration
             $table->date('end_date');
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
             $table->boolean('is_active');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

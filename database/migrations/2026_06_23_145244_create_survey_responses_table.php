@@ -14,8 +14,8 @@ return new class extends Migration
             $table->string('respondent_identifier');
             $table->integer('total_score');
             $table->timestamp('submitted_at');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

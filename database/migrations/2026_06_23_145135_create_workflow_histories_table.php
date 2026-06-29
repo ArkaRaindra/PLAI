@@ -15,8 +15,8 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('acted_by')->constrained('users');
             $table->timestamp('acted_at');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

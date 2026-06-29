@@ -17,8 +17,8 @@ return new class extends Migration
             $table->text('strength')->nullable();
             $table->text('weakness')->nullable();
             $table->timestamps();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

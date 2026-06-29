@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('indicator_id')->constrained('indicators');
             $table->foreignId('quality_period_id')->constrained('quality_periods');
             $table->decimal('target_value', 18, 2);
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

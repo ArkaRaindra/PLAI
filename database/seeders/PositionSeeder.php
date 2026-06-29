@@ -68,8 +68,8 @@ class PositionSeeder extends Seeder
                 [
                     'name' => $item['name'],
                     'description' => $item['description'],
-                    'created_by' => $admin?->id,
-                    'updated_by' => $admin?->id,
+                    'created_by' => 1,
+                    'updated_by' => 1,
                 ]
             );
         }
