@@ -42,7 +42,6 @@ class UsersTable
                     ->state(fn($record): string => $record->userPositions
                         ->where('is_active', true)
                         ->pluck('position.name')
-                        ->filter()
                         ->unique()
                         ->join(', '))
                     ->placeholder('-'),
@@ -51,7 +50,6 @@ class UsersTable
                     ->state(fn($record): string => $record->userPositions
                         ->where('is_active', true)
                         ->pluck('organizationUnit.name')
-                        ->filter()
                         ->unique()
                         ->join(', '))
                     ->placeholder('-'),
