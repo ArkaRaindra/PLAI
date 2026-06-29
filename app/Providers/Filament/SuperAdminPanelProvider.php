@@ -47,8 +47,6 @@ class SuperAdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make('Master')
                     ->label('Master'),
-                NavigationGroup::make('Data')
-                    ->label('Data'),
             ])
             ->discoverResources(in: app_path('Filament/SuperAdmin/Resources'), for: 'App\Filament\SuperAdmin\Resources')
             ->discoverPages(in: app_path('Filament/SuperAdmin/Pages'), for: 'App\Filament\SuperAdmin\Pages')

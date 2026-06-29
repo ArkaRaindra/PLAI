@@ -57,41 +57,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasRole($roles);
     }
 
-    public function auditEvidences()
-    {
-        return $this->hasMany(AuditEvidence::class);
-    }
-
-    public function scores()
-    {
-        return $this->hasMany(AuditScore::class);
-    }
-
-    public function faculty()
-    {
-        return $this->belongsTo(Faculty::class);
-    }
-
-    public function studyProgram()
-    {
-        return $this->belongsTo(StudyProgram::class);
-    }
-
-    public function period()
-    {
-        return $this->belongsTo(Period::class);
-    }
-
-    public function getStudyProgramNameAttribute(): ?string
-    {
-        return $this->studyProgram?->name ?? $this->study_program;
-    }
-
-    public function getFacultyNameAttribute(): ?string
-    {
-        return $this->faculty?->name ?? $this->faculty;
-    }
-
     public function userPositions(): HasMany
     {
         return $this->hasMany(UserPosition::class, 'user_id');
