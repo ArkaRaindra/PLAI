@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');
             $table->text('review_notes')->nullable();
             $table->timestamp('reviewed_at')->nullable();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

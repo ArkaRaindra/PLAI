@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('functional_rank');
             $table->boolean('is_certified');
             $table->string('competency_certification')->nullable();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

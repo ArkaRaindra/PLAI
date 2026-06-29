@@ -15,7 +15,7 @@ return new class extends Migration
             $table->text('notes');
             $table->foreignId('updated_by')->constrained('users');
             $table->timestamp('updated_at');
-            $table->foreignId('created_by')->constrained('users');
+            $table->string('created_by');
         });
     }
 

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignId('risk_owner_position_id')->constrained('user_positions');
             $table->string('status');
             $table->timestamps();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

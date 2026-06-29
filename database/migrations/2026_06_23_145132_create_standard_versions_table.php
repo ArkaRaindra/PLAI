@@ -16,8 +16,8 @@ return new class extends Migration
             $table->text('description');
             $table->date('effective_date');
             $table->boolean('is_active');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

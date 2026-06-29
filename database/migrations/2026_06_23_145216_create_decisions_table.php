@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('standard_version_id')->nullable()->constrained('standard_versions');
             $table->text('description');
             $table->timestamps();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

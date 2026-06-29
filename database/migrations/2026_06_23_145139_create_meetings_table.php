@@ -15,8 +15,8 @@ return new class extends Migration
             $table->timestamp('meeting_date');
             $table->string('location');
             $table->string('status');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

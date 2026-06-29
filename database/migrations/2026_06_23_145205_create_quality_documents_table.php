@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('status');
             $table->foreignId('organization_unit_id')->nullable()->constrained('organization_units');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

@@ -14,8 +14,8 @@ return new class extends Migration
             $table->date('target_date');
             $table->date('completed_date')->nullable();
             $table->string('sla_status');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

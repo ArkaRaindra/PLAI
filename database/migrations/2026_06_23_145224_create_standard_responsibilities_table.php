@@ -14,8 +14,8 @@ return new class extends Migration
             $table->string('ppepp_stage');
             $table->foreignId('user_position_id')->constrained('user_positions');
             $table->timestamps();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 

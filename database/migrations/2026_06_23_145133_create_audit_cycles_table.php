@@ -12,8 +12,8 @@ return new class extends Migration {
             $table->foreignId('quality_period_id')->constrained('quality_periods');
             $table->foreignId('checklist_template_id')->constrained('audit_checklist_templates');
             $table->enum('status', ['planned', 'ongoing', 'completed'])->default('planned');
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

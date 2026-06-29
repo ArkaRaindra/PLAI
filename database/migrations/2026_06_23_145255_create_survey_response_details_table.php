@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('question_id')->constrained('survey_questions');
             $table->integer('score');
             $table->text('comment')->nullable();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
         });
     }
 
