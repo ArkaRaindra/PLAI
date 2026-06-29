@@ -9,6 +9,8 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -90,9 +92,15 @@ class User extends Authenticatable implements FilamentUser
         return $this->faculty?->name ?? $this->faculty;
     }
 
-    public function userPositions()
+    public function userPositions(): HasMany
     {
         return $this->hasMany(UserPosition::class, 'user_id');
+    }
+
+    public function positions(): BelongsToMany
+    {
+        return $this->belongsToMany(Position::class, 'user_positions')
+            ->withPivot(['organization_unit_id', 'start_date', 'end_date', 'is_active']);
     }
 
     public function lecturerQualification()

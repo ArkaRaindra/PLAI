@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -42,6 +43,12 @@ class SuperAdminPanelProvider extends PanelProvider
             ->login(Login::class)
             ->colors([
                 'primary' => '#ffb92d',
+            ])
+            ->navigationGroups([
+                NavigationGroup::make('Master')
+                    ->label('Master'),
+                NavigationGroup::make('Data')
+                    ->label('Data'),
             ])
             ->discoverResources(in: app_path('Filament/SuperAdmin/Resources'), for: 'App\Filament\SuperAdmin\Resources')
             ->discoverPages(in: app_path('Filament/SuperAdmin/Pages'), for: 'App\Filament\SuperAdmin\Pages')

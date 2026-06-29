@@ -3,16 +3,18 @@
 namespace App\Filament\SuperAdmin\Resources\Users\Pages;
 
 use App\Filament\SuperAdmin\Resources\Users\UserResource;
-use App\Models\Faculty;
-use App\Models\StudyProgram;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
 
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
+
+    protected static ?string $title = 'Edit User';
 
     protected function getHeaderActions(): array
     {
@@ -27,25 +29,42 @@ class EditUser extends EditRecord
                 ->label('Simpan Perubahan')
                 ->action(fn () => $this->save())
                 ->color('success'),
+            Action::make('resetPassword')
+                ->label('Reset Password')
+                ->icon(Heroicon::OutlinedKey)
+                ->color('warning')
+                ->schema([
+                    TextInput::make('password')
+                        ->label('Password Baru')
+                        ->password()
+                        ->revealable()
+                        ->required()
+                        ->minLength(8)
+                        ->confirmed(),
+                    TextInput::make('password_confirmation')
+                        ->label('Konfirmasi Password')
+                        ->password()
+                        ->revealable()
+                        ->required(),
+                ])
+                ->action(function (array $data): void {
+                    $this->record->forceFill([
+                        'password' => $data['password'],
+                    ])->save();
+
+                    Notification::make()
+                        ->title('Password berhasil direset')
+                        ->success()
+                        ->send();
+                }),
             DeleteAction::make()
                 ->label('Hapus'),
         ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $faculty = Faculty::find($data['faculty_id']);
-        $studyProgram = StudyProgram::find($data['study_program_id']);
-
-        $data['faculty'] = $faculty?->name;
-        $data['study_program'] = $studyProgram?->name;
-
-        return $data;
-    }
-
     protected function getRedirectUrl(): string
     {
-        return $this->getResource()::getUrl('index');
+        return UserResource::getUrl('index');
     }
 
     protected function getFormActions(): array

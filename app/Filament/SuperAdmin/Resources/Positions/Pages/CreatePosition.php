@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Filament\SuperAdmin\Resources\Users\Pages;
+namespace App\Filament\SuperAdmin\Resources\Positions\Pages;
 
-use App\Filament\SuperAdmin\Resources\Users\UserResource;
+use App\Filament\SuperAdmin\Resources\Positions\PositionResource;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
 
-class CreateUser extends CreateRecord
+class CreatePosition extends CreateRecord
 {
-    protected static string $resource = UserResource::class;
+    protected static string $resource = PositionResource::class;
 
-    protected static ?string $title = 'Tambahkan User';
+    protected static ?string $title = 'Tambah Jabatan';
 
     protected function getHeaderActions(): array
     {
@@ -32,6 +33,14 @@ class CreateUser extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['created_by'] = auth()->id() ?? User::first()?->id;
+        $data['updated_by'] = auth()->id() ?? User::first()?->id;
+
+        return $data;
     }
 
     protected function getCreateFormAction(): Action
