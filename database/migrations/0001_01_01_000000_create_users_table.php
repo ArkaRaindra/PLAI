@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
 

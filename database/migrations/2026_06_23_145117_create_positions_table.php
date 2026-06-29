@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
+            $table->string('code')->unique();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('created_by');

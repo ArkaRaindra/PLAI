@@ -9,20 +9,28 @@ use App\Filament\SuperAdmin\Resources\OrgUnits\Pages\ViewOrgUnit;
 use App\Filament\SuperAdmin\Resources\OrgUnits\Schemas\OrgUnitForm;
 use App\Filament\SuperAdmin\Resources\OrgUnits\Schemas\OrgUnitInfolist;
 use App\Filament\SuperAdmin\Resources\OrgUnits\Tables\OrgUnitsTable;
-use App\Models\OrgUnit;
+use App\Models\OrganizationUnit;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use LaraZeus\Tabler\Tabler;
 
 class OrgUnitResource extends Resource
 {
-    protected static ?string $model = OrgUnit::class;
+    protected static ?string $model = OrganizationUnit::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Tabler::Affiliate;
 
-    protected static ?string $recordTitleAttribute = 'OrganizationUnit';
+    protected static ?string $recordTitleAttribute = 'Unit Organisasi';
+
+    protected static ?string $modelLabel = 'Unit Organisasi';
+
+    protected static ?string $pluralModelLabel = 'Unit Organisasi';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+
+    protected static ?string $navigationLabel = 'Unit Organisasi';
 
     public static function form(Schema $schema): Schema
     {

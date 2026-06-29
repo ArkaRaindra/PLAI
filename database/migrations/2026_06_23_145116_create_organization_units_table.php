@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('organization_units');
             $table->string('code');
             $table->string('name');
-            $table->enum('type',['POLITEKNIK', 'JURUSAN', 'PROGRAM STUDI', 'UPM', 'GKM', 'P3M', 'SPI', 'CDC', 'UNIT'])->default('PROGRAM STUDI');
+            $table->enum('type', ['POLITEKNIK', 'JURUSAN', 'PROGRAM STUDI', 'UPM', 'GKM', 'P3M', 'SPI', 'CDC', 'UNIT'])->default('PROGRAM STUDI');
             $table->boolean('is_active')->default(true);
             $table->string('created_by');
             $table->string('updated_by')->nullable();

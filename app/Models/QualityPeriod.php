@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Blameable;
 use App\Enums\QualityPeriodStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QualityPeriod extends Model
 {
+    use Blameable;
     use HasFactory;
+
+    protected $attributes = [
+        'is_active' => false,
+    ];
 
     protected $fillable = [
         'code', 'name', 'start_date', 'end_date', 'status', 'is_active',
@@ -34,40 +40,5 @@ class QualityPeriod extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    public function standardVersions()
-    {
-        return $this->hasMany(StandardVersion::class, 'quality_period_id');
-    }
-
-    public function targets()
-    {
-        return $this->hasMany(Target::class, 'quality_period_id');
-    }
-
-    public function selfAssessments()
-    {
-        return $this->hasMany(SelfAssessment::class, 'quality_period_id');
-    }
-
-    public function auditCycles()
-    {
-        return $this->hasMany(AuditCycle::class, 'quality_period_id');
-    }
-
-    public function meetings()
-    {
-        return $this->hasMany(Meeting::class, 'quality_period_id');
-    }
-
-    public function surveys()
-    {
-        return $this->hasMany(Survey::class, 'quality_period_id');
-    }
-
-    public function dashboardSnapshots()
-    {
-        return $this->hasMany(DashboardSnapshot::class, 'quality_period_id');
     }
 }
