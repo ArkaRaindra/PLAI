@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             PositionSeeder::class,
-            QualityPeriodSeeder::class,
             UserSeeder::class,
+            QualityPeriodSeeder::class,
         ]);
     }
 }
