@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Users\Pages;
 use App\Filament\SuperAdmin\Resources\Users\UserResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -25,10 +26,7 @@ class EditUser extends EditRecord
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            Action::make('save')
-                ->label('Simpan Perubahan')
-                ->action(fn () => $this->save())
-                ->color('success'),
+            ViewAction::make()->icon(Heroicon::Eye)->color('info'),
             Action::make('resetPassword')
                 ->label('Reset Password')
                 ->icon(Heroicon::OutlinedKey)
@@ -57,8 +55,8 @@ class EditUser extends EditRecord
                         ->success()
                         ->send();
                 }),
-            DeleteAction::make()
-                ->label('Hapus'),
+           DeleteAction::make()
+                ->icon(Heroicon::Trash),
         ];
     }
 

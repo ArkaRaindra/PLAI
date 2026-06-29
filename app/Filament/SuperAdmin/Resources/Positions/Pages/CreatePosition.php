@@ -17,16 +17,12 @@ class CreatePosition extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('back')
+             Action::make('back')
                 ->label('Kembali')
                 ->url($this->getResource()::getUrl('index'))
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            Action::make('save')
-                ->label('Simpan')
-                ->action(fn () => $this->create())
-                ->color('success'),
         ];
     }
 
@@ -43,17 +39,17 @@ class CreatePosition extends CreateRecord
         return $data;
     }
 
-    protected function getCreateFormAction(): Action
-    {
-        return parent::getCreateFormAction()
-            ->visible(false);
-    }
+    // protected function getCreateFormAction(): Action
+    // {
+    //     return parent::getCreateFormAction()
+    //         ->visible(false);
+    // }
 
-    protected function getCreateAnotherFormAction(): Action
-    {
-        return parent::getCreateAnotherFormAction()
-            ->visible(false);
-    }
+    // protected function getCreateAnotherFormAction(): Action
+    // {
+    //     return parent::getCreateAnotherFormAction()
+    //         ->visible(false);
+    // }
 
     protected function getCancelFormAction(): Action
     {

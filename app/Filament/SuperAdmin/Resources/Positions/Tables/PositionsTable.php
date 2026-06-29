@@ -52,8 +52,8 @@ class PositionsTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->color('info'),
+                EditAction::make()->color('warning'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

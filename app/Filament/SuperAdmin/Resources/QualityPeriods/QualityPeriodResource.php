@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\QualityPeriods;
 use App\Filament\SuperAdmin\Resources\QualityPeriods\Pages\CreateQualityPeriod;
 use App\Filament\SuperAdmin\Resources\QualityPeriods\Pages\EditQualityPeriod;
 use App\Filament\SuperAdmin\Resources\QualityPeriods\Pages\ListQualityPeriods;
+use App\Filament\SuperAdmin\Resources\QualityPeriods\Pages\ViewQualityPeriod;
 use App\Filament\SuperAdmin\Resources\QualityPeriods\Schemas\QualityPeriodForm;
 use App\Filament\SuperAdmin\Resources\QualityPeriods\Tables\QualityPeriodsTable;
 use App\Models\QualityPeriod;
@@ -50,6 +51,7 @@ class QualityPeriodResource extends Resource
         return [
             'index' => ListQualityPeriods::route('/'),
             'create' => CreateQualityPeriod::route('/create'),
+            'view' => ViewQualityPeriod::route('/{record}'),
             'edit' => EditQualityPeriod::route('/{record}/edit'),
         ];
     }
