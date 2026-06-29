@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b81b7e5a1c2652db609bf1cb2a068ff5",
+    "content-hash": "0afaae02b0cdf86c980e51ec8b247fac",
     "packages": [
         {
             "name": "archtechx/enums",
@@ -2802,6 +2802,71 @@
                 "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/4.3.2"
             },
             "time": "2026-05-28T20:35:55+00:00"
+        },
+        {
+            "name": "lara-zeus/tabler-icons-enum",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lara-zeus/tabler-icons-enum.git",
+                "reference": "ae3339ca030749c6c00e487ebc5be532fa04a56a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lara-zeus/tabler-icons-enum/zipball/ae3339ca030749c6c00e487ebc5be532fa04a56a",
+                "reference": "ae3339ca030749c6c00e487ebc5be532fa04a56a",
+                "shasum": ""
+            },
+            "require": {
+                "filament/support": "^5.0",
+                "php": "^8.1",
+                "secondnetwork/blade-tabler-icons": "^3.30",
+                "spatie/laravel-package-tools": "^1.19"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^9.0",
+                "phpstan/extension-installer": "^1.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaraZeus\\Tabler\\TablerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaraZeus\\Tabler\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lara Zeus",
+                    "email": "info@larazeus.com"
+                }
+            ],
+            "description": "Lara-zeus tabler icons enum",
+            "homepage": "https://larazeus.com/tabler-icons-enum",
+            "keywords": [
+                "enum",
+                "filamentphp",
+                "icons",
+                "lara-zeus",
+                "laravel",
+                "tabler"
+            ],
+            "support": {
+                "issues": "https://github.com/lara-zeus/tabler-icons-enum/issues",
+                "source": "https://github.com/lara-zeus/tabler-icons-enum"
+            },
+            "time": "2026-03-11T00:21:08+00:00"
         },
         {
             "name": "laravel-lang/actions",
@@ -7658,6 +7723,64 @@
                 }
             ],
             "time": "2022-12-17T21:53:22+00:00"
+        },
+        {
+            "name": "secondnetwork/blade-tabler-icons",
+            "version": "v3.44.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/secondnetwork/blade-tabler-icons.git",
+                "reference": "856ad75e2c0704096bf4a708b6464620e41d1a34"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/secondnetwork/blade-tabler-icons/zipball/856ad75e2c0704096bf4a708b6464620e41d1a34",
+                "reference": "856ad75e2c0704096bf4a708b6464620e41d1a34",
+                "shasum": ""
+            },
+            "require": {
+                "blade-ui-kit/blade-icons": "^1.8",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0|^7.0|^9.0|^10.0",
+                "phpunit/phpunit": "^9.0|^10.0|^11.0|^12.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "secondnetwork\\TablerIcons\\BladeTablerIconsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "secondnetwork\\TablerIcons\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Farah"
+                }
+            ],
+            "description": "A package to easily make use of tabler-icons in your Laravel Blade views.",
+            "homepage": "https://github.com/secondnetwork/blade-tabler-icons",
+            "keywords": [
+                "blade",
+                "laravel",
+                "tabler-icons"
+            ],
+            "support": {
+                "issues": "https://github.com/secondnetwork/blade-tabler-icons/issues",
+                "source": "https://github.com/secondnetwork/blade-tabler-icons/tree/v3.44.0"
+            },
+            "time": "2026-05-11T14:36:11+00:00"
         },
         {
             "name": "spatie/invade",
