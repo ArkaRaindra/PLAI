@@ -22,7 +22,7 @@ class PositionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Masters';
 
-    protected static ?string $navigationLabel = 'Kelola Institusi & Unit';
+    protected static ?string $navigationLabel = 'Jabatan';
 
     protected static ?string $recordTitleAttribute = 'name';
 
