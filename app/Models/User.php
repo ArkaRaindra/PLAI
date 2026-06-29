@@ -9,13 +9,11 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'username', 'password', 'is_active', 'faculty', 'study_program', 'faculty_id', 'study_program_id', 'period_id'])]
+#[Fillable(['name', 'email', 'username', 'password', 'is_active'])]
 #[Hidden(['password', 'remember_token', 'is_active'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -41,8 +39,8 @@ class User extends Authenticatable implements FilamentUser
         return [
             'super-admin' => ['super-admin'],
             'auditor' => ['auditor'],
-            'fakultas' => ['ketua-lpm', 'admin-mutu'],
-            'prodi' => ['kaprodi', 'sekprodi', 'kepala-unit', 'dosen', 'tendik'],
+            'fakultas' => ['fakultas'],
+            'prodi' => ['prodi', 'unit-penunjang'],
         ];
     }
 
@@ -57,15 +55,9 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasRole($roles);
     }
 
-    public function userPositions(): HasMany
+    public function userPositions()
     {
         return $this->hasMany(UserPosition::class, 'user_id');
-    }
-
-    public function positions(): BelongsToMany
-    {
-        return $this->belongsToMany(Position::class, 'user_positions')
-            ->withPivot(['organization_unit_id', 'start_date', 'end_date', 'is_active']);
     }
 
     public function lecturerQualification()
@@ -117,4 +109,5 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(SelfAssessment::class, 'approved_by');
     }
+
 }
