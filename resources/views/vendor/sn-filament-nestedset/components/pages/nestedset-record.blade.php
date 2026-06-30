@@ -33,8 +33,8 @@
                 @svg('heroicon-m-bars-2', 'text-gray-400 w-5 h-5 cursor-move ltr:-mr-2 rtl:-ml-2')
             </button>
 
-            <div class="appearance-none px-3 py-4 ltr:text-left rtl:text-right inline-block">
-                <span>{{ $this->getRecordLabel($record) }}</span>
+            <div class="min-w-0 flex-1 px-3 py-4 ltr:text-left rtl:text-right">
+                {!! $this->getRecordLabel($record) !!}
             </div>
 
             @if($record->children->isNotEmpty())
