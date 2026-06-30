@@ -23,8 +23,8 @@
     class="fi-sn-tree-item"
     data-sortable-item
 >
-    <div class="fi-sn-tree-item-rowinfo flex justify-between relative group px-4 gap-4 hover:bg-gray-50 dark:hover:bg-white/5">
-        <div class="flex gap-4 grow">
+    <div class="fi-sn-tree-item-rowinfo flex items-center justify-between relative group px-4 gap-4 hover:bg-gray-50 dark:hover:bg-white/5">
+        <div class="flex items-center gap-4 grow min-w-0">
             <button 
                 class="fi-sn-tree-item-handle flex items-center ltr:rounded-l-lg rtl:rounded-r-lg"
                 type="button" 
@@ -38,7 +38,7 @@
             </div>
 
             @if($record->children->isNotEmpty())
-                <button type="button" x-on:click="open = !open" title="Toggle children" class="appearance-none text-gray-500">
+                <button type="button" x-on:click="open = !open" title="Toggle children" class="flex shrink-0 items-center appearance-none text-gray-500">
                     <svg class="w-5 h-5 transition ease-in-out duration-200" x-bind:class="{
                         '-rotate-90': !open,
                     }" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
@@ -69,7 +69,9 @@
             @endif
         </div>
 
-        <div class="flex grow-0 gap-3">
+        <div class="flex shrink-0 items-center gap-2 self-center py-2">
+            {{ ($this->indicatorsAction)(['id' => $record->getKey()]) }}
+
             {{-- 一级 depth = 0 --}}
             @if($canCreateChildren)
                 {{ ($this->createChildAction)(['parentId' => $record->getKey()]) }}

@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Pages;
 
+use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
 use App\Models\Standard;
@@ -15,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
+use Filament\Support\Enums\Size;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
@@ -94,8 +96,10 @@ class ManageStandards extends NestedsetPage
     public function createChildAction(): CreateAction
     {
         return CreateAction::make('createChild')
-            ->label('Tambah Sub-standar')
-            ->link()
+            ->iconButton()
+            ->size(Size::Large)
+            ->iconSize(IconSize::Large)
+            ->tooltip('Tambah Sub-standar')
             ->icon('heroicon-o-plus-circle')
             ->url(fn (array $arguments): string => StandardResource::getCreateUrl(
                 $this->standardSourceId,
@@ -106,9 +110,11 @@ class ManageStandards extends NestedsetPage
     public function editAction(): EditAction
     {
         return EditAction::make('edit')
-            ->link()
+            ->iconButton()
+            ->size(Size::Large)
+            ->iconSize(IconSize::Large)
+            ->tooltip('Ubah')
             ->icon('heroicon-m-pencil-square')
-            ->iconSize(IconSize::Small)
             ->url(fn (array $arguments): string => StandardResource::getUrl('edit', [
                 'record' => $arguments['id'],
             ]));
@@ -116,7 +122,22 @@ class ManageStandards extends NestedsetPage
 
     public function deleteAction(): DeleteAction
     {
-        return parent::deleteAction();
+        return parent::deleteAction()
+            ->iconButton()
+            ->size(Size::Large)
+            ->iconSize(IconSize::Large)
+            ->tooltip('Hapus');
+    }
+
+    public function indicatorsAction(): Action
+    {
+        return Action::make('indicators')
+            ->iconButton()
+            ->size(Size::Large)
+            ->iconSize(IconSize::Large)
+            ->tooltip('Indikator')
+            ->icon(Heroicon::ChartBarSquare)
+            ->url(fn (array $arguments): string => IndicatorResource::getCreateUrl($arguments['id']));
     }
 
     public function fixTreeAction(): Action
@@ -143,7 +164,7 @@ class ManageStandards extends NestedsetPage
             return $query->whereRaw('1 = 0');
         }
 
-        return $query;
+        return $query->withCount('indicators');
     }
 
     protected function getHeaderActions(): array
@@ -200,6 +221,18 @@ class ManageStandards extends NestedsetPage
             ? 'bg-success-50 text-success-700 ring-success-600/10 dark:bg-success-400/10 dark:text-success-400 dark:ring-success-400/20'
             : 'bg-danger-50 text-danger-700 ring-danger-600/10 dark:bg-danger-400/10 dark:text-danger-400 dark:ring-danger-400/20';
 
+        $indicatorCount = (int) ($record->indicators_count ?? 0);
+        $indicatorBadgeHtml = '';
+
+        if ($indicatorCount > 0) {
+            $listUrl = e(IndicatorResource::getListUrl($record->getKey()));
+            $indicatorBadgeHtml = <<<HTML
+                <a href="{$listUrl}" class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset bg-primary-50 text-primary-700 ring-primary-600/10 transition-colors hover:bg-primary-100 dark:bg-primary-400/10 dark:text-primary-400 dark:ring-primary-400/20 dark:hover:bg-primary-400/20">
+                    {$indicatorCount} Indikator
+                </a>
+                HTML;
+        }
+
         $descriptionHtml = filled($record->description)
             ? '<div class="fi-prose fi-in-text fi-size-sm mt-1 max-w-none text-gray-500 dark:text-gray-400">'
                 .$record->renderRichContent('description')
@@ -213,6 +246,7 @@ class ManageStandards extends NestedsetPage
                     <span class="text-gray-400"> </span>
                     <span class="text-gray-950 dark:text-white">{$name}</span>
                     <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset {$statusClasses}">{$statusLabel}</span>
+                    {$indicatorBadgeHtml}
                 </div>
                 {$descriptionHtml}
             </div>

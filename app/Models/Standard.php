@@ -8,6 +8,7 @@ use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Kalnoy\Nestedset\NodeTrait;
 
 class Standard extends Model implements HasRichContent
@@ -37,6 +38,11 @@ class Standard extends Model implements HasRichContent
     public function standardSource(): BelongsTo
     {
         return $this->belongsTo(StandardSource::class, 'standard_source_id');
+    }
+
+    public function indicators(): HasMany
+    {
+        return $this->hasMany(Indicator::class);
     }
 
     protected function setUpRichContent(): void
