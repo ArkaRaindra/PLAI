@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code');
             $table->string('name');
-            $table->text('description')->nullable();
+            $table->longText('description')->nullable();
             $table->foreignId('standard_source_id')->constrained('standard_sources');
             $table->boolean('is_active')->default(true);
             $table->nestedSet();
