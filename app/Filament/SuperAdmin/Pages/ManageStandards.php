@@ -2,24 +2,24 @@
 
 namespace App\Filament\SuperAdmin\Pages;
 
+use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
+use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
 use App\Models\Standard;
 use App\Models\StandardSource;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Radio;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconSize;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
-use Kalnoy\Nestedset\NestedSet;
 use LaraZeus\Tabler\Tabler;
 use Livewire\Attributes\Url;
-use Wsmallnews\FilamentNestedset\Forms\Fields\KalnoyNestedsetSelectTree;
 use Wsmallnews\FilamentNestedset\Pages\NestedsetPage;
 
 class ManageStandards extends NestedsetPage
@@ -31,7 +31,7 @@ class ManageStandards extends NestedsetPage
 
     protected static string|BackedEnum|null $navigationIcon = Tabler::ListTree;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Master';
+    protected static string|\UnitEnum|null $navigationGroup = 'Penetapan';
 
     protected static ?string $navigationLabel = 'Standar';
 
@@ -60,33 +60,63 @@ class ManageStandards extends NestedsetPage
         $this->cacheInteractsWithHeaderActions();
     }
 
-    public function createAction(): Action
+    /**
+     * @return array<string, string>
+     */
+    public function getBreadcrumbs(): array
     {
-        return parent::createAction()
+        $breadcrumbs = [
+            StandarSourceResource::getUrl() => StandarSourceResource::getNavigationLabel(),
+        ];
+
+        if ($this->hasSelectedSource()) {
+            $source = StandardSource::query()->find($this->standardSourceId);
+
+            if ($source !== null) {
+                $breadcrumbs[static::getUrl(['standardSourceId' => $this->standardSourceId])] = $source->name;
+            }
+        }
+
+        return [
+            ...$breadcrumbs,
+            static::getNavigationLabel() ?? 'Standar',
+        ];
+    }
+
+    public function createAction(): CreateAction
+    {
+        return CreateAction::make('create')
             ->label('Buat Standar')
-            ->icon(Heroicon::Plus);
+            ->icon(Heroicon::Plus)
+            ->url(fn (): string => StandardResource::getCreateUrl($this->standardSourceId));
     }
 
-    public function createChildAction(): Action
+    public function createChildAction(): CreateAction
     {
-        return parent::createChildAction()
-            ->label('Tambah Sub-standar');
+        return CreateAction::make('createChild')
+            ->label('Tambah Sub-standar')
+            ->link()
+            ->icon('heroicon-o-plus-circle')
+            ->url(fn (array $arguments): string => StandardResource::getCreateUrl(
+                $this->standardSourceId,
+                $arguments['parentId'] ?? null,
+            ));
     }
 
-    protected function getParentSelect(): array|Field
+    public function editAction(): EditAction
     {
-        return KalnoyNestedsetSelectTree::make('parent_id')
-            ->label('Induk Standar')
-            ->level(is_null($this->getLevel()) ? null : ($this->getLevel() - 1))
-            ->searchable()
-            ->query(function () {
-                return $this->getQuery();
-            }, titleAttribute: 'name', parentAttribute: NestedSet::PARENT_ID)
-            ->enableBranchNode()
-            ->withCount()
-            ->placeholder('Pilih induk standar')
-            ->emptyLabel('Tidak ada induk standar')
-            ->treeKey('NestedParentId');
+        return EditAction::make('edit')
+            ->link()
+            ->icon('heroicon-m-pencil-square')
+            ->iconSize(IconSize::Small)
+            ->url(fn (array $arguments): string => StandardResource::getUrl('edit', [
+                'record' => $arguments['id'],
+            ]));
+    }
+
+    public function deleteAction(): DeleteAction
+    {
+        return parent::deleteAction();
     }
 
     public function fixTreeAction(): Action
@@ -155,35 +185,6 @@ class ManageStandards extends NestedsetPage
             ]);
     }
 
-    protected function schema(array $arguments): array
-    {
-        return [
-            Radio::make('is_active')
-                ->label('Status')
-                ->options([
-                    1 => 'AKTIF',
-                    0 => 'TIDAK AKTIF',
-                ])
-                ->default(true)
-                ->columnSpanFull(),
-            TextInput::make('code')
-                ->label('Kode')
-                ->required()
-                ->extraInputAttributes([
-                    'style' => 'text-transform: uppercase',
-                ])
-                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null ? strtoupper($state) : null),
-            TextInput::make('name')
-                ->label('Nama')
-                ->required(),
-            Textarea::make('description')
-                ->label('Deskripsi')
-                ->rows(3)
-                ->nullable()
-                ->columnSpanFull(),
-        ];
-    }
-
     protected function infolistSchema(): array
     {
         return [];
@@ -200,14 +201,16 @@ class ManageStandards extends NestedsetPage
             : 'bg-danger-50 text-danger-700 ring-danger-600/10 dark:bg-danger-400/10 dark:text-danger-400 dark:ring-danger-400/20';
 
         $descriptionHtml = filled($record->description)
-            ? '<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">'.e($record->description).'</p>'
+            ? '<div class="fi-prose fi-in-text fi-size-sm mt-1 max-w-none text-gray-500 dark:text-gray-400">'
+                .$record->renderRichContent('description')
+                .'</div>'
             : '';
 
         return new HtmlString(<<<HTML
             <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span class="font-semibold text-gray-950 dark:text-white">{$code}</span>
-                    <span class="text-gray-400">—</span>
+                    <span class="text-gray-400"> </span>
                     <span class="text-gray-950 dark:text-white">{$name}</span>
                     <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset {$statusClasses}">{$statusLabel}</span>
                 </div>
