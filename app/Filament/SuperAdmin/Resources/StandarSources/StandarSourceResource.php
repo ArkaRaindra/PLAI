@@ -13,7 +13,6 @@ use App\Models\StandardSource;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use LaraZeus\Tabler\Tabler;
 
@@ -29,7 +28,7 @@ class StandarSourceResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Sumber Standar';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+    protected static string|\UnitEnum|null $navigationGroup = 'Penetapan';
 
     protected static ?string $navigationLabel = 'Sumber Standar';
 
