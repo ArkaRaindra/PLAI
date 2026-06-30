@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Filament\SuperAdmin\Pages\ManageStandards;
+use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Models\Standard;
 use App\Models\StandardSource;
 use App\Models\User;
@@ -89,17 +91,41 @@ class StandardNestedsetTest extends TestCase
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
 
+        $description = '<ol><li>Poin pertama</li><li>Poin kedua</li></ol>';
+
         $standard = Standard::scoped(['standard_source_id' => $source->id])->create([
             'code' => 'DESC',
             'name' => 'Standard With Description',
-            'description' => 'Deskripsi standar untuk node ini.',
+            'description' => $description,
             'standard_source_id' => $source->id,
             'is_active' => true,
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
 
-        $this->assertSame('Deskripsi standar untuk node ini.', $standard->fresh()->description);
+        $this->assertSame($description, $standard->fresh()->description);
+    }
+
+    public function test_standard_renders_rich_description_as_html(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $standard = Standard::create([
+            'code' => 'RICH',
+            'name' => 'Standard With Rich Description',
+            'description' => '<ol><li>Poin pertama</li><li>Poin kedua</li></ol>',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $rendered = $standard->renderRichContent('description');
+
+        $this->assertStringContainsString('<ol>', $rendered);
+        $this->assertStringContainsString('<li>Poin pertama</li>', $rendered);
+        $this->assertStringContainsString('<li>Poin kedua</li>', $rendered);
     }
 
     public function test_scoped_query_returns_empty_when_source_has_no_standards(): void
@@ -141,5 +167,46 @@ class StandardNestedsetTest extends TestCase
 
         $this->assertTrue($root->children->isNotEmpty());
         $this->assertFalse(config('sn-filament-nestedset.allow_delete_parent'));
+    }
+
+    public function test_create_standard_page_redirects_without_source(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super-admin');
+
+        $this->actingAs($admin)
+            ->get('/super-admin/standards/create')
+            ->assertRedirect(ManageStandards::getUrl());
+    }
+
+    public function test_create_standard_page_is_accessible_with_source(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super-admin');
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $this->actingAs($admin)
+            ->get(StandardResource::getCreateUrl($source->id))
+            ->assertOk();
+    }
+
+    public function test_edit_standard_page_is_accessible(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super-admin');
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $standard = Standard::create([
+            'code' => 'EDIT',
+            'name' => 'Standard To Edit',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(StandardResource::getUrl('edit', ['record' => $standard]))
+            ->assertOk();
     }
 }
