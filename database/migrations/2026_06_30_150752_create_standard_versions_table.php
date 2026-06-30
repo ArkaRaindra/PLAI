@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('standard_id')->constrained('standards');
             $table->foreignId('quality_period_id')->constrained('quality_periodes');
             $table->string('version');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->date('start_date')->default(now());
+            $table->date('end_date')->nullable();
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
             $table->boolean('is_active')->default(true);
             $table->string('created_by');
