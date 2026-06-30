@@ -6,10 +6,13 @@ use App\Filament\SuperAdmin\Pages\ManageStandards;
 use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
 use App\Models\StandardSource;
+use App\Support\StandardVersionPersister;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class EditStandard extends EditRecord
 {
@@ -51,6 +54,30 @@ class EditStandard extends EditRecord
                 ->icon(Heroicon::ArrowLeft),
             DeleteAction::make()->icon(Heroicon::Trash),
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $this->record->loadMissing('standardVersion');
+
+        return array_merge($data, StandardVersionPersister::toFormData($this->record->standardVersion));
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        return DB::transaction(function () use ($record, $data) {
+            $versionData = StandardVersionPersister::stripNestedFormData($data);
+
+            $record->update($data);
+            $record->refresh();
+            StandardVersionPersister::sync($record, $versionData);
+
+            return $record;
+        });
     }
 
     protected function getRedirectUrl(): string

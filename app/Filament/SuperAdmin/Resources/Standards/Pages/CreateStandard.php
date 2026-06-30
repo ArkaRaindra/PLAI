@@ -7,10 +7,12 @@ use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
 use App\Models\Standard;
 use App\Models\StandardSource;
+use App\Support\StandardVersionPersister;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
 
 class CreateStandard extends CreateRecord
@@ -20,6 +22,12 @@ class CreateStandard extends CreateRecord
 
     #[Url]
     public ?string $parentId = null;
+
+    #[Url]
+    public ?string $qualityPeriodId = null;
+
+    #[Url]
+    public ?string $standardVersionId = null;
 
     protected static string $resource = StandardResource::class;
 
@@ -75,23 +83,37 @@ class CreateStandard extends CreateRecord
 
     protected function fillForm(): void
     {
-        $this->form->fill([
+        $fill = [
             'standard_source_id' => (int) $this->standardSourceId,
             'parent_id' => filled($this->parentId) ? (int) $this->parentId : null,
             'is_active' => true,
-        ]);
+        ];
+
+        if (filled($this->qualityPeriodId)) {
+            $fill['include_standard_version'] = true;
+            $fill['quality_period_mode'] = 'existing';
+            $fill['quality_period_id'] = (int) $this->qualityPeriodId;
+        }
+
+        $this->form->fill($fill);
     }
 
     protected function handleRecordCreation(array $data): Model
     {
-        $parentId = $data['parent_id'] ?? null;
-        unset($data['parent_id']);
+        return DB::transaction(function () use ($data) {
+            $parentId = $data['parent_id'] ?? null;
+            $versionData = StandardVersionPersister::stripNestedFormData($data);
+            unset($data['parent_id']);
 
-        $parent = filled($parentId)
-            ? Standard::scoped(['standard_source_id' => $data['standard_source_id']])->findOrFail($parentId)
-            : null;
+            $parent = filled($parentId)
+                ? Standard::scoped(['standard_source_id' => $data['standard_source_id']])->findOrFail($parentId)
+                : null;
 
-        return Standard::create($data, $parent);
+            $standard = Standard::create($data, $parent);
+            StandardVersionPersister::sync($standard, $versionData);
+
+            return $standard;
+        });
     }
 
     protected function getRedirectUrl(): string

@@ -5,8 +5,10 @@ namespace App\Filament\SuperAdmin\Pages;
 use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
+use App\Models\QualityPeriode;
 use App\Models\Standard;
 use App\Models\StandardSource;
+use App\Models\StandardVersion;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -15,6 +17,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\Size;
 use Filament\Support\Icons\Heroicon;
@@ -28,6 +31,12 @@ class ManageStandards extends NestedsetPage
 {
     #[Url]
     public ?string $standardSourceId = null;
+
+    #[Url]
+    public ?string $qualityPeriodId = null;
+
+    #[Url]
+    public ?string $standardVersionId = null;
 
     protected static ?string $model = Standard::class;
 
@@ -58,8 +67,26 @@ class ManageStandards extends NestedsetPage
 
     public function updatedStandardSourceId(): void
     {
+        $this->qualityPeriodId = null;
+        $this->standardVersionId = null;
         $this->cachedHeaderActions = [];
         $this->cacheInteractsWithHeaderActions();
+    }
+
+    public function updatedQualityPeriodId(): void
+    {
+        if (blank($this->standardVersionId)) {
+            return;
+        }
+
+        $exists = StandardVersion::query()
+            ->whereKey((int) $this->standardVersionId)
+            ->when(filled($this->qualityPeriodId), fn ($query) => $query->where('quality_period_id', (int) $this->qualityPeriodId))
+            ->exists();
+
+        if (! $exists) {
+            $this->standardVersionId = null;
+        }
     }
 
     /**
@@ -90,7 +117,11 @@ class ManageStandards extends NestedsetPage
         return CreateAction::make('create')
             ->label('Buat Standar')
             ->icon(Heroicon::Plus)
-            ->url(fn (): string => StandardResource::getCreateUrl($this->standardSourceId));
+            ->url(fn (): string => StandardResource::getCreateUrl(
+                $this->standardSourceId,
+                qualityPeriodId: $this->qualityPeriodId,
+                standardVersionId: $this->standardVersionId,
+            ));
     }
 
     public function createChildAction(): CreateAction
@@ -104,6 +135,8 @@ class ManageStandards extends NestedsetPage
             ->url(fn (array $arguments): string => StandardResource::getCreateUrl(
                 $this->standardSourceId,
                 $arguments['parentId'] ?? null,
+                qualityPeriodId: $this->qualityPeriodId,
+                standardVersionId: $this->standardVersionId,
             ));
     }
 
@@ -143,7 +176,7 @@ class ManageStandards extends NestedsetPage
     public function fixTreeAction(): Action
     {
         return parent::fixTreeAction()
-            ->label('Perbaiki Tree');
+            ->label('Perbaiki Tree')->color(Color::Gray);
     }
 
     /**
@@ -164,7 +197,23 @@ class ManageStandards extends NestedsetPage
             return $query->whereRaw('1 = 0');
         }
 
-        return $query->withCount('indicators');
+        $query = $query->withCount('indicators');
+
+        if (filled($this->qualityPeriodId)) {
+            $query->whereHas(
+                'standardVersions',
+                fn ($versionQuery) => $versionQuery->where('quality_period_id', (int) $this->qualityPeriodId),
+            );
+        }
+
+        if (filled($this->standardVersionId)) {
+            $query->whereHas(
+                'standardVersions',
+                fn ($versionQuery) => $versionQuery->whereKey((int) $this->standardVersionId),
+            );
+        }
+
+        return $query;
     }
 
     protected function getHeaderActions(): array
@@ -202,6 +251,33 @@ class ManageStandards extends NestedsetPage
                             ->searchable()
                             ->live(debounce: 300)
                             ->columnSpanFull(),
+                        Select::make('qualityPeriodId')
+                            ->label('Periode Kualitas')
+                            ->placeholder('— Semua Periode —')
+                            ->options(fn (): array => QualityPeriode::query()
+                                ->orderBy('name')
+                                ->pluck('name', 'id')
+                                ->all())
+                            ->searchable()
+                            ->live(debounce: 300)
+                            ->visible(fn (): bool => $this->hasSelectedSource()),
+                        Select::make('standardVersionId')
+                            ->label('Versi Standar')
+                            ->placeholder('— Semua Versi —')
+                            ->options(function (): array {
+                                return StandardVersion::query()
+                                    ->with('standard')
+                                    ->when(filled($this->qualityPeriodId), fn ($query) => $query->where('quality_period_id', (int) $this->qualityPeriodId))
+                                    ->orderBy('version')
+                                    ->get()
+                                    ->mapWithKeys(fn (StandardVersion $version) => [
+                                        $version->id => $version->version.' — '.$version->standard?->code,
+                                    ])
+                                    ->all();
+                            })
+                            ->searchable()
+                            ->live(debounce: 300)
+                            ->visible(fn (): bool => $this->hasSelectedSource()),
                     ]),
             ]);
     }

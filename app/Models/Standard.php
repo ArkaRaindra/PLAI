@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Kalnoy\Nestedset\NodeTrait;
 
 class Standard extends Model implements HasRichContent
@@ -43,6 +44,16 @@ class Standard extends Model implements HasRichContent
     public function indicators(): HasMany
     {
         return $this->hasMany(Indicator::class);
+    }
+
+    public function standardVersions(): HasMany
+    {
+        return $this->hasMany(StandardVersion::class);
+    }
+
+    public function standardVersion(): HasOne
+    {
+        return $this->hasOne(StandardVersion::class)->latestOfMany();
     }
 
     protected function setUpRichContent(): void

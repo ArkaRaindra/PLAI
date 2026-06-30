@@ -42,11 +42,17 @@ class StandardResource extends Resource
         ];
     }
 
-    public static function getCreateUrl(int|string $standardSourceId, int|string|null $parentId = null): string
-    {
+    public static function getCreateUrl(
+        int|string $standardSourceId,
+        int|string|null $parentId = null,
+        int|string|null $qualityPeriodId = null,
+        int|string|null $standardVersionId = null,
+    ): string {
         $query = http_build_query(array_filter([
             'standardSourceId' => $standardSourceId,
             'parentId' => $parentId,
+            'qualityPeriodId' => $qualityPeriodId,
+            'standardVersionId' => $standardVersionId,
         ]));
 
         return static::getUrl('create').'?'.$query;
