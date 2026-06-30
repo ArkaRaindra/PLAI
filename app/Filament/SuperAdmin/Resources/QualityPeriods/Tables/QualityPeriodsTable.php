@@ -16,7 +16,6 @@ class QualityPeriodsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['createdBy', 'updatedBy']))
             ->columns([
                 TextColumn::make('code')
                     ->label('Kode')
@@ -40,20 +39,6 @@ class QualityPeriodsTable
                 IconColumn::make('is_active')
                     ->label('Aktif')
                     ->boolean(),
-                TextColumn::make('createdBy.name')
-                    ->label('Dibuat Oleh')
-                    ->sortable()
-                    ->placeholder('-'),
-                TextColumn::make('created_at')
-                    ->label('Dibuat Pada')
-                    ->dateTime('d F Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label('Diperbarui Pada')
-                    ->dateTime('d F Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
