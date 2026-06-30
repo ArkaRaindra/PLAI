@@ -6,6 +6,7 @@ use App\Filament\SuperAdmin\Resources\Positions\PositionResource;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
 
@@ -18,18 +19,14 @@ class EditPosition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('back')
+           Action::make('back')
                 ->label('Kembali')
                 ->url($this->getResource()::getUrl('index'))
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            Action::make('save')
-                ->label('Simpan Perubahan')
-                ->action(fn () => $this->save())
-                ->color('success'),
-            DeleteAction::make()
-                ->label('Hapus'),
+            ViewAction::make()->icon(Heroicon::Eye)->color('info'),
+            DeleteAction::make()->icon(Heroicon::Trash),
         ];
     }
 

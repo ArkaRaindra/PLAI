@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Positions\Pages;
 use App\Filament\SuperAdmin\Resources\Positions\PositionResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Icons\Heroicon;
 
 class ListPositions extends ListRecords
 {
@@ -14,7 +15,7 @@ class ListPositions extends ListRecords
     {
         return [
             CreateAction::make()
-                ->label('Tambahkan Jabatan'),
+               ->icon(Heroicon::Plus),
         ];
     }
 }

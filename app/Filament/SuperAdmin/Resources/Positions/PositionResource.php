@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Positions;
 use App\Filament\SuperAdmin\Resources\Positions\Pages\CreatePosition;
 use App\Filament\SuperAdmin\Resources\Positions\Pages\EditPosition;
 use App\Filament\SuperAdmin\Resources\Positions\Pages\ListPositions;
+use App\Filament\SuperAdmin\Resources\Positions\Pages\ViewPosition;
 use App\Filament\SuperAdmin\Resources\Positions\Schemas\PositionForm;
 use App\Filament\SuperAdmin\Resources\Positions\Tables\PositionsTable;
 use App\Models\Position;
@@ -52,6 +53,7 @@ class PositionResource extends Resource
         return [
             'index' => ListPositions::route('/'),
             'create' => CreatePosition::route('/create'),
+            'view' => ViewPosition::route('/{record}'),
             'edit' => EditPosition::route('/{record}/edit'),
         ];
     }

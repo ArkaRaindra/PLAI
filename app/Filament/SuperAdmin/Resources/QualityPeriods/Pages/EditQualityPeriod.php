@@ -6,6 +6,7 @@ use App\Filament\SuperAdmin\Resources\QualityPeriods\QualityPeriodResource;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
 
@@ -24,12 +25,8 @@ class EditQualityPeriod extends EditRecord
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            Action::make('save')
-                ->label('Simpan Perubahan')
-                ->action(fn () => $this->save())
-                ->color('success'),
-            DeleteAction::make()
-                ->label('Hapus'),
+            ViewAction::make()->icon(Heroicon::Eye)->color('info'),
+            DeleteAction::make()->icon(Heroicon::Trash),
         ];
     }
 

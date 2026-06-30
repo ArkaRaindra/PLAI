@@ -23,10 +23,6 @@ class CreateQualityPeriod extends CreateRecord
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            Action::make('save')
-                ->label('Simpan')
-                ->action(fn () => $this->create())
-                ->color('success'),
         ];
     }
 
@@ -43,17 +39,17 @@ class CreateQualityPeriod extends CreateRecord
         return $data;
     }
 
-    protected function getCreateFormAction(): Action
-    {
-        return parent::getCreateFormAction()
-            ->visible(false);
-    }
+    // protected function getCreateFormAction(): Action
+    // {
+    //     return parent::getCreateFormAction()
+    //         ->visible(false);
+    // }
 
-    protected function getCreateAnotherFormAction(): Action
-    {
-        return parent::getCreateAnotherFormAction()
-            ->visible(false);
-    }
+    // protected function getCreateAnotherFormAction(): Action
+    // {
+    //     return parent::getCreateAnotherFormAction()
+    //         ->visible(false);
+    // }
 
     protected function getCancelFormAction(): Action
     {
