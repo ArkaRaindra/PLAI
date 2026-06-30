@@ -16,8 +16,13 @@ return [
         'move_node_failed' => 'Gagal memindahkan node',
         'move_node_failed_body_depth' => 'Gagal memindahkan node, level target tidak boleh melebihi level maksimum :level.',
 
-        'fix_nestedset' => 'Perbaiki tree',
+        'fix_nestedset' => 'Perbaiki Tree',
         'fix_nestedset_success' => 'Tree berhasil diperbaiki',
+        'fix_nestedset_failed' => 'Gagal memperbaiki Tree',
+        'fix_nestedset_failed_body' => 'Gagal memperbaiki Tree, silakan coba lagi.',
+        'fix_nestedset_failed_body_depth' => 'Gagal memperbaiki Tree, level target tidak boleh melebihi level maksimum :level.',
+        'fix_nestedset_failed_body_circular' => 'Gagal memperbaiki Tree, node tidak boleh memiliki dirinya sendiri sebagai induk.',
+        'fix_nestedset_failed_body_root' => 'Gagal memperbaiki Tree, node tidak boleh memiliki dirinya sendiri sebagai induk.',
     ],
 
     'field' => [
