@@ -20,7 +20,7 @@ class OrgUnitResource extends Resource
 {
     protected static ?string $model = OrganizationUnit::class;
 
-    // protected static string|BackedEnum|null $navigationIcon = Tabler::Affiliate;
+    protected static string|BackedEnum|null $navigationIcon = Tabler::Affiliate;
 
     protected static ?string $recordTitleAttribute = 'Unit Organisasi';
 
