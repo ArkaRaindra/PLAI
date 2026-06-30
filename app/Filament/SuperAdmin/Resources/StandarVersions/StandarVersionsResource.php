@@ -9,7 +9,7 @@ use App\Filament\SuperAdmin\Resources\StandarVersions\Pages\ViewStandarVersions;
 use App\Filament\SuperAdmin\Resources\StandarVersions\Schemas\StandarVersionsForm;
 use App\Filament\SuperAdmin\Resources\StandarVersions\Schemas\StandarVersionsInfolist;
 use App\Filament\SuperAdmin\Resources\StandarVersions\Tables\StandarVersionsTable;
-use App\Models\StandarVersions;
+use App\Models\StandardVersion;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 
 class StandarVersionsResource extends Resource
 {
-    protected static ?string $model = StandarVersions::class;
+    protected static ?string $model = StandardVersion::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

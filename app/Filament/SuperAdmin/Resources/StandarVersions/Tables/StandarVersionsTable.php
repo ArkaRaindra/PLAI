@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class StandarVersionsTable
@@ -14,7 +15,22 @@ class StandarVersionsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('standard.name')
+                    ->label('Standar')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('version')
+                    ->label('Versi')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('start_date')
+                    ->label('Tanggal Mulai')
+                    ->date()
+                    ->sortable(),
+                TextColumn::make('end_date')
+                    ->label('Tanggal Selesai')
+                    ->date()
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -24,9 +40,9 @@ class StandarVersionsTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 }
