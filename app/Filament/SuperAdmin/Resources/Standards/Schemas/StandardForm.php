@@ -67,10 +67,13 @@ class StandardForm
                     ->label('Deskripsi')
                     ->fileAttachments(false)
                     ->nullable()
+                    ->extraAttributes([
+                        'style' => 'min-height: 300px;',
+                    ])
                     ->columnSpanFull(),
                 Toggle::make('include_standard_version')
                     ->label('Tautkan Versi Standar')
-                    ->helperText('Opsional — kosongkan jika standar belum perlu versi.')
+                    ->helperText('Opsional — kosongkan jika standar belum perlu atau tidak perlu versi dan periode kualitas.')
                     ->default(false)
                     ->live()
                     ->columnSpanFull(),
@@ -120,11 +123,11 @@ class StandardForm
                         DatePicker::make('standardVersion.start_date')
                             ->label('Tanggal Mulai')
                             ->default(now())
-                            ->native(false),
+                            ->native(false)->required(),
                         DatePicker::make('standardVersion.end_date')
                             ->label('Tanggal Selesai')
                             ->nullable()
-                            ->native(false),
+                            ->native(false)->nullable(),
                         Select::make('standardVersion.status')
                             ->label('Status')
                             ->options(collect(QualityPeriodStatus::cases())->mapWithKeys(
