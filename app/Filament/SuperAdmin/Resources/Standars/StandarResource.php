@@ -9,7 +9,7 @@ use App\Filament\SuperAdmin\Resources\Standars\Pages\ViewStandar;
 use App\Filament\SuperAdmin\Resources\Standars\Schemas\StandarForm;
 use App\Filament\SuperAdmin\Resources\Standars\Schemas\StandarInfolist;
 use App\Filament\SuperAdmin\Resources\Standars\Tables\StandarsTable;
-use App\Models\Standar;
+use App\Models\Standard;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 
 class StandarResource extends Resource
 {
-    protected static ?string $model = Standar::class;
+    protected static ?string $model = Standard::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
