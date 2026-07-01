@@ -35,6 +35,6 @@ class StandardVersion extends Model
 
     public function qualityPeriod(): BelongsTo
     {
-        return $this->belongsTo(QualityPeriode::class, 'quality_period_id');
+        return $this->belongsTo(QualityPeriod::class, 'quality_period_id');
     }
 }

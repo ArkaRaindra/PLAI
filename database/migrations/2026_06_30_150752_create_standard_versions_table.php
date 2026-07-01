@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('standard_versions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('standard_id')->constrained('standards');
-            $table->foreignId('quality_period_id')->constrained('quality_periodes');
+            $table->foreignId('quality_period_id')->constrained('quality_periods');
             $table->string('version');
             $table->date('start_date')->default(now());
             $table->date('end_date')->nullable();

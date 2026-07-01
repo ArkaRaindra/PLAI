@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\QualityPeriode;
+use App\Models\QualityPeriod;
 use App\Models\Standard;
 use App\Models\StandardVersion;
 use App\Models\User;
@@ -22,7 +22,7 @@ class StandardVersionFactory extends Factory
     {
         return [
             'standard_id' => Standard::factory(),
-            'quality_period_id' => QualityPeriode::factory(),
+            'quality_period_id' => QualityPeriod::factory(),
             'version' => 'v'.$this->faker->numerify('#'),
             'start_date' => $this->faker->date(),
             'end_date' => null,

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\QualityPeriode;
+use App\Models\QualityPeriod;
 use App\Models\Standard;
 use App\Models\StandardSource;
 use App\Models\StandardVersion;
@@ -45,7 +45,7 @@ class StandardVersionTest extends TestCase
             'include_standard_version' => false,
             'quality_period_mode' => 'existing',
             'quality_period_id' => null,
-            'qualityPeriode' => [],
+            'qualityPeriod' => [],
             'standardVersion' => [],
         ]);
 
@@ -57,7 +57,7 @@ class StandardVersionTest extends TestCase
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
-        $period = QualityPeriode::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
 
         $standard = Standard::create([
             'code' => 'WITH-VER',
@@ -72,7 +72,7 @@ class StandardVersionTest extends TestCase
             'include_standard_version' => true,
             'quality_period_mode' => 'existing',
             'quality_period_id' => $period->id,
-            'qualityPeriode' => [],
+            'qualityPeriod' => [],
             'standardVersion' => [
                 'version' => 'v1',
                 'start_date' => now()->toDateString(),
@@ -86,7 +86,7 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $period->id,
             'version' => 'v1',
         ]);
-        $this->assertDatabaseCount('quality_periodes', 1);
+        $this->assertDatabaseCount('quality_periods', 1);
     }
 
     public function test_create_standard_with_new_quality_period(): void
@@ -107,7 +107,7 @@ class StandardVersionTest extends TestCase
             'include_standard_version' => true,
             'quality_period_mode' => 'new',
             'quality_period_id' => null,
-            'qualityPeriode' => [
+            'qualityPeriod' => [
                 'code' => 'QP-2026',
                 'name' => 'Periode 2026',
                 'start_date' => '2026-01-01',
@@ -123,7 +123,7 @@ class StandardVersionTest extends TestCase
             ],
         ]);
 
-        $this->assertDatabaseHas('quality_periodes', [
+        $this->assertDatabaseHas('quality_periods', [
             'code' => 'QP-2026',
             'name' => 'Periode 2026',
         ]);
@@ -137,7 +137,7 @@ class StandardVersionTest extends TestCase
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
-        $period = QualityPeriode::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
 
         $standard = Standard::create([
             'code' => 'DEL-VER',
@@ -162,7 +162,7 @@ class StandardVersionTest extends TestCase
             'include_standard_version' => false,
             'quality_period_mode' => 'existing',
             'quality_period_id' => $period->id,
-            'qualityPeriode' => [],
+            'qualityPeriod' => [],
             'standardVersion' => [],
         ]);
 
@@ -173,8 +173,8 @@ class StandardVersionTest extends TestCase
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
-        $periodA = QualityPeriode::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
-        $periodB = QualityPeriode::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $periodA = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $periodB = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
 
         $standardA = Standard::create([
             'code' => 'STD-A',
@@ -253,7 +253,7 @@ class StandardVersionTest extends TestCase
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
-        $period = QualityPeriode::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
 
         $standard = Standard::create([
             'code' => 'FILL',

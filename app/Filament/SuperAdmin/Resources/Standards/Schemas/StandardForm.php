@@ -3,8 +3,8 @@
 namespace App\Filament\SuperAdmin\Resources\Standards\Schemas;
 
 use App\Enums\QualityPeriodStatus;
-use App\Filament\SuperAdmin\Resources\QualityPeriodes\Schemas\QualityPeriodeForm;
-use App\Models\QualityPeriode;
+use App\Filament\SuperAdmin\Resources\QualityPeriods\Schemas\QualityPeriodForm;
+use App\Models\QualityPeriod;
 use App\Models\Standard;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -91,7 +91,7 @@ class StandardForm
                             ->columnSpanFull(),
                         Select::make('quality_period_id')
                             ->label('Periode Kualitas')
-                            ->options(fn (): array => QualityPeriode::query()
+                            ->options(fn (): array => QualityPeriod::query()
                                 ->orderBy('name')
                                 ->pluck('name', 'id')
                                 ->all())
@@ -99,11 +99,11 @@ class StandardForm
                             ->visible(fn (Get $get): bool => $get('quality_period_mode') === 'existing')
                             ->required(fn (Get $get): bool => (bool) $get('include_standard_version') && $get('quality_period_mode') === 'existing')
                             ->columnSpanFull(),
-                        ...collect(QualityPeriodeForm::fields('qualityPeriode.'))
+                        ...collect(QualityPeriodForm::fields('qualityPeriod.'))
                             ->map(function ($field) {
                                 $field = $field->visible(fn (Get $get): bool => $get('quality_period_mode') === 'new');
 
-                                if ($field->getName() !== 'qualityPeriode.is_active') {
+                                if ($field->getName() !== 'qualityPeriod.is_active') {
                                     $field->required(fn (Get $get): bool => (bool) $get('include_standard_version') && $get('quality_period_mode') === 'new');
                                 }
 

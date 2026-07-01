@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-use App\Models\QualityPeriode;
+use App\Models\QualityPeriod;
 use App\Models\Standard;
 use App\Models\StandardVersion;
 
@@ -30,7 +30,7 @@ class StandardVersionPersister
             'include_standard_version' => $data['include_standard_version'] ?? false,
             'quality_period_mode' => $data['quality_period_mode'] ?? 'existing',
             'quality_period_id' => $data['quality_period_id'] ?? null,
-            'qualityPeriode' => $data['qualityPeriode'] ?? [],
+            'qualityPeriod' => $data['qualityPeriod'] ?? [],
             'standardVersion' => $data['standardVersion'] ?? [],
         ];
 
@@ -38,7 +38,7 @@ class StandardVersionPersister
             $data['include_standard_version'],
             $data['quality_period_mode'],
             $data['quality_period_id'],
-            $data['qualityPeriode'],
+            $data['qualityPeriod'],
             $data['standardVersion'],
         );
 
@@ -75,7 +75,7 @@ class StandardVersionPersister
                 'include_standard_version' => false,
                 'quality_period_mode' => 'existing',
                 'quality_period_id' => null,
-                'qualityPeriode' => [],
+                'qualityPeriod' => [],
                 'standardVersion' => [],
             ];
         }
@@ -122,7 +122,7 @@ class StandardVersionPersister
     protected static function resolveQualityPeriodId(array $versionData): int
     {
         if (($versionData['quality_period_mode'] ?? 'existing') === 'new') {
-            return QualityPeriode::query()->create($versionData['qualityPeriode'])->id;
+            return QualityPeriod::query()->create($versionData['qualityPeriod'])->id;
         }
 
         return (int) $versionData['quality_period_id'];

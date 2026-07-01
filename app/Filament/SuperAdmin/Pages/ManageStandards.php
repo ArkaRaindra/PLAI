@@ -5,7 +5,7 @@ namespace App\Filament\SuperAdmin\Pages;
 use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
-use App\Models\QualityPeriode;
+use App\Models\QualityPeriod;
 use App\Models\Standard;
 use App\Models\StandardSource;
 use App\Models\StandardVersion;
@@ -254,7 +254,7 @@ class ManageStandards extends NestedsetPage
                         Select::make('qualityPeriodId')
                             ->label('Periode Kualitas')
                             ->placeholder('— Semua Periode —')
-                            ->options(fn (): array => QualityPeriode::query()
+                            ->options(fn (): array => QualityPeriod::query()
                                 ->orderBy('name')
                                 ->pluck('name', 'id')
                                 ->all())
