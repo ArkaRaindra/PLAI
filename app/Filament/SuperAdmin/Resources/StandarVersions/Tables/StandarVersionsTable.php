@@ -15,8 +15,16 @@ class StandarVersionsTable
     {
         return $table
             ->columns([
+                TextColumn::make('standard.code')
+                    ->label('Kode Standar')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('standard.name')
-                    ->label('Standar')
+                    ->label('Nama Standar')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('standard.name')
+                    ->label('Nama Standar')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('version')

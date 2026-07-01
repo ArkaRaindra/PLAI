@@ -116,6 +116,15 @@ class StandardForm
                 Section::make('Versi Standar')
                     ->visible(fn (Get $get): bool => (bool) $get('include_standard_version'))
                     ->schema([
+                        Radio::make('standardVersion.is_active')
+                            ->label('Status Data Versi Standar')
+                            ->options([
+                                true => 'AKTIF',
+                                false => 'TIDAK AKTIF',
+                            ])
+                            ->default(true)
+                            ->required()
+                            ->columnSpanFull(),
                         TextInput::make('standardVersion.version')
                             ->label('Versi')
                             ->required(fn (Get $get): bool => (bool) $get('include_standard_version'))
@@ -134,10 +143,8 @@ class StandardForm
                                 fn (QualityPeriodStatus $status) => [$status->value => $status->getLabel()],
                             )->all())
                             ->default(QualityPeriodStatus::Draft->value)
-                            ->native(false),
-                        Toggle::make('standardVersion.is_active')
-                            ->label('Aktif')
-                            ->default(true),
+                            ->native(false)
+                            ->required(),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

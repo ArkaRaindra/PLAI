@@ -12,22 +12,24 @@ use App\Models\QualityPeriod;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use LaraZeus\Tabler\Tabler;
 
 class QualityPeriodResource extends Resource
 {
     protected static ?string $model = QualityPeriod::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
+    protected static string|BackedEnum|null $navigationIcon = Tabler::CalendarEvent;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Masters';
+    protected static ?string $recordTitleAttribute = 'Kualitas Periode';
 
-    protected static ?string $navigationLabel = 'Kelola Periode Mutu';
+    protected static ?string $modelLabel = 'Kualitas Periode';
 
-    protected static ?string $pluralLabel = 'Kualitas Periode';
+    protected static ?string $pluralModelLabel = 'Kualitas Periode';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static string|\UnitEnum|null $navigationGroup = 'Penetapan';
+
+    protected static ?string $navigationLabel = 'Kualitas Periode';
 
     public static function form(Schema $schema): Schema
     {

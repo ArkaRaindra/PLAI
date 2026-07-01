@@ -15,14 +15,24 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use LaraZeus\Tabler\Tabler;
 
 class StandarVersionsResource extends Resource
 {
     protected static ?string $model = StandardVersion::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Tabler::GitCommit;
 
-    protected static ?string $recordTitleAttribute = 'StandardVersion';
+    protected static ?string $recordTitleAttribute = 'Versi Standar';
+
+    protected static ?string $modelLabel = 'Versi Standar';
+
+    protected static ?string $pluralModelLabel = 'Versi Standar';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Penetapan';
+
+    protected static ?string $navigationLabel = 'Versi Standar';
+
 
     public static function form(Schema $schema): Schema
     {
