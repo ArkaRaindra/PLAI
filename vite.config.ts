@@ -12,7 +12,10 @@ export default defineConfig({
             input: [
                 'resources/css/app.css', 
                 'resources/js/app.ts',
-                'resources/css/filament/prodi/theme.css'],
+                'resources/css/filament/prodi/theme.css',
+                'resources/css/filament/super-admin/theme.css',
+                'resources/css/filament/shared/base-theme.css',
+            ],
             refresh: true,
             fonts: [
                 bunny('Instrument Sans', {

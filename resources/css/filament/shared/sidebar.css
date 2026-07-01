@@ -1,0 +1,49 @@
+.fi-sidebar-group-collapse-btn svg {
+    transition: transform 0.3s ease;
+    transform: rotate(0deg);
+}
+
+.fi-sidebar-group-collapse-btn[aria-expanded="true"] svg {
+    transform: rotate(-90deg);
+}
+
+.fi-sidebar-item-grouped-border-part {
+    opacity: 0;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    font-size: 1rem;
+    font-weight: 600;
+    transform: none;
+    cursor: default;
+}
+
+.fi-sidebar-item .fi-sidebar-item-label {
+    transition: all 0.3s ease-out;
+}
+
+.fi-sidebar-item:not(.fi-active):hover .fi-sidebar-item-label {
+    transform: scale(1.03);
+}
+
+.fi-topbar-start {
+    @apply gap-x-2;
+}
+
+.fi-topbar-start .fi-logo {
+    @apply ms-0!;
+}
+
+.fi-topbar-start > a,
+.fi-topbar-start > .fi-logo {
+    order: 1;
+}
+
+.fi-topbar-collapse-sidebar-btn-ctn {
+    order: 2;
+}
+
+.fi-topbar-open-collapse-sidebar-btn .fi-icon svg,
+.fi-topbar-close-collapse-sidebar-btn .fi-icon svg {
+    @apply size-6;
+}

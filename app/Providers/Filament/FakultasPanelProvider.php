@@ -29,9 +29,6 @@ class FakultasPanelProvider extends PanelProvider
             ->brandLogoHeight('3rem')
             ->globalSearch(false)
             ->login(Login::class)
-            ->colors([
-                'primary' => '#ffb92d',
-            ])
             ->pages([
                 Dashboard::class,
             ])

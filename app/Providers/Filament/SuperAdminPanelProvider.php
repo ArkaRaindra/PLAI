@@ -41,9 +41,6 @@ class SuperAdminPanelProvider extends PanelProvider
             ->brandLogoHeight('3rem')
             ->globalSearch(false)
             ->login(Login::class)
-            ->colors([
-                'primary' => '#ffb92d',
-            ])
             ->navigationGroups([
                 NavigationGroup::make('Master')
                     ->label('Master'),
