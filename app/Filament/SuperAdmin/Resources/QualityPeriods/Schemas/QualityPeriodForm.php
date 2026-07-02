@@ -4,6 +4,7 @@ namespace App\Filament\SuperAdmin\Resources\QualityPeriods\Schemas;
 
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -17,25 +18,34 @@ class QualityPeriodForm
     public static function fields(string $prefix = ''): array
     {
         return [
-            TextInput::make($prefix.'code')
+            Radio::make($prefix . 'is_active')
+                ->label('Aktif')
+                ->options([
+                    '1' => 'Aktif',
+                    '0' => 'Tidak Aktif',
+                ])
+                ->formatStateUsing(fn($state) => (string) (int) $state)
+                ->dehydrateStateUsing(fn ($state) => (bool) $state)
+                ->default('1')
+                ->columnSpanFull(),
+            TextInput::make($prefix . 'code')
                 ->label('Kode')
                 ->required()
                 ->maxLength(255)
                 ->unique(ignoreRecord: true),
-            TextInput::make($prefix.'name')
+            TextInput::make($prefix . 'name')
                 ->label('Nama')
                 ->required()
                 ->maxLength(255),
-            DatePicker::make($prefix.'start_date')
+            DatePicker::make($prefix . 'start_date')
                 ->label('Tanggal Mulai')
                 ->required()
                 ->default(now())
                 ->native(false),
-            DatePicker::make($prefix.'end_date')
+            DatePicker::make($prefix . 'end_date')
                 ->label('Tanggal Selesai')
-                ->required()
                 ->native(false),
-            Select::make($prefix.'status')
+            Select::make($prefix . 'status')
                 ->label('Status')
                 ->options([
                     'draft' => 'Draft',
@@ -44,9 +54,6 @@ class QualityPeriodForm
                 ])
                 ->default('draft')
                 ->required(),
-            Toggle::make($prefix.'is_active')
-                ->label('Aktif')
-                ->default(true),
         ];
     }
 
