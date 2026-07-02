@@ -22,7 +22,18 @@ class RealizationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'Realization';
+    protected static ?string $recordTitleAttribute = 'id';
+
+    protected static ?string $modelLabel = 'Realisasi';
+
+    protected static ?string $pluralModelLabel = 'Realisasi';
+
+    protected static ?string $slug = 'realizations';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -54,5 +65,19 @@ class RealizationResource extends Resource
             'view' => ViewRealization::route('/{record}'),
             'edit' => EditRealization::route('/{record}/edit'),
         ];
+    }
+
+    public static function getListUrl(int|string $targetId): string
+    {
+        return static::getUrl('index').'?'.http_build_query([
+            'targetId' => $targetId,
+        ]);
+    }
+
+    public static function getCreateUrl(int|string $targetId): string
+    {
+        return static::getUrl('create').'?'.http_build_query([
+            'targetId' => $targetId,
+        ]);
     }
 }
