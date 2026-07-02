@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\Enums\CalculationMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,52 +21,8 @@ class Indicator extends Model
     protected function casts(): array
     {
         return [
+            'calculation_method' => CalculationMethod::class,
             'weight' => 'decimal:2',
-        ];
-    }
-
-    public const COUNT = 'count';
-
-    public const SUM = 'sum';
-
-    public const AVG = 'avg';
-
-    public const MIN = 'min';
-
-    public const MAX = 'max';
-
-    public const PERCENTAGE = 'percentage';
-
-    public const RATIO = 'ratio';
-
-    public const BOOLEAN = 'boolean';
-
-    public const WEIGHTED_AVERAGE = 'weighted_average';
-
-    public const TARGET_ACHIEVEMENT = 'target_achievement';
-
-    public const SCORE = 'score';
-
-    public const INDEX = 'index';
-
-    public const TREND = 'trend';
-
-    public static function options(): array
-    {
-        return [
-            self::COUNT => 'Jumlah',
-            self::SUM => 'Total',
-            self::AVG => 'Rata-rata',
-            self::MIN => 'Nilai Minimum',
-            self::MAX => 'Nilai Maksimum',
-            self::PERCENTAGE => 'Persentase',
-            self::RATIO => 'Rasio',
-            self::BOOLEAN => 'Ya / Tidak',
-            self::WEIGHTED_AVERAGE => 'Rata-rata Tertimbang',
-            self::TARGET_ACHIEVEMENT => 'Ketercapaian Target',
-            self::SCORE => 'Skor',
-            self::INDEX => 'Indeks',
-            self::TREND => 'Tren',
         ];
     }
 

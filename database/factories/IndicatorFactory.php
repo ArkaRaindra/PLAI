@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CalculationMethod;
 use App\Models\Indicator;
 use App\Models\StandardVersion;
 use App\Models\User;
@@ -25,7 +26,7 @@ class IndicatorFactory extends Factory
             'code' => strtoupper($this->faker->unique()->lexify('IND-???')),
             'name' => $this->faker->words(3, true),
             'description' => $this->faker->optional()->sentence(),
-            'calculation_method' => Indicator::COUNT,
+            'calculation_method' => CalculationMethod::Count,
             'measurement_unit' => 'unit',
             'weight' => $this->faker->randomFloat(2, 1, 100),
             'created_by' => User::factory(),

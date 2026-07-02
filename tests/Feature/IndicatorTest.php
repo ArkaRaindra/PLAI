@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\CalculationMethod;
 use App\Filament\SuperAdmin\Pages\ManageStandards;
 use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\Indicators\Pages\EditIndicator;
@@ -154,7 +155,7 @@ class IndicatorTest extends TestCase
             'standard_id' => $standard->id,
             'code' => 'IND-001',
             'name' => 'Indikator Satu',
-            'calculation_method' => Indicator::COUNT,
+            'calculation_method' => CalculationMethod::Count,
             'measurement_unit' => 'unit',
             'weight' => 1.50,
             'created_by' => $admin->id,
@@ -167,7 +168,7 @@ class IndicatorTest extends TestCase
                 'standard_id' => $standard->id,
                 'code' => 'IND-001',
                 'name' => 'Indikator Satu',
-                'calculation_method' => Indicator::COUNT,
+                'calculation_method' => CalculationMethod::Count->value,
                 'measurement_unit' => 'unit',
                 'weight' => '1.50',
             ]);
@@ -192,7 +193,7 @@ class IndicatorTest extends TestCase
             'standard_id' => $standard->id,
             'code' => 'IND-SAVE',
             'name' => 'Nama Lama',
-            'calculation_method' => Indicator::COUNT,
+            'calculation_method' => CalculationMethod::Count,
             'measurement_unit' => 'unit',
             'weight' => 1,
             'created_by' => $admin->id,

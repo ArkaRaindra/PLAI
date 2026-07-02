@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Indicators\Schemas;
 
+use App\Enums\CalculationMethod;
 use App\Models\Indicator;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -60,7 +61,9 @@ class IndicatorForm
                 Select::make('calculation_method')
                     ->label('Metode Perhitungan')
                     ->placeholder('Pilih metode perhitungan')
-                    ->options(Indicator::options())
+                    ->options(collect(CalculationMethod::cases())->mapWithKeys(
+                        fn (CalculationMethod $method) => [$method->value => $method->getLabel()],
+                    ))
                     ->native(false)
                     ->searchable()
                     ->nullable(),

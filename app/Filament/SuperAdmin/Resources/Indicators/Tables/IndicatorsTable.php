@@ -2,7 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Indicators\Tables;
 
-use App\Models\Indicator;
+use App\Enums\CalculationMethod;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -30,7 +30,7 @@ class IndicatorsTable
                     ->sortable(),
                 TextColumn::make('calculation_method')
                     ->label('Metode Perhitungan')
-                    ->formatStateUsing(fn (string $state): string => Indicator::options()[$state] ?? $state)
+                    ->formatStateUsing(fn (CalculationMethod|string|null $state): string => $state instanceof CalculationMethod ? $state->getLabel() : ($state ?? ''))
                     ->sortable(),
                 TextColumn::make('measurement_unit')
                     ->label('Satuan')
