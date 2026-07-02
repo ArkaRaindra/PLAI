@@ -15,12 +15,15 @@ class TargetsTable
     {
         return $table
             ->columns([
-                TextColumn::make('indicator.code')
-                    ->label('Kode Indikator')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('indicator.name')
                     ->label('Nama Indikator')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('indicator.standardVersion.version')
+                    ->label('Versi Standar')
+                    ->searchable(),
+                TextColumn::make('indicator.standardVersion.standard.name')
+                    ->label('Nama Standar')
                     ->searchable(),
                 TextColumn::make('qualityPeriod.code')
                     ->label('Periode')

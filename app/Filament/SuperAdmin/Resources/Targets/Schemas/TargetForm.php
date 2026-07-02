@@ -19,7 +19,7 @@ class TargetForm
             ->components([
                 Select::make('indicator_id')
                     ->label('Indikator')
-                    ->options(Indicator::query()->orderBy('code')->pluck('code', 'id'))
+                    ->options(Indicator::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
                     ->required()

@@ -8,6 +8,7 @@ use App\Models\UserPosition;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -42,7 +43,7 @@ class IndicatorOwnerForm
                     ->afterStateUpdated(fn (Set $set) => $set('user_position_id', null))
                     ->required(),
                 Select::make('user_position_id')
-                    ->label('Jabatan')
+                    ->label('Pengguna Yang Menjabat di Unit Organisasi')
                     ->relationship(
                         name: 'userPosition',
                         titleAttribute: 'id',
@@ -65,12 +66,8 @@ class IndicatorOwnerForm
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                RichEditor::make('notes')
+                Textarea::make('notes')
                     ->label('Catatan')
-                    ->extraAttributes([
-                        'style' => 'min-height: 300px;',
-                    ])
-                    ->required()
                     ->columnSpanFull(),
             ]);
     }

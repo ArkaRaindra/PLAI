@@ -6,6 +6,7 @@ use App\Models\Indicator;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
 class IndicatorMappingForm
@@ -26,25 +27,24 @@ class IndicatorMappingForm
                     ->label('Indikator Internal')
                     ->options(Indicator::query()->pluck('name', 'id'))
                     ->searchable()
-                    ->preload()
-                    ->requiredWithout('external_indicator_id')
-                    ->validationMessages([
-                        'required_without' => 'Indikator Internal atau Indikator Eksternal wajib diisi.',
-                    ]),
+                    ->required()
+                    ->preload(),
+                    // ->requiredWithout('external_indicator_id')
+                    // ->validationMessages([
+                    //     'required_without' => 'Indikator Internal atau Indikator Eksternal wajib diisi.',
+                    // ]),
                 Select::make('external_indicator_id')
                     ->label('Indikator Eksternal')
                     ->options(Indicator::query()->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
-                    ->requiredWithout('internal_indicator_id')
-                    ->validationMessages([
-                        'required_without' => 'Indikator Internal atau Indikator Eksternal wajib diisi.',
-                    ]),
-                RichEditor::make('notes')
+                    ->required(),
+                    // ->requiredWithout('internal_indicator_id')
+                    // ->validationMessages([
+                    //     'required_without' => 'Indikator Internal atau Indikator Eksternal wajib diisi.',
+                    // ]),
+                Textarea::make('notes')
                     ->label('Catatan')
-                    ->extraAttributes([
-                        'style' => 'min-height: 300px;',
-                    ])
                     ->columnSpanFull(),
             ]);
     }
