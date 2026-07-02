@@ -6,8 +6,8 @@ use App\Models\OrganizationUnit;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class OrgUnitForm
@@ -29,8 +29,13 @@ class OrgUnitForm
                         ->label('Jenis Organisasi')
                         ->options([
                             'POLITEKNIK' => 'POLITEKNIK',
+                            'JURUSAN' => 'JURUSAN',
                             'PROGRAM STUDI' => 'PROGRAM STUDI',
-                            'LPMI' => 'LPMI',
+                            'UPM' => 'UPM',
+                            'GKM' => 'GKM',
+                            'P3M' => 'P3M',
+                            'SPI' => 'SPI',
+                            'CDC' => 'CDC',
                             'UNIT' => 'UNIT',
                         ])
                         ->native(false),
@@ -40,11 +45,11 @@ class OrgUnitForm
                         ->searchable()
                         ->preload()
                         // hanya tampil jika bukan POLITEKNIK
-                        ->visible(fn(Get $get) => $get('type') !== 'POLITEKNIK')
+                        ->visible(fn (Get $get) => $get('type') !== 'POLITEKNIK')
                         // wajib jika bukan POLITEKNIK
-                        ->required(fn(Get $get) => $get('type') !== 'POLITEKNIK')
+                        ->required(fn (Get $get) => $get('type') !== 'POLITEKNIK')
                         // disable jika belum ada parent
-                        ->disabled(fn() => OrganizationUnit::count() === 0)
+                        ->disabled(fn () => OrganizationUnit::count() === 0)
                         ->helperText(function () {
                             return OrganizationUnit::count() === 0
                                 ? 'Belum ada organisasi induk. Buat POLITEKNIK terlebih dahulu.'

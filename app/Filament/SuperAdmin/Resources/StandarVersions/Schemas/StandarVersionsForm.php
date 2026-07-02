@@ -3,6 +3,7 @@
 namespace App\Filament\SuperAdmin\Resources\StandarVersions\Schemas;
 
 use App\Models\QualityPeriod;
+use App\Models\Standard;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -23,10 +24,20 @@ class StandarVersionsForm
                     ])
                     ->default('1')
                     ->columnSpanFull(),
+                Select::make('standard_id')
+                    ->label('Standar')
+                    ->options(fn (): array => Standard::query()
+                        ->orderBy('code')
+                        ->pluck('name', 'id')
+                        ->all())
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->native(false),
                 Select::make('quality_period_id')
                     ->label('Kode Periode')
                     ->options(fn (): array => QualityPeriod::query()
-                    ->where('is_active', true)
+                        ->where('is_active', true)
                         ->orderBy('name')
                         ->pluck('name', 'id')
                         ->all()),
@@ -41,16 +52,15 @@ class StandarVersionsForm
                     ->native(false),
                 DatePicker::make('end_date')
                     ->label('Tanggal Selesai')
-                    ->required()
                     ->default(now())
                     ->native(false),
                 Select::make('status')
-                ->label('Status')
-                ->options([
-                    'draft' => 'Draft',
-                    'active' => 'Aktif',
-                    'closed' => 'Tutup',
-                ])
+                    ->label('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'active' => 'Aktif',
+                        'closed' => 'Tutup',
+                    ]),
             ]);
     }
 }

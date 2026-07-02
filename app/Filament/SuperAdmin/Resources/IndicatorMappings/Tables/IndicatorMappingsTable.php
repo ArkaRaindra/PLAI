@@ -19,7 +19,7 @@ class IndicatorMappingsTable
                 TextColumn::make('internalIndicator.name')
                     ->label('Indikator Internal')
                     ->searchable(),
-                TextColumn::make('internalIndicator.name')
+                TextColumn::make('externalIndicator.name')
                     ->label('Indikator Eksternal')
                     ->searchable(),
                 TextColumn::make('is_primary')
