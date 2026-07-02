@@ -3,7 +3,6 @@
 namespace App\Filament\SuperAdmin\Resources\Positions\Pages;
 
 use App\Filament\SuperAdmin\Resources\Positions\PositionResource;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
@@ -19,7 +18,7 @@ class EditPosition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-           Action::make('back')
+            Action::make('back')
                 ->label('Kembali')
                 ->url($this->getResource()::getUrl('index'))
                 ->button()
@@ -33,12 +32,5 @@ class EditPosition extends EditRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $data['updated_by'] = auth()->id() ?? User::first()?->id;
-
-        return $data;
     }
 }

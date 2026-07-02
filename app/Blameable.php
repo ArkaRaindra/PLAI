@@ -15,10 +15,8 @@ trait Blameable
 
             if (Auth::check()) {
                 $model->created_by = Auth::id();
-                $model->updated_by = Auth::id();
             } else {
                 $model->created_by = 'system';
-                $model->updated_by = 'system';
             }
         });
 

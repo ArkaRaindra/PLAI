@@ -95,7 +95,6 @@ class UserForm
                                 : 'Jabatan Baru')
                         ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                             $data['created_by'] = auth()->id();
-                            $data['updated_by'] = auth()->id();
 
                             return $data;
                         })

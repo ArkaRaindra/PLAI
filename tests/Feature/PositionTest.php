@@ -31,6 +31,24 @@ class PositionTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
+        $this->actingAs($admin);
+
+        $position = Position::create([
+            'code' => 'AUTO',
+            'name' => 'Auto Blameable Position',
+            'description' => 'Created without explicit blame fields',
+        ]);
+
+        $this->assertModelExists($position);
+        $this->assertEquals($admin->id, $position->created_by);
+        $this->assertNull($position->updated_by);
+
+        $position->update([
+            'name' => 'Auto Blameable Position Updated',
+        ]);
+
+        $this->assertEquals($admin->id, $position->fresh()->updated_by);
+
         $position = Position::create([
             'code' => 'TEST',
             'name' => 'Test Position',

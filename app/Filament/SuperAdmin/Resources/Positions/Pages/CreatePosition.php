@@ -17,7 +17,7 @@ class CreatePosition extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-             Action::make('back')
+            Action::make('back')
                 ->label('Kembali')
                 ->url($this->getResource()::getUrl('index'))
                 ->button()
@@ -34,7 +34,6 @@ class CreatePosition extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = auth()->id() ?? User::first()?->id;
-        $data['updated_by'] = auth()->id() ?? User::first()?->id;
 
         return $data;
     }

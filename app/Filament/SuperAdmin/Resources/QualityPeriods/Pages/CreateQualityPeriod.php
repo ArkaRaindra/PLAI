@@ -34,7 +34,6 @@ class CreateQualityPeriod extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = auth()->id() ?? User::first()?->id;
-        $data['updated_by'] = auth()->id() ?? User::first()?->id;
 
         return $data;
     }
