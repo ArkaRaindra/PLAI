@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+Before starting any task (planning, searching, coding, running commands), you MUST:
+1) Read `.cursor/rules/ponytail.mdc`
+2) Write exactly one line: "Ponytail read." + one bullet summarizing which rung you will try first for this task.
+
+If you cannot do (1), you must stop and ask the user to provide the file contents.
