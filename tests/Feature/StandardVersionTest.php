@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Models\QualityPeriod;
 use App\Models\Standard;
 use App\Models\StandardSource;
@@ -27,29 +28,56 @@ class StandardVersionTest extends TestCase
         ]);
     }
 
-    public function test_create_standard_without_version_does_not_create_standard_version(): void
+    public function test_sync_without_version_removes_root_and_descendant_versions(): void
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
 
-        $standard = Standard::create([
-            'code' => 'NO-VER',
-            'name' => 'Standard Without Version',
+        $root = Standard::create([
+            'code' => 'ROOT',
+            'name' => 'Root Standard',
             'standard_source_id' => $source->id,
             'is_active' => true,
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
 
-        StandardVersionPersister::sync($standard, [
+        $child = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $root);
+
+        $versionData = [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $period->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'version' => 'v1',
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ];
+
+        StandardVersionPersister::sync($root, $versionData);
+        StandardVersionPersister::inheritFromParent($child, $root);
+
+        $this->assertDatabaseCount('standard_versions', 2);
+
+        StandardVersionPersister::sync($root, [
             'include_standard_version' => false,
             'quality_period_mode' => 'existing',
-            'quality_period_id' => null,
+            'quality_period_id' => $period->id,
             'qualityPeriod' => [],
             'standardVersion' => [],
         ]);
 
-        $this->assertDatabaseCount('standards', 1);
         $this->assertDatabaseCount('standard_versions', 0);
     }
 
@@ -280,5 +308,259 @@ class StandardVersionTest extends TestCase
         $this->assertSame('existing', $formData['quality_period_mode']);
         $this->assertSame($period->id, $formData['quality_period_id']);
         $this->assertSame('v2', $formData['standardVersion']['version']);
+    }
+
+    public function test_from_parent_throws_when_parent_has_no_version(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $parent = Standard::create([
+            'code' => 'NO-VER',
+            'name' => 'Parent Without Version',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        StandardVersionPersister::fromParent($parent);
+    }
+
+    public function test_child_inherits_parent_version_on_create(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $parent = Standard::create([
+            'code' => 'PARENT',
+            'name' => 'Parent Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        StandardVersionPersister::sync($parent, [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $period->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'version' => 'v1',
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ]);
+
+        $child = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $parent);
+
+        StandardVersionPersister::inheritFromParent($child, $parent);
+
+        $this->assertDatabaseHas('standard_versions', [
+            'standard_id' => $child->id,
+            'quality_period_id' => $period->id,
+            'version' => 'v1',
+        ]);
+    }
+
+    public function test_root_version_change_cascades_to_descendants(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $periodA = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $periodB = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $root = Standard::create([
+            'code' => 'ROOT',
+            'name' => 'Root Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $child = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $root);
+
+        $grandchild = Standard::create([
+            'code' => 'GRAND',
+            'name' => 'Grandchild Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $child);
+
+        $initialVersionData = [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $periodA->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'version' => 'v1',
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ];
+
+        StandardVersionPersister::sync($root, $initialVersionData);
+        StandardVersionPersister::inheritFromParent($child, $root);
+        StandardVersionPersister::inheritFromParent($grandchild, $child);
+
+        StandardVersionPersister::sync($root, [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $periodB->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'version' => 'v2',
+                'start_date' => now()->toDateString(),
+                'status' => 'active',
+                'is_active' => true,
+            ],
+        ]);
+
+        $child->refresh()->load('standardVersion');
+        $grandchild->refresh()->load('standardVersion');
+
+        $this->assertSame('v2', $root->fresh()->standardVersion?->version);
+        $this->assertSame('v2', $child->standardVersion?->version);
+        $this->assertSame('v2', $grandchild->standardVersion?->version);
+        $this->assertSame($periodB->id, $child->standardVersion?->quality_period_id);
+        $this->assertSame($periodB->id, $grandchild->standardVersion?->quality_period_id);
+    }
+
+    public function test_child_standard_update_does_not_change_inherited_version(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $parent = Standard::create([
+            'code' => 'PARENT',
+            'name' => 'Parent Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        StandardVersionPersister::sync($parent, [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $period->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'version' => 'v1',
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ]);
+
+        $child = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $parent);
+
+        StandardVersionPersister::inheritFromParent($child, $parent);
+
+        $child->update(['name' => 'Updated Child Name']);
+
+        $this->assertSame('v1', $child->fresh()->standardVersion?->version);
+        $this->assertSame($period->id, $child->fresh()->standardVersion?->quality_period_id);
+    }
+
+    public function test_deleting_standard_cascades_to_standard_versions(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $parent = Standard::create([
+            'code' => 'PARENT',
+            'name' => 'Parent Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        StandardVersionPersister::sync($parent, [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $period->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'version' => 'v1',
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ]);
+
+        $child = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $parent);
+
+        StandardVersionPersister::inheritFromParent($child, $parent);
+
+        $childVersionId = $child->fresh()->standardVersion?->id;
+        $this->assertNotNull($childVersionId);
+
+        $child->delete();
+
+        $this->assertDatabaseMissing('standards', ['id' => $child->id]);
+        $this->assertDatabaseMissing('standard_versions', ['id' => $childVersionId]);
+        $this->assertDatabaseHas('standards', ['id' => $parent->id]);
+        $this->assertDatabaseCount('standard_versions', 1);
+    }
+
+    public function test_create_child_standard_redirects_when_parent_has_no_version(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super-admin');
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $parent = Standard::create([
+            'code' => 'PARENT',
+            'name' => 'Parent Without Version',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(StandardResource::getCreateUrl($source->id, $parent->id))
+            ->assertRedirect(StandardResource::getManageStandardsUrl($source->id));
     }
 }

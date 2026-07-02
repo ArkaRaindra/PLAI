@@ -12,9 +12,9 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Kalnoy\Nestedset\NestedSet;
 use Wsmallnews\FilamentNestedset\Forms\Fields\KalnoyNestedsetSelectTree;
@@ -28,6 +28,9 @@ class StandardForm
                 Hidden::make('standard_source_id')
                     ->visible(fn (string $operation): bool => $operation === 'create')
                     ->required(fn (string $operation): bool => $operation === 'create'),
+                Hidden::make('include_standard_version')
+                    ->default(true)
+                    ->dehydrated(fn (string $operation, Get $get, ?Standard $record): bool => self::isRootStandard($operation, $get, $record)),
                 Radio::make('is_active')
                     ->label('Status')
                     ->options([
@@ -51,6 +54,22 @@ class StandardForm
                     ->placeholder('Pilih induk standar')
                     ->emptyLabel('Tidak ada induk standar')
                     ->treeKey('StandardParentId')
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, ?int $state): void {
+                        if (blank($state)) {
+                            $set('_inherited_quality_period', null);
+                            $set('_inherited_version', null);
+
+                            return;
+                        }
+
+                        $parent = Standard::query()
+                            ->with('standardVersion.qualityPeriod')
+                            ->find($state);
+
+                        $set('_inherited_quality_period', $parent?->standardVersion?->qualityPeriod?->name);
+                        $set('_inherited_version', $parent?->standardVersion?->version);
+                    })
                     ->visible(fn (string $operation): bool => $operation === 'create')
                     ->columnSpanFull(),
                 TextInput::make('code')
@@ -71,14 +90,23 @@ class StandardForm
                         'style' => 'min-height: 300px;',
                     ])
                     ->columnSpanFull(),
-                Toggle::make('include_standard_version')
-                    ->label('Tautkan Versi Standar')
-                    ->helperText('Opsional — kosongkan jika standar belum perlu atau tidak perlu versi dan periode kualitas.')
-                    ->default(false)
-                    ->live()
+                Section::make('Periode Kualitas & Versi Standar')
+                    ->description('Mengikuti induk standar — tidak dapat diubah pada sub-standar.')
+                    ->visible(fn (string $operation, Get $get, ?Standard $record): bool => self::isChildStandard($operation, $get, $record))
+                    ->schema([
+                        TextInput::make('_inherited_quality_period')
+                            ->label('Periode Kualitas')
+                            ->disabled()
+                            ->dehydrated(false),
+                        TextInput::make('_inherited_version')
+                            ->label('Versi')
+                            ->disabled()
+                            ->dehydrated(false),
+                    ])
+                    ->columns(2)
                     ->columnSpanFull(),
                 Section::make('Periode Kualitas')
-                    ->visible(fn (Get $get): bool => (bool) $get('include_standard_version'))
+                    ->visible(fn (string $operation, Get $get, ?Standard $record): bool => self::isRootStandard($operation, $get, $record))
                     ->schema([
                         Radio::make('quality_period_mode')
                             ->label('Sumber Periode')
@@ -92,20 +120,20 @@ class StandardForm
                         Select::make('quality_period_id')
                             ->label('Periode Kualitas')
                             ->options(fn (): array => QualityPeriod::query()
-                            ->where('is_active', true)
+                                ->where('is_active', true)
                                 ->orderBy('name')
                                 ->pluck('name', 'id')
                                 ->all())
                             ->searchable()
                             ->visible(fn (Get $get): bool => $get('quality_period_mode') === 'existing')
-                            ->required(fn (Get $get): bool => (bool) $get('include_standard_version') && $get('quality_period_mode') === 'existing')
+                            ->required(fn (Get $get): bool => $get('quality_period_mode') === 'existing')
                             ->columnSpanFull(),
                         ...collect(QualityPeriodForm::fields('qualityPeriod.'))
                             ->map(function ($field) {
                                 $field = $field->visible(fn (Get $get): bool => $get('quality_period_mode') === 'new');
 
                                 if ($field->getName() !== 'qualityPeriod.is_active') {
-                                    $field->required(fn (Get $get): bool => (bool) $get('include_standard_version') && $get('quality_period_mode') === 'new');
+                                    $field->required(fn (Get $get): bool => $get('quality_period_mode') === 'new');
                                 }
 
                                 return $field;
@@ -115,7 +143,7 @@ class StandardForm
                     ->columns(2)
                     ->columnSpanFull(),
                 Section::make('Versi Standar')
-                    ->visible(fn (Get $get): bool => (bool) $get('include_standard_version'))
+                    ->visible(fn (string $operation, Get $get, ?Standard $record): bool => self::isRootStandard($operation, $get, $record))
                     ->schema([
                         Radio::make('standardVersion.is_active')
                             ->label('Status Data Versi Standar')
@@ -128,7 +156,7 @@ class StandardForm
                             ->columnSpanFull(),
                         TextInput::make('standardVersion.version')
                             ->label('Versi')
-                            ->required(fn (Get $get): bool => (bool) $get('include_standard_version'))
+                            ->required()
                             ->maxLength(255),
                         DatePicker::make('standardVersion.start_date')
                             ->label('Tanggal Mulai')
@@ -150,5 +178,23 @@ class StandardForm
                     ->columns(2)
                     ->columnSpanFull(),
             ]);
+    }
+
+    protected static function isChildStandard(string $operation, Get $get, ?Standard $record): bool
+    {
+        if ($operation === 'create') {
+            return filled($get('parent_id'));
+        }
+
+        return filled($record?->parent_id);
+    }
+
+    protected static function isRootStandard(string $operation, Get $get, ?Standard $record): bool
+    {
+        if ($operation === 'create') {
+            return blank($get('parent_id'));
+        }
+
+        return $record?->parent_id === null;
     }
 }

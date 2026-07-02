@@ -130,8 +130,17 @@ class ManageStandards extends NestedsetPage
             ->iconButton()
             ->size(Size::Large)
             ->iconSize(IconSize::Large)
-            ->tooltip('Tambah Sub-standar')
+            ->tooltip(fn (array $arguments): string => Standard::query()
+                ->whereKey($arguments['parentId'] ?? null)
+                ->whereHas('standardVersion')
+                ->exists()
+                ? 'Tambah Sub-standar'
+                : 'Induk harus memiliki periode kualitas dan versi standar terlebih dahulu')
             ->icon('heroicon-o-plus-circle')
+            ->disabled(fn (array $arguments): bool => ! Standard::query()
+                ->whereKey($arguments['parentId'] ?? null)
+                ->whereHas('standardVersion')
+                ->exists())
             ->url(fn (array $arguments): string => StandardResource::getCreateUrl(
                 $this->standardSourceId,
                 $arguments['parentId'] ?? null,
@@ -197,7 +206,7 @@ class ManageStandards extends NestedsetPage
             return $query->whereRaw('1 = 0');
         }
 
-        $query = $query->withCount('indicators');
+        $query = $query->withCount('indicators')->with('standardVersion');
 
         if (filled($this->qualityPeriodId)) {
             $query->whereHas(

@@ -62,7 +62,14 @@ class EditStandard extends EditRecord
      */
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $this->record->loadMissing('standardVersion');
+        $this->record->loadMissing('standardVersion.qualityPeriod');
+
+        if (filled($this->record->parent_id)) {
+            return array_merge($data, [
+                '_inherited_quality_period' => $this->record->standardVersion?->qualityPeriod?->name,
+                '_inherited_version' => $this->record->standardVersion?->version,
+            ]);
+        }
 
         return array_merge($data, StandardVersionPersister::toFormData($this->record->standardVersion));
     }
@@ -70,6 +77,22 @@ class EditStandard extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(function () use ($record, $data) {
+            if (filled($record->parent_id)) {
+                unset(
+                    $data['include_standard_version'],
+                    $data['quality_period_mode'],
+                    $data['quality_period_id'],
+                    $data['qualityPeriod'],
+                    $data['standardVersion'],
+                    $data['_inherited_quality_period'],
+                    $data['_inherited_version'],
+                );
+
+                $record->update($data);
+
+                return $record;
+            }
+
             $versionData = StandardVersionPersister::stripNestedFormData($data);
 
             $record->update($data);

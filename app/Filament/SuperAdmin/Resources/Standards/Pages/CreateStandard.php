@@ -9,6 +9,7 @@ use App\Models\Standard;
 use App\Models\StandardSource;
 use App\Support\StandardVersionPersister;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +44,23 @@ class CreateStandard extends CreateRecord
             $this->redirect(StandardResource::getManageStandardsUrl());
 
             return;
+        }
+
+        if (filled($this->parentId)) {
+            $parent = Standard::scoped(['standard_source_id' => (int) $this->standardSourceId])
+                ->with('standardVersion')
+                ->find($this->parentId);
+
+            if ($parent === null || $parent->standardVersion === null) {
+                Notification::make()
+                    ->title('Induk standar belum memiliki periode kualitas dan versi standar.')
+                    ->danger()
+                    ->send();
+
+                $this->redirect(StandardResource::getManageStandardsUrl($this->standardSourceId));
+
+                return;
+            }
         }
 
         parent::mount();
@@ -87,12 +105,21 @@ class CreateStandard extends CreateRecord
             'standard_source_id' => (int) $this->standardSourceId,
             'parent_id' => filled($this->parentId) ? (int) $this->parentId : null,
             'is_active' => true,
+            'include_standard_version' => true,
         ];
 
-        if (filled($this->qualityPeriodId)) {
-            $fill['include_standard_version'] = true;
+        if (blank($this->parentId) && filled($this->qualityPeriodId)) {
             $fill['quality_period_mode'] = 'existing';
             $fill['quality_period_id'] = (int) $this->qualityPeriodId;
+        }
+
+        if (filled($this->parentId)) {
+            $parent = Standard::scoped(['standard_source_id' => (int) $this->standardSourceId])
+                ->with('standardVersion.qualityPeriod')
+                ->find($this->parentId);
+
+            $fill['_inherited_quality_period'] = $parent?->standardVersion?->qualityPeriod?->name;
+            $fill['_inherited_version'] = $parent?->standardVersion?->version;
         }
 
         $this->form->fill($fill);
@@ -110,7 +137,12 @@ class CreateStandard extends CreateRecord
                 : null;
 
             $standard = Standard::create($data, $parent);
-            StandardVersionPersister::sync($standard, $versionData);
+
+            if ($parent !== null) {
+                StandardVersionPersister::inheritFromParent($standard, $parent);
+            } else {
+                StandardVersionPersister::sync($standard, $versionData);
+            }
 
             return $standard;
         });

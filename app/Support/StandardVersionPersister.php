@@ -46,9 +46,51 @@ class StandardVersionPersister
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public static function fromParent(Standard $parent): array
+    {
+        $parent->unsetRelation('standardVersion');
+        $parent->load('standardVersion');
+
+        if ($parent->standardVersion === null) {
+            throw new \InvalidArgumentException('Induk standar belum memiliki periode kualitas dan versi standar.');
+        }
+
+        return self::toFormData($parent->standardVersion);
+    }
+
+    public static function inheritFromParent(Standard $child, Standard $parent): void
+    {
+        self::sync($child, self::fromParent($parent));
+    }
+
+    /**
+     * @param  array<string, mixed>  $versionData
+     */
+    public static function cascadeToDescendants(Standard $standard, array $versionData): void
+    {
+        foreach ($standard->descendants()->get() as $descendant) {
+            self::persistVersion($descendant, $versionData);
+        }
+    }
+
+    /**
      * @param  array<string, mixed>  $versionData
      */
     public static function sync(Standard $standard, array $versionData): void
+    {
+        self::persistVersion($standard, $versionData);
+
+        if ($standard->parent_id === null) {
+            self::cascadeToDescendants($standard, $versionData);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $versionData
+     */
+    protected static function persistVersion(Standard $standard, array $versionData): void
     {
         if (! self::shouldPersist($versionData)) {
             $standard->standardVersion?->delete();
