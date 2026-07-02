@@ -92,6 +92,7 @@ class StandardForm
                         Select::make('quality_period_id')
                             ->label('Periode Kualitas')
                             ->options(fn (): array => QualityPeriod::query()
+                            ->where('is_active', true)
                                 ->orderBy('name')
                                 ->pluck('name', 'id')
                                 ->all())
