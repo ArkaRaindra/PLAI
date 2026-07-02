@@ -31,12 +31,12 @@ class OrgUnitForm
                             'POLITEKNIK' => 'POLITEKNIK',
                             'JURUSAN' => 'JURUSAN',
                             'PROGRAM STUDI' => 'PROGRAM STUDI',
-                            'UPM' => 'UPM',
-                            'GKM' => 'GKM',
-                            'P3M' => 'P3M',
-                            'SPI' => 'SPI',
-                            'CDC' => 'CDC',
-                            'UNIT' => 'UNIT',
+                            'UPM' => 'UPM (Unit Penjaminan Mutu)',
+                            'GKM' => 'GKM (Gugus Kendali Mutu)',
+                            'P3M' => 'P3M (Pusat Penelitian dan Pengabdian kepada Masyarakat)',
+                            'SPI' => 'SPI (Satuan Pengawas Internal)',
+                            'CDC' => 'CDC (Career Development Center (Pusat Pengembangan Karir))',
+                            'UNIT' => 'UNIT ',
                         ])
                         ->native(false),
                     Select::make('parent_id')
