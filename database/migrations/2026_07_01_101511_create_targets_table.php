@@ -15,11 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('indicator_id')->constrained('indicators');
             $table->foreignId('quality_period_id')->constrained('quality_periods');
-            $table->foreignId('user_position_id')->constrained('user_positions');
             $table->decimal('target_value', 10, 2);
             $table->string('created_by');
             $table->string('updated_by')->nullable();
             $table->timestamps();
+
+            $table->unique(
+                ['indicator_id', 'quality_period_id'],
+                'targets_indicator_period_unique'
+            );
         });
     }
 

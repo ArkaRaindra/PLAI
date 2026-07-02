@@ -13,7 +13,6 @@ class Target extends Model
     protected $fillable = [
         'indicator_id',
         'quality_period_id',
-        'user_position_id',
         'target_value',
         'created_by',
         'updated_by',
