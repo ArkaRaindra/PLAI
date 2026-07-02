@@ -55,7 +55,7 @@ class EditUser extends EditRecord
                         ->success()
                         ->send();
                 }),
-           DeleteAction::make()
+            DeleteAction::make()
                 ->icon(Heroicon::Trash),
         ];
     }
