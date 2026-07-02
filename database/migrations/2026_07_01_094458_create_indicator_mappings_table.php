@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('indicator_mappings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('internal_indicator_id')->constrained('indicators')->nullable();
-            $table->foreignId('external_indicator_id')->constrained('indicators')->nullable();
+            $table->foreignId('internal_indicator_id')->nullable()->constrained('indicators');
+            $table->foreignId('external_indicator_id')->nullable()->constrained('indicators');
             $table->boolean('is_primary')->default(true);
             $table->text('notes')->nullable();
             $table->string('created_by');
