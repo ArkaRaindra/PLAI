@@ -35,4 +35,9 @@ class OrganizationUnit extends Model
     {
         return $this->hasMany(UserPosition::class, 'organization_unit_id');
     }
+
+    public function indicatorOwners()
+    {
+        return $this->hasMany(IndicatorOwner::class, 'organization_unit_id');
+    }
 }

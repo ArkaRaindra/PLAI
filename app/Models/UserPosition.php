@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Blameable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserPosition extends Model
 {
@@ -24,18 +26,23 @@ class UserPosition extends Model
         ];
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function position()
+    public function position(): BelongsTo
     {
         return $this->belongsTo(Position::class, 'position_id');
     }
 
-    public function organizationUnit()
+    public function organizationUnit(): BelongsTo
     {
         return $this->belongsTo(OrganizationUnit::class, 'organization_unit_id');
+    }
+
+    public function indicatorOwners(): HasMany
+    {
+        return $this->hasMany(IndicatorOwner::class, 'user_position_id');
     }
 }

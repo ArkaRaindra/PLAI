@@ -6,6 +6,7 @@ use App\Blameable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Indicator extends Model
 {
@@ -77,4 +78,24 @@ class Indicator extends Model
     {
         return $this->belongsTo(Standard::class);
     }
+
+    public function indicatorOwners(): HasMany
+    {
+        return $this->hasMany(IndicatorOwner::class);
+    }
+
+    public function indicatorMappingsInternal(): HasMany
+    {
+        return $this->hasMany(IndicatorMapping::class, 'internal_indicator_id');
+    }
+
+    public function indicatorMappingsExternal(): HasMany
+    {
+        return $this->hasMany(IndicatorMapping::class, 'external_indicator_id');
+    }
+
+    public function targets(): HasMany
+    {
+        return $this->hasMany(Target::class);
+    }   
 }
