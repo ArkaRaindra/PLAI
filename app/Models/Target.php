@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Blameable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Target extends Model
 {
@@ -26,5 +27,10 @@ class Target extends Model
     public function qualityPeriod(): BelongsTo
     {
         return $this->belongsTo(QualityPeriod::class);
+    }
+
+    public function realizations(): HasMany
+    {
+        return $this->hasMany(Realization::class);
     }
 }
