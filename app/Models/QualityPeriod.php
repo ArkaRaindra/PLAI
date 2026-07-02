@@ -18,8 +18,14 @@ class QualityPeriod extends Model
     ];
 
     protected $fillable = [
-        'code', 'name', 'start_date', 'end_date', 'status', 'is_active',
-        'created_by', 'updated_by',
+        'code',
+        'name',
+        'start_date',
+        'end_date',
+        'status',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array

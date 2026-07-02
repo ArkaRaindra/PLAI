@@ -12,8 +12,11 @@ class Position extends Model
     use Blameable, HasFactory;
 
     protected $fillable = [
-        'code', 'name', 'description',
-        'created_by', 'updated_by',
+        'code',
+        'name',
+        'description',
+        'created_by',
+        'updated_by',
     ];
 
     public function createdBy(): BelongsTo

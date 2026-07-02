@@ -10,8 +10,13 @@ class OrganizationUnit extends Model
     use Blameable;
 
     protected $fillable = [
-        'parent_id', 'code', 'name', 'type', 'is_active',
-        'created_by', 'updated_by',
+        'parent_id',
+        'code',
+        'name',
+        'type',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array

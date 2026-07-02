@@ -18,8 +18,13 @@ class Standard extends Model implements HasRichContent
     use Blameable, HasFactory, InteractsWithRichContent, NodeTrait;
 
     protected $fillable = [
-        'code', 'name', 'description', 'standard_source_id', 'is_active',
-        'created_by', 'updated_by',
+        'code',
+        'name',
+        'description',
+        'standard_source_id',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array

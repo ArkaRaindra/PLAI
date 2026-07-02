@@ -12,9 +12,14 @@ class UserPosition extends Model
     use Blameable;
 
     protected $fillable = [
-        'user_id', 'position_id', 'organization_unit_id',
-        'start_date', 'end_date', 'is_active',
-        'created_by', 'updated_by',
+        'user_id',
+        'position_id',
+        'organization_unit_id',
+        'start_date',
+        'end_date',
+        'is_active',
+        'created_by', 
+        'updated_by',
     ];
 
     protected function casts(): array

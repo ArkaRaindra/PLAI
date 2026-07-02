@@ -14,8 +14,15 @@ class Indicator extends Model
     use Blameable, HasFactory;
 
     protected $fillable = [
-        'standard_version_id', 'parent_indicator_id', 'code', 'name', 'description', 'calculation_method', 'measurement_unit', 'weight',
-        'created_by', 'updated_by',
+        'standard_version_id',
+        'parent_indicator_id',
+        'code', 'name',
+        'description',
+        'calculation_method',
+        'measurement_unit',
+        'weight',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array

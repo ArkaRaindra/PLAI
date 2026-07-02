@@ -15,8 +15,15 @@ class StandardVersion extends Model
     use HasFactory;
 
     protected $fillable = [
-        'standard_id', 'quality_period_id', 'version', 'start_date', 'end_date',
-        'status', 'is_active', 'created_by', 'updated_by',
+        'standard_id',
+        'quality_period_id',
+        'version',
+        'start_date',
+        'end_date',
+        'status',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array
