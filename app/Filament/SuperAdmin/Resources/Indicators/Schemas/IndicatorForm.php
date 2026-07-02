@@ -18,7 +18,7 @@ class IndicatorForm
     {
         return $schema
             ->components([
-                Hidden::make('standard_id'),
+                Hidden::make('standard_version_id'),
                 Select::make('parent_indicator_id')
                     ->label('Induk Indikator')
                     ->relationship(
@@ -26,7 +26,7 @@ class IndicatorForm
                         titleAttribute: 'name',
                         ignoreRecord: true,
                         modifyQueryUsing: fn (Builder $query, Get $get): Builder => $query
-                            ->where('standard_id', $get('standard_id'))
+                            ->where('standard_version_id', $get('standard_version_id'))
                             ->orderBy('code'),
                     )
                     ->getOptionLabelFromRecordUsing(
@@ -45,7 +45,8 @@ class IndicatorForm
                     ])
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null ? strtoupper($state) : null)
                     ->unique(
-                        modifyRuleUsing: fn (Unique $rule, callable $get) => $rule->where('standard_id', $get('standard_id')),
+                        modifyRuleUsing: fn (Unique $rule, callable $get) => $rule
+                            ->where('standard_version_id', $get('standard_version_id')),
                         ignoreRecord: true,
                     ),
                 TextInput::make('name')

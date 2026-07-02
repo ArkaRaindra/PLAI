@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Kalnoy\Nestedset\NodeTrait;
 
@@ -41,9 +42,16 @@ class Standard extends Model implements HasRichContent
         return $this->belongsTo(StandardSource::class, 'standard_source_id');
     }
 
-    public function indicators(): HasMany
+    public function indicators(): HasManyThrough
     {
-        return $this->hasMany(Indicator::class);
+        return $this->hasManyThrough(
+            Indicator::class,
+            StandardVersion::class,
+            'standard_id',
+            'standard_version_id',
+            'id',
+            'id',
+        );
     }
 
     public function standardVersions(): HasMany

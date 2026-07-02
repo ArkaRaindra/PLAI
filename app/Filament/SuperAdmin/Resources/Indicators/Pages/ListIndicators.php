@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\Indicators\Pages;
 use App\Filament\SuperAdmin\Pages\ManageStandards;
 use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
+use App\Models\Indicator;
 use App\Models\Standard;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -65,11 +66,12 @@ class ListIndicators extends ListRecords
     protected function getTableQuery(): Builder
     {
         if (blank($this->standardId)) {
-            return parent::getTableQuery()->whereRaw('1 = 0');
+            return Indicator::query()->whereRaw('1 = 0');
         }
 
-        return parent::getTableQuery()
-            ->where('standard_id', (int) $this->standardId);
+        return Indicator::query()
+            ->whereHas('standardVersion', fn (Builder $query): Builder => $query
+                ->where('standard_id', (int) $this->standardId));
     }
 
     protected function getHeaderActions(): array

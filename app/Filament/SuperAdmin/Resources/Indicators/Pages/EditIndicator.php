@@ -23,12 +23,12 @@ class EditIndicator extends EditRecord
      */
     public function getBreadcrumbs(): array
     {
-        $standard = $this->record->standard;
+        $standard = $this->record->standardVersion?->standard;
 
         $breadcrumbs = [
             StandarSourceResource::getUrl() => StandarSourceResource::getNavigationLabel(),
-            ManageStandards::getUrl(['standardSourceId' => $standard->standard_source_id]) => $standard->standardSource?->name ?? 'Standar',
-            IndicatorResource::getListUrl($standard->id) => $standard->code.' '.$standard->name,
+            ManageStandards::getUrl(['standardSourceId' => $standard?->standard_source_id]) => $standard?->standardSource?->name ?? 'Standar',
+            IndicatorResource::getListUrl($standard?->id ?? '') => trim(($standard?->code ?? '').' '.($standard?->name ?? '')),
         ];
 
         return [
@@ -42,7 +42,7 @@ class EditIndicator extends EditRecord
         return [
             Action::make('back')
                 ->label('Kembali')
-                ->url(IndicatorResource::getListUrl($this->record->standard_id))
+                ->url(IndicatorResource::getListUrl($this->record->standardVersion?->standard_id ?? ''))
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
@@ -56,19 +56,19 @@ class EditIndicator extends EditRecord
      */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $data['standard_id'] = $this->record->standard_id;
+        $data['standard_version_id'] = $this->record->standard_version_id;
 
         return $data;
     }
 
     protected function getRedirectUrl(): string
     {
-        return IndicatorResource::getListUrl($this->record->standard_id);
+        return IndicatorResource::getListUrl($this->record->standardVersion?->standard_id ?? '');
     }
 
     protected function getCancelFormAction(): Action
     {
         return parent::getCancelFormAction()
-            ->url(IndicatorResource::getListUrl($this->record->standard_id));
+            ->url(IndicatorResource::getListUrl($this->record->standardVersion?->standard_id ?? ''));
     }
 }

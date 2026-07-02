@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Indicator;
-use App\Models\Standard;
+use App\Models\StandardVersion;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,7 +20,7 @@ class IndicatorFactory extends Factory
     public function definition(): array
     {
         return [
-            'standard_id' => Standard::factory(),
+            'standard_version_id' => StandardVersion::factory(),
             'parent_indicator_id' => null,
             'code' => strtoupper($this->faker->unique()->lexify('IND-???')),
             'name' => $this->faker->words(3, true),

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('indicators', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('standard_id')->constrained('standards')->cascadeOnDelete();
+            $table->foreignId('standard_version_id')->constrained('standard_versions')->cascadeOnDelete();
             $table->foreignId('parent_indicator_id')->nullable()->constrained('indicators')->cascadeOnDelete();
             $table->string('code');
             $table->string('name');

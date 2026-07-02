@@ -13,7 +13,7 @@ class Indicator extends Model
     use Blameable, HasFactory;
 
     protected $fillable = [
-        'standard_id', 'parent_indicator_id', 'code', 'name', 'description', 'calculation_method', 'measurement_unit', 'weight',
+        'standard_version_id', 'parent_indicator_id', 'code', 'name', 'description', 'calculation_method', 'measurement_unit', 'weight',
         'created_by', 'updated_by',
     ];
 
@@ -74,9 +74,9 @@ class Indicator extends Model
         return $this->belongsTo(Indicator::class, 'parent_indicator_id');
     }
 
-    public function standard(): BelongsTo
+    public function standardVersion(): BelongsTo
     {
-        return $this->belongsTo(Standard::class);
+        return $this->belongsTo(StandardVersion::class);
     }
 
     public function indicatorOwners(): HasMany
@@ -97,5 +97,5 @@ class Indicator extends Model
     public function targets(): HasMany
     {
         return $this->hasMany(Target::class);
-    }   
+    }
 }

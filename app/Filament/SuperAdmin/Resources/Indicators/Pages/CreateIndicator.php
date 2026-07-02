@@ -5,7 +5,6 @@ namespace App\Filament\SuperAdmin\Resources\Indicators\Pages;
 use App\Filament\SuperAdmin\Pages\ManageStandards;
 use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
-use App\Models\Indicator;
 use App\Models\Standard;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
@@ -73,14 +72,17 @@ class CreateIndicator extends CreateRecord
 
     protected function fillForm(): void
     {
+        $standard = Standard::query()->find($this->standardId);
+
         $this->form->fill([
-            'standard_id' => (int) $this->standardId,
+            'standard_version_id' => $standard?->standardVersion?->id,
         ]);
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['standard_id'] = (int) $this->standardId;
+        $standard = Standard::query()->find($this->standardId);
+        $data['standard_version_id'] = $standard?->standardVersion?->id;
 
         return $data;
     }
