@@ -75,8 +75,6 @@ class CreateIndicator extends CreateRecord
     {
         $this->form->fill([
             'standard_id' => (int) $this->standardId,
-            'calculation_method' => Indicator::COUNT,
-            'weight' => 1,
         ]);
     }
 

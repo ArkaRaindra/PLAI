@@ -58,21 +58,20 @@ class IndicatorForm
                     ->columnSpanFull(),
                 Select::make('calculation_method')
                     ->label('Metode Perhitungan')
+                    ->placeholder('Pilih metode perhitungan')
                     ->options(Indicator::options())
-                    ->required()
                     ->native(false)
-                    ->searchable(),
+                    ->searchable()
+                    ->nullable(),
                 TextInput::make('measurement_unit')
                     ->label('Satuan Pengukuran')
-                    ->required()
                     ->maxLength(255),
                 TextInput::make('weight')
                     ->label('Bobot')
-                    ->required()
                     ->numeric()
                     ->minValue(0)
-                    ->maxValue(999999.99)
-                    ->step(0.01),
+                    ->maxValue(999999)
+                    ->nullable(),
             ]);
     }
 }
