@@ -41,9 +41,4 @@ class EditQualityPeriod extends EditRecord
 
         return $data;
     }
-
-    protected function getFormActions(): array
-    {
-        return [];
-    }
 }

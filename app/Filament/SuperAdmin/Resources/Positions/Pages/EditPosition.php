@@ -41,9 +41,4 @@ class EditPosition extends EditRecord
 
         return $data;
     }
-
-    protected function getFormActions(): array
-    {
-        return [];
-    }
 }
