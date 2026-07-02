@@ -19,12 +19,8 @@ class StandarVersionsTable
                     ->label('Kode Standar')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('standard.name')
-                    ->label('Nama Standar')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('standard.name')
-                    ->label('Nama Standar')
+                TextColumn::make('qualityPeriod.code')
+                    ->label('Kode Periode')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('version')
