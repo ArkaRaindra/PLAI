@@ -7,7 +7,6 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Icons\Heroicon;
 
 class EditStandarVersions extends EditRecord
 {
@@ -26,14 +25,14 @@ class EditStandarVersions extends EditRecord
                 ->url($this->getResource()::getUrl('index'))
                 ->button()
                 ->color('gray')
-                ->icon(Heroicon::ArrowLeft),
+                ->icon('heroicon-o-arrow-left'),
 
             ViewAction::make()
                 ->label('Lihat')
                 ->url($this->getResource()::getUrl('view', ['record' => $this->record]))
                 ->button()
                 ->color('info')
-                ->icon(Heroicon::Eye),
+                ->icon('heroicon-o-eye'),
         ];
     }
 }
