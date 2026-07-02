@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('targets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('indicator_id')->constrained('indicators');
-            $table->foreignId('quality_period_id')->constrained('quality_periods');
+            $table->foreignId('indicator_id')->constrained('indicators')->cascadeOnDelete();
+            $table->foreignId('quality_period_id')->constrained('quality_periods')->cascadeOnDelete();
             $table->decimal('target_value', 10, 2);
             $table->string('created_by');
             $table->string('updated_by')->nullable();

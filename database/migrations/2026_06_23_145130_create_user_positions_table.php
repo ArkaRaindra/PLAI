@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('user_positions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('position_id')->constrained('positions');
-            $table->foreignId('organization_unit_id')->constrained('organization_units');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('position_id')->constrained('positions')->cascadeOnDelete();
+            $table->foreignId('organization_unit_id')->constrained('organization_units')->cascadeOnDelete();
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->boolean('is_active');

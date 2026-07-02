@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('standard_versions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('standard_id')->constrained('standards');
-            $table->foreignId('quality_period_id')->constrained('quality_periods');
+            $table->foreignId('standard_id')->constrained('standards')->cascadeOnDelete();
+            $table->foreignId('quality_period_id')->constrained('quality_periods')->cascadeOnDelete();
             $table->string('version');
             $table->date('start_date')->default(now());
             $table->date('end_date')->nullable();

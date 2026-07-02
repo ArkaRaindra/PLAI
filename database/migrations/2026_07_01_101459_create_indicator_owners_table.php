@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('indicator_owners', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('indicator_id')->constrained('indicators');
-            $table->foreignId('organization_unit_id')->constrained('organization_units');
-            $table->foreignId('user_position_id')->nullable()->constrained('user_positions');
+            $table->foreignId('indicator_id')->constrained('indicators')->cascadeOnDelete();
+            $table->foreignId('organization_unit_id')->constrained('organization_units')->cascadeOnDelete();
+            $table->foreignId('user_position_id')->nullable()->constrained('user_positions')->cascadeOnDelete();
             $table->boolean('is_primary')->default(true);
             $table->text('notes')->nullable();
             $table->string('created_by');

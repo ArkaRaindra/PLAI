@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('organization_units', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_id')->nullable()->constrained('organization_units');
+            $table->foreignId('parent_id')->nullable()->constrained('organization_units')->cascadeOnDelete();
             $table->string('code');
             $table->string('name');
             $table->enum('type', ['POLITEKNIK', 'JURUSAN', 'PROGRAM STUDI', 'UPM', 'GKM', 'P3M', 'SPI', 'CDC', 'UNIT'])->default('PROGRAM STUDI');
