@@ -15,15 +15,23 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use LaraZeus\Tabler\Tabler;
 
 class IndicatorOwnerResource extends Resource
 {
     protected static ?string $model = IndicatorOwner::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Tabler::UserStar;
 
-    protected static ?string $recordTitleAttribute = 'IndicatorOwner';
+    protected static ?string $recordTitleAttribute = 'Pemilik Indikator';
 
+    protected static ?string $modelLabel = 'Pemilik Indikator';
+
+    protected static ?string $pluralModelLabel = 'Pemilik Indikator';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Indikator';
+
+    protected static ?string $navigationLabel = 'Pemilik Indikator';
     public static function form(Schema $schema): Schema
     {
         return IndicatorOwnerForm::configure($schema);

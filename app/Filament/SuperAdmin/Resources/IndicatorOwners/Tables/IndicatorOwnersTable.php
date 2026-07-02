@@ -22,8 +22,13 @@ class IndicatorOwnersTable
                 TextColumn::make('organizationUnit.name')
                     ->label('Unit Organisasi')
                     ->searchable(),
+                TextColumn::make('userPosition.user.name')
+                    ->label('Nama Pengguna')
+                    ->placeholder('—')
+                    ->searchable(),
                 TextColumn::make('userPosition.position.name')
                     ->label('Jabatan')
+                    ->placeholder('—')
                     ->searchable(),
                 TextColumn::make('is_primary')
                     ->label('Data Utama')
@@ -33,7 +38,7 @@ class IndicatorOwnersTable
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d-m-Y H:i:s')
-                    ->formatStateUsing(fn ($state): string => Carbon::parse($state)->format('d-M-Y H:i:s'))
+                    ->formatStateUsing(fn ($state): string => Carbon::parse($state)->format('d M y H:i:s'))
                     ->sortable(),
             ])
             ->filters([

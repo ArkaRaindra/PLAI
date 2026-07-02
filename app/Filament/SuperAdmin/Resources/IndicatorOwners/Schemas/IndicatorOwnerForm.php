@@ -8,7 +8,10 @@ use App\Models\UserPosition;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class IndicatorOwnerForm
 {
@@ -35,13 +38,33 @@ class IndicatorOwnerForm
                     ->options(OrganizationUnit::query()->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set) => $set('user_position_id', null))
                     ->required(),
-                // Select::make('user_position_id')
-                //     ->label('Jabatan')
-                //     ->options(UserPosition::query()->pluck('name', 'id'))
-                //     ->searchable()
-                //     ->preload()
-                //     ->required(),
+                Select::make('user_position_id')
+                    ->label('Jabatan')
+                    ->relationship(
+                        name: 'userPosition',
+                        titleAttribute: 'id',
+                        modifyQueryUsing: fn (Builder $query, Get $get): Builder => $query
+                            ->with(['user', 'position', 'organizationUnit'])
+                            ->where('is_active', true)
+                            ->when(
+                                filled($get('organization_unit_id')),
+                                fn (Builder $query) => $query->where('organization_unit_id', $get('organization_unit_id')),
+                                fn (Builder $query) => $query->whereRaw('1 = 0'),
+                            ),
+                    )
+                    ->getOptionLabelFromRecordUsing(
+                        fn (UserPosition $record): string => "{$record->user->name} — {$record->position->name} — {$record->organizationUnit->name}",
+                    )
+                    ->disabled(fn (Get $get): bool => blank($get('organization_unit_id')))
+                    ->placeholder(fn (Get $get): string => blank($get('organization_unit_id'))
+                        ? 'Pilih unit organisasi terlebih dahulu'
+                        : 'Tidak ada')
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
                 RichEditor::make('notes')
                     ->label('Catatan')
                     ->extraAttributes([
