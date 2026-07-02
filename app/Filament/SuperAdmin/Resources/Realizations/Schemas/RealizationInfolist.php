@@ -41,6 +41,17 @@ class RealizationInfolist
                             TextEntry::make('notes')->label('Catatan')->columnSpanFull(),
                         ]),
                     ]),
+                Section::make('Riwayat Status')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextEntry::make('submittedBy.name')->label('Diajukan Oleh')->placeholder('-'),
+                            TextEntry::make('submitted_at')->label('Diajukan Pada')->dateTime()->placeholder('-'),
+                            TextEntry::make('approvedBy.name')->label('Disetujui Oleh')->placeholder('-'),
+                            TextEntry::make('approved_at')->label('Disetujui Pada')->dateTime()->placeholder('-'),
+                            TextEntry::make('rejectedBy.name')->label('Ditolak Oleh')->placeholder('-'),
+                            TextEntry::make('rejected_at')->label('Ditolak Pada')->dateTime()->placeholder('-'),
+                        ]),
+                    ]),
                 Section::make('Meta')
                     ->schema([
                         Grid::make(2)->schema([

@@ -177,6 +177,108 @@ class RealizationAccessTest extends TestCase
         $this->assertSame(2, Realization::query()->where('target_id', $target->id)->count());
     }
 
+    public function test_submitted_status_sets_submitted_by_on_create(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        [$target, $unit] = $this->createTargetWithUnit($admin);
+
+        $this->actingAs($admin);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $unit->id,
+            'actual_value' => 10,
+            'score' => 8,
+            'status' => 'submitted',
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $realization->refresh();
+
+        $this->assertSame($admin->id, $realization->submitted_by);
+        $this->assertNotNull($realization->submitted_at);
+        $this->assertNull($realization->approved_by);
+    }
+
+    public function test_status_transition_sets_actor_on_update(): void
+    {
+        $submitter = User::factory()->create(['is_active' => true, 'name' => 'Submitter']);
+        $approver = User::factory()->create(['is_active' => true, 'name' => 'Approver']);
+        [$target, $unit] = $this->createTargetWithUnit($submitter);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $unit->id,
+            'actual_value' => 10,
+            'score' => 8,
+            'status' => 'draft',
+            'created_by' => (string) $submitter->id,
+        ]);
+
+        $this->actingAs($submitter);
+        $realization->update(['status' => 'submitted']);
+        $realization->refresh();
+
+        $this->assertSame($submitter->id, $realization->submitted_by);
+
+        $this->actingAs($approver);
+        $realization->update(['status' => 'approved']);
+        $realization->refresh();
+
+        $this->assertSame($approver->id, $realization->approved_by);
+        $this->assertNotNull($realization->approved_at);
+        $this->assertSame($submitter->id, $realization->submitted_by);
+    }
+
+    public function test_rejected_status_sets_rejected_by(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        [$target, $unit] = $this->createTargetWithUnit($admin);
+
+        $this->actingAs($admin);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $unit->id,
+            'actual_value' => 10,
+            'score' => 8,
+            'status' => 'rejected',
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $realization->refresh();
+
+        $this->assertSame($admin->id, $realization->rejected_by);
+        $this->assertNotNull($realization->rejected_at);
+    }
+
+    public function test_saving_without_status_change_does_not_overwrite_submitted_by(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        $other = User::factory()->create(['is_active' => true]);
+        [$target, $unit] = $this->createTargetWithUnit($admin);
+
+        $this->actingAs($admin);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $unit->id,
+            'actual_value' => 10,
+            'score' => 8,
+            'status' => 'submitted',
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $originalSubmittedAt = $realization->submitted_at;
+
+        $this->actingAs($other);
+        $realization->update(['actual_value' => 11]);
+        $realization->refresh();
+
+        $this->assertSame($admin->id, $realization->submitted_by);
+        $this->assertTrue($originalSubmittedAt->equalTo($realization->submitted_at));
+    }
+
     /**
      * @return array{0: Target, 1: OrganizationUnit}
      */
