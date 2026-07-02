@@ -50,13 +50,15 @@ class EditIndicator extends EditRecord
         ];
     }
 
-    protected function fillForm(): void
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        parent::fillForm();
+        $data['standard_id'] = $this->record->standard_id;
 
-        $this->form->fill([
-            'standard_id' => $this->record->standard_id,
-        ]);
+        return $data;
     }
 
     protected function getRedirectUrl(): string
