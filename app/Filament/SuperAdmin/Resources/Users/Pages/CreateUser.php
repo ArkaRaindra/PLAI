@@ -29,22 +29,4 @@ class CreateUser extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
-
-    // protected function getCreateFormAction(): Action
-    // {
-    //     return parent::getCreateFormAction()
-    //         ->visible(false);
-    // }
-
-    // protected function getCreateAnotherFormAction(): Action
-    // {
-    //     return parent::getCreateAnotherFormAction()
-    //         ->visible(false);
-    // }
-
-    protected function getCancelFormAction(): Action
-    {
-        return parent::getCancelFormAction()
-            ->visible(false);
-    }
 }

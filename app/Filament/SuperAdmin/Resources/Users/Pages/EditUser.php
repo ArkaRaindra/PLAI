@@ -25,11 +25,11 @@ class EditUser extends EditRecord
                 ->url($this->getResource()::getUrl('index'))
                 ->button()
                 ->color('gray')
-                ->icon(Heroicon::ArrowLeft),
-            ViewAction::make()->icon(Heroicon::Eye)->color('info'),
+                ->icon('heroicon-o-arrow-left'),
+            ViewAction::make()->icon('heroicon-o-eye')->color('info'),
             Action::make('resetPassword')
                 ->label('Reset Password')
-                ->icon(Heroicon::OutlinedKey)
+                ->icon('heroicon-o-key')
                 ->color('warning')
                 ->schema([
                     TextInput::make('password')
@@ -63,10 +63,5 @@ class EditUser extends EditRecord
     protected function getRedirectUrl(): string
     {
         return UserResource::getUrl('index');
-    }
-
-    protected function getFormActions(): array
-    {
-        return [];
     }
 }
