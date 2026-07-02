@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('actual_value', 18, 2);
             $table->decimal('score', 18, 2);
             $table->text('notes')->nullable();
+            $table->text('note_rejected')->nullable();
             $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
             $table->foreignId('submitted_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnDelete();

@@ -19,6 +19,7 @@ class Realization extends Model
         'actual_value',
         'score',
         'notes',
+        'note_rejected',
         'status',
         'submitted_by',
         'submitted_at',

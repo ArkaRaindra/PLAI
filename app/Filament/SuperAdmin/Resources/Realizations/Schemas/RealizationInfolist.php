@@ -50,6 +50,11 @@ class RealizationInfolist
                             TextEntry::make('approved_at')->label('Disetujui Pada')->dateTime()->placeholder('-'),
                             TextEntry::make('rejectedBy.name')->label('Ditolak Oleh')->placeholder('-'),
                             TextEntry::make('rejected_at')->label('Ditolak Pada')->dateTime()->placeholder('-'),
+                            TextEntry::make('note_rejected')
+                                ->label('Catatan Penolakan')
+                                ->placeholder('-')
+                                ->columnSpanFull()
+                                ->visible(fn ($record): bool => $record->status === 'rejected'),
                         ]),
                     ]),
                 Section::make('Meta')

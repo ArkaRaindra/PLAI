@@ -252,6 +252,28 @@ class RealizationAccessTest extends TestCase
         $this->assertNotNull($realization->rejected_at);
     }
 
+    public function test_rejected_status_persists_note_rejected(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        [$target, $unit] = $this->createTargetWithUnit($admin);
+
+        $this->actingAs($admin);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $unit->id,
+            'actual_value' => 10,
+            'score' => 8,
+            'status' => 'rejected',
+            'note_rejected' => 'Data tidak lengkap',
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $realization->refresh();
+
+        $this->assertSame('Data tidak lengkap', $realization->note_rejected);
+    }
+
     public function test_saving_without_status_change_does_not_overwrite_submitted_by(): void
     {
         $admin = User::factory()->create(['is_active' => true]);

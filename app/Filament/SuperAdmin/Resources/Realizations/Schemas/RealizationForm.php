@@ -82,7 +82,13 @@ class RealizationForm
                     ])
                     ->default('draft')
                     ->required()
+                    ->live()
                     ->native(false),
+                Textarea::make('note_rejected')
+                    ->label('Catatan Penolakan')
+                    ->visible(fn (Get $get): bool => $get('status') === 'rejected')
+                    ->required(fn (Get $get): bool => $get('status') === 'rejected')
+                    ->columnSpanFull(),
                 Textarea::make('notes')
                     ->label('Catatan')
                     ->columnSpanFull(),
