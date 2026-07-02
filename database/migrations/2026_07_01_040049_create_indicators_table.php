@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('code');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('calculation_method');
-            $table->string('measurement_unit');
-            $table->decimal('weight', 8, 2);
+            $table->string('calculation_method')->nullable();
+            $table->string('measurement_unit')->nullable();
+            $table->decimal('weight', 8, 2)->nullable();
             $table->string('created_by');
             $table->string('updated_by')->nullable();
             $table->timestamps();
