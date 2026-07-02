@@ -64,6 +64,13 @@ class Standard extends Model implements HasRichContent
         return $this->hasOne(StandardVersion::class)->latestOfMany();
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Standard $standard): void {
+            $standard->standardVersions()->delete();
+        });
+    }
+
     protected function setUpRichContent(): void
     {
         $this->registerRichContent('description');
