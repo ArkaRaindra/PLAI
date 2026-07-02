@@ -15,10 +15,10 @@ class IndicatorMappingForm
         return $schema
             ->components([
                 Radio::make('is_primary')
-                    ->label('Primeri')
+                    ->label('Data Utama')
                     ->options([
-                        true => 'Primeri',
-                        false => 'Bukan Primeri',
+                        true => 'Ya',
+                        false => 'Bukan ',
                     ])
                     ->default(true)
                     ->columnSpanFull(),

@@ -23,10 +23,10 @@ class IndicatorMappingsTable
                     ->label('Indikator Eksternal')
                     ->searchable(),
                 TextColumn::make('is_primary')
-                    ->label('Primeri')
+                    ->label('Data Utama')
                     ->badge()
                     ->color(fn ($state): string => $state ? 'success' : 'gray')
-                    ->formatStateUsing(fn ($state): string => $state ? 'Primeri' : 'Bukan Primeri'),
+                    ->formatStateUsing(fn ($state): string => $state ? 'Ya' : 'Bukan'),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d-m-Y H:i:s')
