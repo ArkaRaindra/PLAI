@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Realizations\Schemas;
 
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -22,14 +23,14 @@ class RealizationInfolist
                             TextEntry::make('status')
                                 ->label('Status')
                                 ->badge()
-                                ->formatStateUsing(fn (string $state): string => match ($state) {
+                                ->formatStateUsing(fn(string $state): string => match ($state) {
                                     'draft' => 'Draft',
                                     'submitted' => 'Diajukan',
                                     'approved' => 'Disetujui',
                                     'rejected' => 'Ditolak',
                                     default => $state,
                                 })
-                                ->color(fn (string $state): string => match ($state) {
+                                ->color(fn(string $state): string => match ($state) {
                                     'draft' => 'gray',
                                     'submitted' => 'info',
                                     'approved' => 'success',
@@ -41,22 +42,41 @@ class RealizationInfolist
                             TextEntry::make('notes')->label('Catatan')->columnSpanFull(),
                         ]),
                     ]),
-                Section::make('Riwayat Status')
+                RepeatableEntry::make('statusHistories')
+                    ->label('Riwayat Status')
                     ->schema([
-                        Grid::make(2)->schema([
-                            TextEntry::make('submittedBy.name')->label('Diajukan Oleh')->placeholder('-'),
-                            TextEntry::make('submitted_at')->label('Diajukan Pada')->dateTime()->placeholder('-'),
-                            TextEntry::make('approvedBy.name')->label('Disetujui Oleh')->placeholder('-'),
-                            TextEntry::make('approved_at')->label('Disetujui Pada')->dateTime()->placeholder('-'),
-                            TextEntry::make('rejectedBy.name')->label('Ditolak Oleh')->placeholder('-'),
-                            TextEntry::make('rejected_at')->label('Ditolak Pada')->dateTime()->placeholder('-'),
-                            TextEntry::make('note_rejected')
-                                ->label('Catatan Penolakan')
-                                ->placeholder('-')
-                                ->columnSpanFull()
-                                ->visible(fn ($record): bool => $record->status === 'rejected'),
-                        ]),
-                    ]),
+                        TextEntry::make('status')
+                            ->label('Status')
+                            ->badge()
+                            ->formatStateUsing(fn(string $state) => match ($state) {
+                                'draft' => 'Draft',
+                                'submitted' => 'Diajukan',
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                default => $state,
+                            })
+                            ->color(fn(string $state): string => match ($state) {
+                                'draft' => 'gray',
+                                'submitted' => 'info',
+                                'approved' => 'success',
+                                'rejected' => 'danger',
+                                default => 'gray',
+                            }),
+
+                        TextEntry::make('user.name')
+                            ->label('Oleh'),
+
+                        TextEntry::make('created_at')
+                            ->label('Status diperbarui pada')
+                            ->dateTime(),
+
+                        TextEntry::make('note')
+                            ->label('Catatan Penolakan')
+                            ->placeholder('-')
+                            ->columnSpanFull()
+                            ->visible(fn ($record) => $record->status === 'rejected'),
+                    ])
+                    ->columns(3),
                 Section::make('Meta')
                     ->schema([
                         Grid::make(2)->schema([
