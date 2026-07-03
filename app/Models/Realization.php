@@ -43,24 +43,52 @@ class Realization extends Model
 
     protected static function booted(): void
     {
-        static::created(function (Realization $realization) {
-        $realization->statusHistories()->create([
-            'status' => 'draft',
-            'action' => 'created',
-            'user_id' => auth()->id(),
-        ]);
-    });
+        static::saving(function (Realization $realization): void {
+            $realization->applyStatusTransitionAudit();
+        });
 
-    static::updated(function (Realization $realization) {
-        if ($realization->wasChanged('status')) {
+        static::created(function (Realization $realization): void {
             $realization->statusHistories()->create([
-                'status' => $realization->status,
-                'action' => $realization->status,
-                'user_id' => auth()->id(),
-                'note' => $realization->note_rejected,
+                'status' => 'draft',
+                'action' => 'created',
+                'user_id' => Auth::id(),
             ]);
+        });
+
+        static::updated(function (Realization $realization): void {
+            if ($realization->wasChanged('status')) {
+                $realization->statusHistories()->create([
+                    'status' => $realization->status,
+                    'action' => $realization->status,
+                    'user_id' => Auth::id(),
+                    'note' => $realization->note_rejected,
+                ]);
+            }
+        });
+    }
+
+    public function applyStatusTransitionAudit(): void
+    {
+        if (! Auth::check() || ! $this->isDirty('status')) {
+            return;
         }
-    });
+
+        $userId = Auth::id();
+
+        if ($this->status === 'submitted') {
+            $this->submitted_by = $userId;
+            $this->submitted_at = now();
+        }
+
+        if ($this->status === 'approved') {
+            $this->approved_by = $userId;
+            $this->approved_at = now();
+        }
+
+        if ($this->status === 'rejected') {
+            $this->rejected_by = $userId;
+            $this->rejected_at = now();
+        }
     }
 
     public function target(): BelongsTo
