@@ -55,7 +55,11 @@ class RealizationsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn ($record) => in_array($record->status, [
+                        'draft',
+                        'rejected'
+                    ])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

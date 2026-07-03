@@ -43,7 +43,11 @@ class ViewRealization extends ViewRecord
                 ->button()
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
-            EditAction::make(),
+            EditAction::make()
+                ->visible(fn ($record) => ! in_array($record->status, [
+                    'submitted',
+                    'approved'
+                ])),
         ];
     }
 
