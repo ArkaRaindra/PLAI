@@ -95,4 +95,14 @@ class Realization extends Model
     {
         return $this->belongsTo(User::class, 'rejected_by');
     }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 }
