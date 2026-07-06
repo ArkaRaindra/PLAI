@@ -148,15 +148,15 @@ class RealizationResource extends Resource
             });
     }
 
-    /**
-     * @return array<int, Action>
-     */
-    public static function workflowActions(): array
-    {
-        return [
-            static::submitAction(),
-            static::approveAction(),
-            static::rejectAction(),
-        ];
-    }
+    // /**
+    //  * @return array<int, Action>
+    //  */
+    // public static function workflowActions(): array
+    // {
+    //     return [
+    //         static::submitAction(),
+    //         static::approveAction(),
+    //         static::rejectAction(),
+    //     ];
+    // }
 }

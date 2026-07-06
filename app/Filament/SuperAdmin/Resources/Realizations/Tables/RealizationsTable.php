@@ -58,10 +58,13 @@ class RealizationsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                ActionGroup::make(RealizationResource::workflowActions())
-                    ->label('Workflow')
-                    ->button()
-                    ->color('gray'),
+                RealizationResource::submitAction(),
+                RealizationResource::approveAction(),
+                RealizationResource::rejectAction(),
+                // ActionGroup::make(RealizationResource::workflowActions())
+                //     ->label('Workflow')
+                //     ->button()
+                //     ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

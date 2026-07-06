@@ -128,7 +128,7 @@ class RealizationWorkflowTest extends TestCase
         $this->actingAs($ketuaLpm);
         $realization->update(['status' => 'approved']);
 
-        $statuses = $realization->statusHistories()->pluck('status')->all();
+        $statuses = $realization->statusHistories()->latest('id')->pluck('status')->all();
 
         $this->assertSame(['approved', 'submitted', 'draft'], $statuses);
     }
