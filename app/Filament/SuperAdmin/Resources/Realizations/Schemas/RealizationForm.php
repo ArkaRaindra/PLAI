@@ -84,6 +84,9 @@ class RealizationForm
                     ->required()
                     ->live()
                     ->native(false),
+                Hidden::make('status')
+                    ->default('draft')
+                    ->dehydrated(fn(string $operation): bool => $operation === 'create'),
                 Textarea::make('note_rejected')
                     ->label('Catatan Penolakan')
                     ->visible(fn (Get $get): bool => $get('status') === 'rejected')

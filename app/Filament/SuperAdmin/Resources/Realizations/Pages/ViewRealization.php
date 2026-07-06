@@ -48,6 +48,7 @@ class ViewRealization extends ViewRecord
                     'submitted',
                     'approved'
                 ])),
+            ...RealizationResource::workflowActions(),
         ];
     }
 

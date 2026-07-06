@@ -14,6 +14,13 @@ class Realization extends Model
 
     protected $table = 'realizations';
 
+    public const array TRANSITIONS = [
+        'draft' => ['submitted'],
+        'submitted' => ['approved', 'rejected'],
+        'rejected' => ['submitted'],
+        'approved' => [],
+    ];
+
     protected $fillable = [
         'target_id',
         'organization_unit_id',
@@ -67,10 +74,26 @@ class Realization extends Model
         });
     }
 
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::TRANSITIONS[$this->status] ?? [], true);
+    }
+
     public function applyStatusTransitionAudit(): void
     {
-        if (! Auth::check() || ! $this->isDirty('status')) {
+        if (! $this->isDirty('status')) {
             return;
+        }
+
+        if ($this->exists) {
+            $from = $this->getOriginal('status');
+            $to = $this->status;
+
+            if (! in_array($to, self::TRANSITIONS[$from] ?? [], true)) {
+                throw new \RuntimeException(
+                    "Transisi status realisasi dari '{$from}' ke '{$to} tidak diizinkan'"
+                );
+            }
         }
 
         $userId = Auth::id();

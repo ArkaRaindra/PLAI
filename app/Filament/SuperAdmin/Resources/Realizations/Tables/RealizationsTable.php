@@ -2,6 +2,8 @@
 
 namespace App\Filament\SuperAdmin\Resources\Realizations\Tables;
 
+use App\Filament\SuperAdmin\Resources\Realizations\RealizationResource;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -55,13 +57,11 @@ class RealizationsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make()
-                    // ->visible(fn ($record) => in_array($record->status, [
-                    //     'draft',
-                    //     'rejected'
-                    // ]
-                    // ))
-                    ,
+                EditAction::make(),
+                ActionGroup::make(RealizationResource::workflowActions())
+                    ->label('Workflow')
+                    ->button()
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

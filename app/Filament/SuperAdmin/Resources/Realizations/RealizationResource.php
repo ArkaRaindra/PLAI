@@ -11,10 +11,14 @@ use App\Filament\SuperAdmin\Resources\Realizations\Schemas\RealizationInfolist;
 use App\Filament\SuperAdmin\Resources\Realizations\Tables\RealizationsTable;
 use App\Models\Realization;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class RealizationResource extends Resource
 {
@@ -69,15 +73,90 @@ class RealizationResource extends Resource
 
     public static function getListUrl(int|string $targetId): string
     {
-        return static::getUrl('index').'?'.http_build_query([
+        return static::getUrl('index') . '?' . http_build_query([
             'targetId' => $targetId,
         ]);
     }
 
     public static function getCreateUrl(int|string $targetId): string
     {
-        return static::getUrl('create').'?'.http_build_query([
+        return static::getUrl('create') . '?' . http_build_query([
             'targetId' => $targetId,
         ]);
+    }
+
+    public static function submitAction(): Action
+    {
+        return Action::make('submit')
+            ->label('Ajukan')
+            ->icon(Heroicon::PaperAirplane)
+            ->color('info')
+            ->requiresConfirmation()
+            ->modalHeading('Ajukan Realisasi')
+            ->modalDescription('Realisasi akan diajukan untuk disetujui. Data tidak dapat diubah lagi setelah diajukan.')
+            ->modalSubmitActionLabel('Ya, Ajukan')
+            ->authorize(fn(Realization $record): bool => Auth::user()?->can('submit', $record) ?? false)
+            ->action(function (Realization $record): void {
+                $record->update(['status' => 'submitted']);
+
+                Notification::make()->title('Realisasi berhasil diajukan')->success()->send();
+            });
+    }
+
+    public static function approveAction(): Action
+    {
+        return Action::make('approve')
+            ->label('Setujui')
+            ->icon(Heroicon::CheckCircle)
+            ->color('success')
+            ->requiresConfirmation()
+            ->modalHeading('Setujui Realisasi')
+            ->modalDescription('Realisasi akan disetujui dan tidak dapat diubah lagi setelahnya.')
+            ->modalSubmitActionLabel('Ya, Setujui')
+            ->authorize(fn(Realization $record): bool => Auth::user()?->can('approve', $record) ?? false)
+            ->action(function (Realization $record): void {
+                $record->update(['status' => 'approved']);
+
+                Notification::make()->title('Realisasi disetujui')->success()->send();
+            });
+    }
+
+    public static function rejectAction(): Action
+    {
+        return Action::make('reject')
+            ->label('Tolak')
+            ->icon(Heroicon::XCircle)
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Tolak Realisasi')
+            ->modalSubmitActionLabel('Ya, Tolak')
+            ->schema([
+                Textarea::make('note_rejected')
+                    ->label('Alasan Penolakan')
+                    ->required()
+                    ->minLength(5)
+                    ->columnSpanFull(),
+            ])
+            ->authorize(fn(Realization $record): bool => Auth::user()?->can('reject', $record) ?? false)
+            ->action(function (Realization $record, array $data): void {
+                $record->update([
+                    'status' => 'rejected',
+                    'note_rejected' => $data['note_rejected'],
+                ]);
+
+                Notification::make()->title('Realisasi ditolak')->danger()->send();
+            });
+    }
+
+    /**
+     * @return array<int, Action>
+     */
+    public static function workflowActions(): array
+    {
+        return [
+            static::submitAction(),
+            static::approveAction(),
+            static::rejectAction(),
+        ];
     }
 }
