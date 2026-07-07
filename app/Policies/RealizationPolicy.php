@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Realization;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class RealizationPolicy
 {
@@ -29,7 +28,7 @@ class RealizationPolicy
      */
     public function create(User $user): bool
     {
-       return $user->can('ppepp.create');
+        return $user->can('ppepp.create');
     }
 
     /**

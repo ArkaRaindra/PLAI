@@ -56,5 +56,4 @@ class SelfAssessmentDetail extends Model
     {
         return $this->belongsTo(Indicator::class);
     }
-
 }

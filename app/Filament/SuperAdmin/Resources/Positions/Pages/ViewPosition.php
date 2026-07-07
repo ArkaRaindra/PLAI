@@ -14,7 +14,7 @@ class ViewPosition extends ViewRecord
 
     protected function getHeaderActions(): array
     {
-         return [
+        return [
             Action::make('back')
                 ->label('Kembali')
                 ->url($this->getResource()::getUrl('index'))

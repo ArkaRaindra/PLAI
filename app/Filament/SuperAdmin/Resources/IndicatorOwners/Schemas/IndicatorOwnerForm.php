@@ -6,7 +6,6 @@ use App\Models\Indicator;
 use App\Models\OrganizationUnit;
 use App\Models\UserPosition;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Utilities\Get;

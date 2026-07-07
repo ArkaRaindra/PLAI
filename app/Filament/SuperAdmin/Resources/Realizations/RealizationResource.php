@@ -73,14 +73,14 @@ class RealizationResource extends Resource
 
     public static function getListUrl(int|string $targetId): string
     {
-        return static::getUrl('index') . '?' . http_build_query([
+        return static::getUrl('index').'?'.http_build_query([
             'targetId' => $targetId,
         ]);
     }
 
     public static function getCreateUrl(int|string $targetId): string
     {
-        return static::getUrl('create') . '?' . http_build_query([
+        return static::getUrl('create').'?'.http_build_query([
             'targetId' => $targetId,
         ]);
     }
@@ -95,7 +95,7 @@ class RealizationResource extends Resource
             ->modalHeading('Ajukan Realisasi')
             ->modalDescription('Realisasi akan diajukan untuk disetujui. Data tidak dapat diubah lagi setelah diajukan.')
             ->modalSubmitActionLabel('Ya, Ajukan')
-            ->authorize(fn(Realization $record): bool => Auth::user()?->can('submit', $record) ?? false)
+            ->authorize(fn (Realization $record): bool => Auth::user()?->can('submit', $record) ?? false)
             ->action(function (Realization $record): void {
                 $record->update(['status' => 'submitted']);
 
@@ -113,7 +113,7 @@ class RealizationResource extends Resource
             ->modalHeading('Setujui Realisasi')
             ->modalDescription('Realisasi akan disetujui dan tidak dapat diubah lagi setelahnya.')
             ->modalSubmitActionLabel('Ya, Setujui')
-            ->authorize(fn(Realization $record): bool => Auth::user()?->can('approve', $record) ?? false)
+            ->authorize(fn (Realization $record): bool => Auth::user()?->can('approve', $record) ?? false)
             ->action(function (Realization $record): void {
                 $record->update(['status' => 'approved']);
 
@@ -137,7 +137,7 @@ class RealizationResource extends Resource
                     ->minLength(5)
                     ->columnSpanFull(),
             ])
-            ->authorize(fn(Realization $record): bool => Auth::user()?->can('reject', $record) ?? false)
+            ->authorize(fn (Realization $record): bool => Auth::user()?->can('reject', $record) ?? false)
             ->action(function (Realization $record, array $data): void {
                 $record->update([
                     'status' => 'rejected',

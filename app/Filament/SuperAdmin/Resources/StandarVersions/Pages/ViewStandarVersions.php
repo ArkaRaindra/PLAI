@@ -6,7 +6,6 @@ use App\Filament\SuperAdmin\Resources\StandarVersions\StandarVersionsResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Support\Icons\Heroicon;
 
 class ViewStandarVersions extends ViewRecord
 {

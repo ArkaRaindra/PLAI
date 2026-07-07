@@ -30,7 +30,7 @@ class StandarSourceForm
                     ->extraInputAttributes([
                         'style' => 'text-transform: uppercase',
                     ])
-                    ->dehydrateStateUsing(fn($state) => strtoupper($state)),
+                    ->dehydrateStateUsing(fn ($state) => strtoupper($state)),
                 Textarea::make('description')
                     ->label('Deskripsi')
                     ->rows(3)

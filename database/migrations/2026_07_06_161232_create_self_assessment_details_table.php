@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('self_assessment_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('self_assessment_id')->constrained('self_assessment')->cascadeOnDelete();
+            $table->foreignId('self_assessment_id')->constrained('self_assessments')->cascadeOnDelete();
             $table->foreignId('indicator_id')->constrained('indicators')->cascadeOnDelete();
             $table->decimal('score', 8, 2)->nullable();
             $table->text('analysis')->nullable();

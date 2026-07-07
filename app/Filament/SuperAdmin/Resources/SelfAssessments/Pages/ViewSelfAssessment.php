@@ -13,7 +13,11 @@ class ViewSelfAssessment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            EditAction::make()
+                ->visible(fn ($record) => in_array($record->status, ['draft', 'rejected'], true)),
+            SelfAssessmentResource::submitAction(),
+            SelfAssessmentResource::approveAction(),
+            SelfAssessmentResource::rejectAction(),
         ];
     }
 }

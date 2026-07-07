@@ -15,7 +15,7 @@ class ListPositions extends ListRecords
     {
         return [
             CreateAction::make()
-               ->icon(Heroicon::Plus),
+                ->icon(Heroicon::Plus),
         ];
     }
 }

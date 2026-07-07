@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('self_assessment', function (Blueprint $table) {
+        Schema::create('self_assessments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('organization_unit_id')->constrained('organization_units')->cascadeOnDelete();
             $table->foreignId('quality_period_id')->constrained('quality_periods')->cascadeOnDelete();
             $table->decimal('final_score', 8, 2)->nullable();
             $table->text('summary')->nullable();
-            $table->enum('status' , ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
+            $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
             $table->foreignId('submitted_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('rejected_by')->nullable()->constrained('users')->cascadeOnDelete();
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('self_assessment');
+        Schema::dropIfExists('self_assessments');
     }
 };

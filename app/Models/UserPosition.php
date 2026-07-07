@@ -18,7 +18,7 @@ class UserPosition extends Model
         'start_date',
         'end_date',
         'is_active',
-        'created_by', 
+        'created_by',
         'updated_by',
     ];
 

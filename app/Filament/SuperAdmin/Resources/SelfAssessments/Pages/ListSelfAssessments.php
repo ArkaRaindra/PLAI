@@ -10,10 +10,13 @@ class ListSelfAssessments extends ListRecords
 {
     protected static string $resource = SelfAssessmentResource::class;
 
+    protected static ?string $title = 'Self Assessment';
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->label('Tambah Self Assessment'),
         ];
     }
 }

@@ -46,11 +46,11 @@ class ViewRealization extends ViewRecord
             EditAction::make()
                 ->visible(fn ($record) => ! in_array($record->status, [
                     'submitted',
-                    'approved'
+                    'approved',
                 ])),
-                RealizationResource::submitAction(),
-                RealizationResource::approveAction(),
-                RealizationResource::rejectAction(),
+            RealizationResource::submitAction(),
+            RealizationResource::approveAction(),
+            RealizationResource::rejectAction(),
         ];
     }
 

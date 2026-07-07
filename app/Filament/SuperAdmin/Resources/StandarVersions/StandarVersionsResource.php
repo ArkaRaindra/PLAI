@@ -13,7 +13,6 @@ use App\Models\StandardVersion;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use LaraZeus\Tabler\Tabler;
 
@@ -32,7 +31,6 @@ class StandarVersionsResource extends Resource
     protected static string|\UnitEnum|null $navigationGroup = 'Penetapan';
 
     protected static ?string $navigationLabel = 'Versi Standar';
-
 
     public static function form(Schema $schema): Schema
     {
