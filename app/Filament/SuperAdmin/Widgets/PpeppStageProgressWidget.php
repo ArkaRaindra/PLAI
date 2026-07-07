@@ -33,26 +33,26 @@ class PpeppStageProgressWidget extends BaseWidget
             ->count();
         $pelaksanaanProgress = round(($targetsWithRealization / $totalTargets) * 100, 1);
 
-        $totoalUnits = max(OrganizationUnit::query()->where('is_active', true)->count(), 1);
+        $totalUnits = max(OrganizationUnit::query()->where('is_active', true)->count(), 1);
         $unitsEvaluated = SelfAssessment::query()
             ->when($periodId, fn ($query) => $query->where('quality_period_id', $periodId))
             ->where('status', 'approved')
             ->pluck('organization_unit_id')
             ->unique()
             ->count();
-        $evaluasiProgress = round(($unitsEvaluated / $totoalUnits) * 100, 1);
+        $evaluasiProgress = round(($unitsEvaluated / $totalUnits) * 100, 1);
 
         return [
             Stat::make('Penetapan', "{$penetapanProgress}%")
-                ->description("{$indicatorsWithTarget} dari {$totalIndicators} indikator sudah punya target")
+                ->description("{$indicatorsWithTarget} dari {$totalIndicators} indikator telah ditetapkan target")
                 ->color($this->progressColor($penetapanProgress)),
 
             Stat::make('Pelaksanaan', "{$pelaksanaanProgress}%")
-                ->description("{$targetsWithRealization} dari {$totalTargets} target sudah direalisasikan")
+                ->description("{$targetsWithRealization} dari {$totalTargets} target telah direalisasikan dan disetujui")
                 ->color($this->progressColor($pelaksanaanProgress)),
 
             Stat::make('Evaluasi', "{$evaluasiProgress}%")
-                ->description("{$unitsEvaluated} dari {$totoalUnits} unit organisasi sudah self assessment disetujui")
+                ->description("{$unitsEvaluated} dari {$totalUnits} unit organisasi telah menyelesaikan self assessment")
                 ->color($this->progressColor($evaluasiProgress)),
         ];
     }

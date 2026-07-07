@@ -14,7 +14,7 @@ class PpeppAchievementChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $periodId = $this->filters['qualiry_period_id'] ?? null;
+        $periodId = $this->filters['quality_period_id'] ?? null;
 
         $realizationsByUnit = Realization::query()
             ->where('status', 'approved')
