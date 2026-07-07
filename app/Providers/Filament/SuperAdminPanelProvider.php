@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Auth\Login;
 use App\Filament\SuperAdmin\Pages\PpeppDashboard;
+use App\Filament\SuperAdmin\Pages\TargetAchievementMonitoring;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -51,6 +52,7 @@ class SuperAdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
                 PpeppDashboard::class,
+                TargetAchievementMonitoring::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
