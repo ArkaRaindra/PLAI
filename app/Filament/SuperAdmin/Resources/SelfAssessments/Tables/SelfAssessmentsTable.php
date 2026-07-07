@@ -29,7 +29,7 @@ class SelfAssessmentsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'draft' => 'Draft',
-                        'submitetd' => 'Diajukan',
+                        'submitted' => 'Diajukan',
                         'approved' => 'Disetujui',
                         'rejected' => 'Ditolak',
                         default => $state,

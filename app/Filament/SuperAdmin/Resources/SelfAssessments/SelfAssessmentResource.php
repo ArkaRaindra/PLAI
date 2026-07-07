@@ -30,7 +30,7 @@ class SelfAssessmentResource extends Resource
 
     protected static ?string $modelLabel = 'Self Assessment';
 
-    protected static ?string $pluralModelLabel = 'SelfAssessment';
+    protected static ?string $pluralModelLabel = 'Self Assessment';
 
     protected static ?string $slug = 'self-assessments';
 
