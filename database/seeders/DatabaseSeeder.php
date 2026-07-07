@@ -16,7 +16,18 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             PositionSeeder::class,
             UserSeeder::class,
+            OrganizationUnitSeeder::class,
             QualityPeriodSeeder::class,
+            StandardSourceSeeder::class,
+            StandardSeeder::class,
+            StandardVersionSeeder::class,
+            IndicatorSeeder::class,
+            IndicatorMappingSeeder::class,
+            IndicatorOwnerSeeder::class,
+            UserPositionSeeder::class,
+            TargetSeeder::class,
+            RealizationSeeder::class,
+            SelfAssessmentSeeder::class,
         ]);
     }
 }

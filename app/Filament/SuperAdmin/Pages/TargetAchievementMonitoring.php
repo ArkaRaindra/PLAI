@@ -37,7 +37,7 @@ class TargetAchievementMonitoring extends Page implements HasTable
                 Realization::query()->with(['target.indicator', 'target.qualityPeriod', 'organizationUnit'])
             )
             ->heading('Monitoring Capaian Target')
-            ->description('Achievement %, progress pelaporan, dan status setiap realisasi target')
+            ->description('Achievement, Progress pelaporan, dan Status setiap realisasi target')
             ->columns([
                 TextColumn::make('target.indicator.name')
                     ->label('Indikator')

@@ -22,7 +22,7 @@ class QualityPeriodSeeder extends Seeder
         $data = [
             [
                 'code' => 'QP_2021',
-                'name' => 'Periode Kualitas 2021/2022',
+                'name' => 'Periode 2021/2022',
                 'start_date' => '2021-09-01',
                 'end_date' => '2022-08-31',
                 'status' => 'closed',
@@ -30,7 +30,7 @@ class QualityPeriodSeeder extends Seeder
             ],
             [
                 'code' => 'QP_2023',
-                'name' => 'Periode Kualitas 2023/2024',
+                'name' => 'Periode 2023/2024',
                 'start_date' => '2023-09-01',
                 'end_date' => '2024-08-31',
                 'status' => 'closed',
@@ -38,7 +38,7 @@ class QualityPeriodSeeder extends Seeder
             ],
             [
                 'code' => 'QP_2025',
-                'name' => 'Periode Kualitas 2025/2026',
+                'name' => 'Periode 2025/2026',
                 'start_date' => '2025-09-01',
                 'end_date' => '2026-08-31',
                 'status' => 'active',

@@ -44,7 +44,7 @@ class PpeppStageProgressWidget extends BaseWidget
 
         return [
             Stat::make('Penetapan', "{$penetapanProgress}%")
-                ->description("{$indicatorsWithTarget} dari {$totalIndicators} indikator telah ditetapkan target")
+                ->description("{$indicatorsWithTarget} dari {$totalIndicators} indikator telah ditetapkan targetnya")
                 ->color($this->progressColor($penetapanProgress)),
 
             Stat::make('Pelaksanaan', "{$pelaksanaanProgress}%")

@@ -21,15 +21,15 @@ class QualityPeriodResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Tabler::CalendarEvent;
 
-    protected static ?string $recordTitleAttribute = 'Kualitas Periode';
+    protected static ?string $recordTitleAttribute = 'Periode';
 
-    protected static ?string $modelLabel = 'Kualitas Periode';
+    protected static ?string $modelLabel = 'Periode';
 
-    protected static ?string $pluralModelLabel = 'Kualitas Periode';
+    protected static ?string $pluralModelLabel = 'Periode';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Penetapan';
 
-    protected static ?string $navigationLabel = 'Kualitas Periode';
+    protected static ?string $navigationLabel = 'Periode';
 
     public static function form(Schema $schema): Schema
     {
