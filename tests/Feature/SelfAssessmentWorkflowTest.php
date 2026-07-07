@@ -251,4 +251,31 @@ class SelfAssessmentWorkflowTest extends TestCase
             'created_by' => (string) $creator->id,
         ]);
     }
+
+    public function test_detail_score_analysis_strength_and_weakness_are_persisted(): void
+{
+    $kaprodi = $this->makeUser('kaprodi');
+    $selfAssessment = $this->makeSelfAssessment($kaprodi);
+
+    $detail = $selfAssessment->details()->create([
+        'indicator_id' => Indicator::factory()->create([
+            'created_by' => $kaprodi->id, 'updated_by' => $kaprodi->id,
+        ])->id,
+        'score' => 75.5,
+        'analysis' => 'Capaian sudah sesuai target namun perlu penguatan dokumentasi.',
+        'strength' => 'Partisipasi dosen dalam pelaporan tinggi.',
+        'weakness' => 'Bukti evaluasi belum terarsip rapi.',
+        'created_by' => (string) $kaprodi->id,
+    ]);
+
+    $detail->refresh();
+
+    $this->assertSame('75.50', $detail->score);
+    $this->assertSame('Capaian sudah sesuai target namun perlu penguatan dokumentasi.', $detail->analysis);
+    $this->assertSame('Partisipasi dosen dalam pelaporan tinggi.', $detail->strength);
+    $this->assertSame('Bukti evaluasi belum terarsip rapi.', $detail->weakness);
+
+    $detail->update(['analysis' => 'Diperbarui setelah tinjauan.']);
+    $this->assertSame('Diperbarui setelah tinjauan.', $detail->fresh()->analysis);
+}
 }
