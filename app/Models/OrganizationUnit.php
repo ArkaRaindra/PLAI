@@ -52,4 +52,9 @@ class OrganizationUnit extends Model
     {
         return $this->hasMany(Realization::class, 'organization_unit_id');
     }
+
+    public function selfAssessments(): HasMany
+    {
+        return $this->hasMany(SelfAssessment::class, 'organization_unit_id');
+    }
 }
