@@ -16,7 +16,7 @@ class StandardVersionSeeder extends Seeder
         $std001 = Standard::where('code', 'STD-001')->firstOrFail();
         $std004 = Standard::where('code', 'STD-004')->firstOrFail();
 
-        $periods = QualityPeriod::all();
+        $periods = QualityPeriod::where('code', 'QP_2025')->get();
 
         foreach ($periods as $period) {
             StandardVersion::query()->firstOrCreate([

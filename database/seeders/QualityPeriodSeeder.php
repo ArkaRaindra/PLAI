@@ -44,6 +44,14 @@ class QualityPeriodSeeder extends Seeder
                 'status' => 'active',
                 'is_active' => true,
             ],
+            [
+                'code' => 'QP_2026',
+                'name' => 'Periode 2026/2027',
+                'start_date' => '2026-09-01',
+                'end_date' => '2027-08-31',
+                'status' => 'draft',
+                'is_active' => false,
+            ],
         ];
 
         foreach ($data as $item) {

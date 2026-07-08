@@ -24,16 +24,22 @@ class QualityPeriodSeederTest extends TestCase
             QualityPeriodSeeder::class,
         ]);
 
-        $this->assertSame(3, QualityPeriod::query()->count());
+        $this->assertSame(4, QualityPeriod::query()->count());
 
         $this->assertDatabaseHas('quality_periods', [
             'code' => 'QP_2021',
-            'name' => 'Periode Kualitas 2021/2022',
+            'name' => 'Periode 2021/2022',
         ]);
 
         $this->assertDatabaseHas('quality_periods', [
             'code' => 'QP_2025',
             'status' => 'active',
+        ]);
+
+        $this->assertDatabaseHas('quality_periods', [
+            'code' => 'QP_2026',
+            'name' => 'Periode 2026/2027',
+            'status' => 'draft',
         ]);
     }
 
@@ -74,7 +80,7 @@ class QualityPeriodSeederTest extends TestCase
             QualityPeriodSeeder::class,
         ]);
 
-        $this->assertSame(3, QualityPeriod::query()->count());
+        $this->assertSame(4, QualityPeriod::query()->count());
         $this->assertSame('Existing Period', QualityPeriod::where('code', 'QP_2025')->first()->name);
     }
 }

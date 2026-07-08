@@ -14,7 +14,7 @@ class TargetSeeder extends Seeder
     {
         $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
         $indicators = Indicator::all();
-        $periods = QualityPeriod::all();
+        $periods = QualityPeriod::where('code', 'QP_2025')->get();
 
         foreach ($periods as $period) {
             foreach ($indicators as $indicator) {

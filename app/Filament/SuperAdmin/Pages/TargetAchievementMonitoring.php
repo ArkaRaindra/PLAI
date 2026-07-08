@@ -68,10 +68,12 @@ class TargetAchievementMonitoring extends Page implements HasTable
                     ->color(fn (Realization $record): string => $this->achievementColor($this->achievementPercentage($record))),
                 TextColumn::make('progress_percentage')
                     ->label('Progress')
-                    ->state(fn (Realization $record): string => $this->progressPercentage($record).'%')
+                    ->description(fn (Realization $record): ?string => $this->progressDescription($record))
+                    ->state(fn (Realization $record): string => $this->progressPercentage($record) !== null
+                        ? number_format($this->progressPercentage($record), 1).'%'
+                        : '-')
                     ->badge()
                     ->color(fn (Realization $record): string => $this->progressColor($record)),
-
                 TextColumn::make('overall_status')
                     ->label('Status')
                     ->state(fn (Realization $record): string => $this->statusLabel($record))
@@ -124,24 +126,71 @@ class TargetAchievementMonitoring extends Page implements HasTable
         };
     }
 
-    private function progressPercentage(Realization $record): int
+    private function progressPercentage(Realization $record): ?float
     {
-        return match ($record->status) {
-            'approved' => 100,
-            'submitted' => 60,
-            'rejected' => 40,
-            default => 25,
-        };
+        $period = $record->target?->qualityPeriod;
+
+        if (! $period?->start_date || ! $period?->end_date) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $start = $period->start_date->copy()->startOfDay();
+        $end = $period->end_date->copy()->startOfDay();
+
+        if ($today->lessThanOrEqualTo($start)) {
+            return 0.0;
+        }
+        if ($today->greaterThanOrEqualTo($end)) {
+            return 100.0;
+        }
+
+        $totalDays = $start->diffInDays($end);
+        $elapsedDays = $start->diffInDays($today);
+
+        return round(($elapsedDays / $totalDays) * 100, 1);
     }
 
     private function progressColor(Realization $record): string
     {
-        return match ($record->status) {
-            'approved' => 'success',
-            'submitted' => 'info',
-            'rejected' => 'danger',
-            default => 'gray',
+        $progress = $this->progressPercentage($record);
+        $achievement = $this->achievementPercentage($record);
+
+        if ($progress === null) {
+            return 'gray';
+        }
+
+        if ($achievement === null) {
+            return 'gray';
+        }
+
+        if ($record->status === 'approved' && $achievement >= 100) {
+            return 'success';
+        }
+
+        return match (true) {
+            $achievement >= $progress => 'success',
+            $achievement >= $progress * 0.75 => 'warning',
+            default => 'danger',
         };
+    }
+
+    private function progressDescription(Realization $record): ?string
+    {
+        $progress = $this->progressPercentage($record);
+        $achievement = $this->achievementPercentage($record);
+
+        if ($progress === null) {
+            return 'Periode tanpa tanggal mulai/selesai';
+        }
+
+        if ($achievement === null) {
+            return $progress >= 100 ? 'Periode berakhir (tidak ada target)' : 'Periode berjalan (tidak ada target)';
+        }
+
+        return $achievement >= $progress
+            ? 'Sesuai atau lebih cepat dari jadwal periode'
+            : 'Tertinggal dari jadwal periode';
     }
 
     private function statusLabel(Realization $record): string
@@ -178,7 +227,8 @@ class TargetAchievementMonitoring extends Page implements HasTable
         return match (true) {
             $achievement === null => 'gray',
             $achievement >= 100 => 'success',
-            default => 'warning',
+            $achievement >= 75 => 'warning',
+            default => 'danger',
         };
     }
 }

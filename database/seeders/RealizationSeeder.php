@@ -26,10 +26,15 @@ class RealizationSeeder extends Seeder
 
             Auth::setUser($admin);
 
+            $actualValue = match ($status) {
+                'approved' => (float) $target->target_value + fake()->randomFloat(2, 0, 20),
+                default => fake()->randomFloat(2, 40, 120),
+            };
+
             $realization = Realization::query()->create([
                 'target_id' => $target->id,
                 'organization_unit_id' => $unit->id,
-                'actual_value' => fake()->randomFloat(2, 40, 120),
+                'actual_value' => $actualValue,
                 'score' => fake()->randomFloat(2, 50, 100),
                 'notes' => 'Realisasi capaian untuk ' . $target->indicator->name,
                 'status' => $status,
