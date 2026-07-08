@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Blameable;
 use App\Enums\CalculationMethod;
+use App\HasTraceability;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Indicator extends Model
 {
-    use Blameable, HasFactory;
+    use Blameable, HasFactory, HasTraceability;
 
     protected $fillable = [
         'standard_version_id',

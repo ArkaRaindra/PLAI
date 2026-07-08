@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\HasTraceability;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Target extends Model
 {
-    use Blameable;
+    use Blameable, HasTraceability;
 
     protected $fillable = [
         'indicator_id',

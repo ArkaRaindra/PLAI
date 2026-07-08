@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\HasTraceability;
 use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
 use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Kalnoy\Nestedset\NodeTrait;
 
 class Standard extends Model implements HasRichContent
 {
-    use Blameable, HasFactory, InteractsWithRichContent, NodeTrait;
+    use Blameable, HasFactory, HasTraceability, InteractsWithRichContent, NodeTrait;
 
     protected $fillable = [
         'code',

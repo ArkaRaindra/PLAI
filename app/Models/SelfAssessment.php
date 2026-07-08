@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\HasTraceability;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SelfAssessment extends Model
 {
-    use Blameable;
+    use Blameable, HasTraceability;
 
     protected $table = 'self_assessments';
 

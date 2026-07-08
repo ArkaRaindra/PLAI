@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Realizations\Pages;
 
+use App\Events\TraceabilityRecorded;
 use App\Filament\SuperAdmin\Resources\Realizations\RealizationResource;
 use App\Filament\SuperAdmin\Resources\Targets\TargetResource;
 use App\Models\Target;
@@ -104,5 +105,20 @@ class CreateRealization extends CreateRecord
     {
         return parent::getCancelFormAction()
             ->url(RealizationResource::getListUrl($this->targetId));
+    }
+
+    protected function afterCreate(): void
+    {
+        $realization = $this->record->loadMissing('target');
+
+        if ($realization->target === null) {
+            return;
+        }
+
+        TraceabilityRecorded::dispatch(
+            source: $realization,
+            target: $realization->target,
+            relationType: 'measured_by',
+        );
     }
 }

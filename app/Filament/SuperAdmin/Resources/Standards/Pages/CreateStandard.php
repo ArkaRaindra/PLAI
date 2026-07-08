@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Standards\Pages;
 
+use App\Events\TraceabilityRecorded;
 use App\Filament\SuperAdmin\Pages\ManageStandards;
 use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
@@ -140,8 +141,25 @@ class CreateStandard extends CreateRecord
 
             if ($parent !== null) {
                 StandardVersionPersister::inheritFromParent($standard, $parent);
+
+                TraceabilityRecorded::dispatch(
+                    source: $parent,
+                    target: $standard,
+                    relationType: 'related_to',
+                );
             } else {
                 StandardVersionPersister::sync($standard, $versionData);
+
+                TraceabilityRecorded::dispatch(
+                    source: $standard,
+                    target: $standard->standardSource,
+                    relationType: 'mapped_to',
+                    metadata: [
+                        'code' => $standard->code,
+                        'name' => $standard->name,
+                        'standard_source_id' => $standard->standard_source_id,
+                    ],
+                );
             }
 
             return $standard;
