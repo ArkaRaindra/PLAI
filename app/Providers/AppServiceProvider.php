@@ -2,14 +2,26 @@
 
 namespace App\Providers;
 
+use App\Events\TraceabilityRecorded;
+use App\Listeners\RecordTraceabilityListener;
+use App\Models\Indicator;
+use App\Models\OrganizationUnit;
+use App\Models\Realization;
+use App\Models\SelfAssessment;
+use App\Models\Standard;
+use App\Models\StandardSource;
+use App\Models\Target;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Panel;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsIconAlias;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Openplain\FilamentShadcnTheme\Color;
@@ -32,6 +44,18 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureFilamentIcons();
         $this->configureFilamentRenderHooks();
+        Relation::enforceMorphMap([
+            'indicator' => Indicator::class,
+            'organization_unit' => OrganizationUnit::class,
+            'realization' => Realization::class,
+            'standard' => Standard::class,
+            'standard_source' => StandardSource::class,
+            'target' => Target::class,
+            'self_assessment' => SelfAssessment::class,
+            'user' => User::class,
+        ]);
+
+        Event::listen(TraceabilityRecorded::class, RecordTraceabilityListener::class);
     }
 
     protected function configureFilamentIcons(): void

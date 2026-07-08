@@ -14,7 +14,7 @@ class SelfAssessmentDetail extends Model
 
     protected $fillable = [
         'self_assessment_id',
-        'indicator_id',
+        'realization_id',
         'score',
         'analysis',
         'strength',
@@ -52,8 +52,8 @@ class SelfAssessmentDetail extends Model
         return $this->belongsTo(SelfAssessment::class);
     }
 
-    public function indicator(): BelongsTo
+    public function realization(): BelongsTo
     {
-        return $this->belongsTo(Indicator::class);
+        return $this->belongsTo(Realization::class);
     }
 }

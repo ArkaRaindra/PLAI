@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\SelfAssessments\Pages;
 
+use App\Events\TraceabilityRecorded;
 use App\Filament\SuperAdmin\Resources\SelfAssessments\SelfAssessmentResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
@@ -21,7 +22,7 @@ class CreateSelfAssessment extends CreateRecord
             'status' => 'draft',
             'details' => [
                 [
-                    'indicator_id' => null,
+                    'realization_id' => null,
                     'score' => null,
                     'analysis' => null,
                     'strength' => null,
@@ -41,5 +42,22 @@ class CreateSelfAssessment extends CreateRecord
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
         ];
+    }
+
+    protected function afterCreate(): void
+    {
+        $selfAssessment = $this->record->loadMissing('details.realization');
+
+        foreach ($selfAssessment->details as $detail) {
+            if ($detail->realization === null) {
+                continue;
+            }
+
+            TraceabilityRecorded::dispatch(
+                source: $detail->realization,
+                target: $selfAssessment,
+                relationType: 'evaluated_in',
+            );
+        }
     }
 }

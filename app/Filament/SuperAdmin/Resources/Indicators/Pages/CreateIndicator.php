@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Indicators\Pages;
 
+use App\Events\TraceabilityRecorded;
 use App\Filament\SuperAdmin\Pages\ManageStandards;
 use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
 use App\Filament\SuperAdmin\Resources\StandarSources\StandarSourceResource;
@@ -96,5 +97,27 @@ class CreateIndicator extends CreateRecord
     {
         return parent::getCancelFormAction()
             ->url(IndicatorResource::getListUrl($this->standardId));
+    }
+
+    protected function afterCreate(): void
+    {
+        $indicator = $this->record->loadMissing('standardVersion.standard', 'parentIndicator');
+        $standard = $indicator->standardVersion?->standard;
+
+        if ($standard !== null) {
+            TraceabilityRecorded::dispatch(
+                source: $standard,
+                target: $indicator,
+                relationType: 'defines',
+            );
+        }
+
+        if ($indicator->parentIndicator !== null) {
+            TraceabilityRecorded::dispatch(
+                source: $indicator->parentIndicator,
+                target: $indicator,
+                relationType: 'related_to',
+            );
+        }
     }
 }

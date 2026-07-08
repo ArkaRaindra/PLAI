@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Models\Indicator;
 use App\Models\OrganizationUnit;
 use App\Models\QualityPeriod;
+use App\Models\Realization;
 use App\Models\SelfAssessment;
 use App\Models\SelfAssessmentDetail;
+use App\Models\Target;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -159,10 +161,7 @@ class SelfAssessmentWorkflowTest extends TestCase
         $this->addDetail($selfAssessment, $kaprodi, score: 80);
         $this->assertSame('80.00', $selfAssessment->fresh()->final_score);
 
-        $detail = $this->addDetail($selfAssessment, $kaprodi, score: 90, indicator: Indicator::factory()->create([
-            'created_by' => $kaprodi->id,
-            'updated_by' => $kaprodi->id,
-        ]));
+        $detail = $this->addDetail($selfAssessment, $kaprodi, score: 90);
 
         $this->assertSame('85.00', $selfAssessment->fresh()->final_score);
 
@@ -238,44 +237,68 @@ class SelfAssessmentWorkflowTest extends TestCase
         SelfAssessment $selfAssessment,
         User $creator,
         float $score,
-        ?Indicator $indicator = null,
+        ?Realization $realization = null,
     ): SelfAssessmentDetail {
-        $indicator ??= Indicator::factory()->create([
-            'created_by' => $creator->id,
-            'updated_by' => $creator->id,
-        ]);
+        $realization ??= $this->makeRealizationForSelfAssessment($selfAssessment, $creator, $score);
 
         return $selfAssessment->details()->create([
-            'indicator_id' => $indicator->id,
+            'realization_id' => $realization->id,
             'score' => $score,
             'created_by' => (string) $creator->id,
         ]);
     }
 
+    private function makeRealizationForSelfAssessment(
+        SelfAssessment $selfAssessment,
+        User $creator,
+        float $score,
+    ): Realization {
+        $indicator = Indicator::factory()->create([
+            'created_by' => $creator->id,
+            'updated_by' => $creator->id,
+        ]);
+
+        $target = Target::query()->create([
+            'indicator_id' => $indicator->id,
+            'quality_period_id' => $selfAssessment->quality_period_id,
+            'target_value' => 100,
+            'created_by' => (string) $creator->id,
+        ]);
+
+        return Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $selfAssessment->organization_unit_id,
+            'actual_value' => 10,
+            'score' => $score,
+            'status' => 'approved',
+            'created_by' => (string) $creator->id,
+        ]);
+    }
+
     public function test_detail_score_analysis_strength_and_weakness_are_persisted(): void
-{
-    $kaprodi = $this->makeUser('kaprodi');
-    $selfAssessment = $this->makeSelfAssessment($kaprodi);
+    {
+        $kaprodi = $this->makeUser('kaprodi');
+        $selfAssessment = $this->makeSelfAssessment($kaprodi);
 
-    $detail = $selfAssessment->details()->create([
-        'indicator_id' => Indicator::factory()->create([
-            'created_by' => $kaprodi->id, 'updated_by' => $kaprodi->id,
-        ])->id,
-        'score' => 75.5,
-        'analysis' => 'Capaian sudah sesuai target namun perlu penguatan dokumentasi.',
-        'strength' => 'Partisipasi dosen dalam pelaporan tinggi.',
-        'weakness' => 'Bukti evaluasi belum terarsip rapi.',
-        'created_by' => (string) $kaprodi->id,
-    ]);
+        $realization = $this->makeRealizationForSelfAssessment($selfAssessment, $kaprodi, 75.5);
 
-    $detail->refresh();
+        $detail = $selfAssessment->details()->create([
+            'realization_id' => $realization->id,
+            'score' => 75.5,
+            'analysis' => 'Capaian sudah sesuai target namun perlu penguatan dokumentasi.',
+            'strength' => 'Partisipasi dosen dalam pelaporan tinggi.',
+            'weakness' => 'Bukti evaluasi belum terarsip rapi.',
+            'created_by' => (string) $kaprodi->id,
+        ]);
 
-    $this->assertSame('75.50', $detail->score);
-    $this->assertSame('Capaian sudah sesuai target namun perlu penguatan dokumentasi.', $detail->analysis);
-    $this->assertSame('Partisipasi dosen dalam pelaporan tinggi.', $detail->strength);
-    $this->assertSame('Bukti evaluasi belum terarsip rapi.', $detail->weakness);
+        $detail->refresh();
 
-    $detail->update(['analysis' => 'Diperbarui setelah tinjauan.']);
-    $this->assertSame('Diperbarui setelah tinjauan.', $detail->fresh()->analysis);
-}
+        $this->assertSame('75.50', $detail->score);
+        $this->assertSame('Capaian sudah sesuai target namun perlu penguatan dokumentasi.', $detail->analysis);
+        $this->assertSame('Partisipasi dosen dalam pelaporan tinggi.', $detail->strength);
+        $this->assertSame('Bukti evaluasi belum terarsip rapi.', $detail->weakness);
+
+        $detail->update(['analysis' => 'Diperbarui setelah tinjauan.']);
+        $this->assertSame('Diperbarui setelah tinjauan.', $detail->fresh()->analysis);
+    }
 }

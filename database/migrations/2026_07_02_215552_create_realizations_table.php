@@ -29,6 +29,8 @@ return new class extends Migration
             $table->string('created_by');
             $table->string('updated_by')->nullable();
             $table->timestamps();
+
+            $table->unique(['target_id', 'organization_unit_id']);
         });
     }
 

@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\HasTraceability;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 
 class Realization extends Model
 {
-    use Blameable;
+    use Blameable, HasTraceability;
 
     protected $table = 'realizations';
 
@@ -153,5 +155,10 @@ class Realization extends Model
     {
         return $this->hasMany(RealizationStatusHistory::class)
             ->latest();
+    }
+
+    public function selfAssessmentDetail(): HasOne
+    {
+        return $this->hasOne(SelfAssessmentDetail::class);
     }
 }
