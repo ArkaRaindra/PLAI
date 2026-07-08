@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('submitted_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('rejected_by')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->text('note_rejected')->nullable();
             $table->timestamp('submitted_at')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('rejected_at')->nullable();
