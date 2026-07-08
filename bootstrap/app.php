@@ -26,4 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 abort(404);
             }
         });
-    })->create();
+    })
+    ->withCommands([
+        app_path('Console/Commands'),
+    ])
+    ->create();
