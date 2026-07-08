@@ -12,6 +12,8 @@ class PpeppAchievementChartWidget extends ChartWidget
 
     protected ?string $heading = 'Capaian Realisasi per Unit Organisasi';
 
+    protected int | string | array $columnSpan = 'full';
+
     protected function getData(): array
     {
         $periodId = $this->filters['quality_period_id'] ?? null;
