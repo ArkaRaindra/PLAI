@@ -14,21 +14,29 @@ class RealizationSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
-        $targets = Target::all();
+        $targets = Target::orderBy('id')->get();
         $unit = OrganizationUnit::where('code', 'TI')->firstOrFail();
         $kaprodi = User::where('email', 'kaprodi@example.com')->firstOrFail();
         $ketuaLpm = User::where('email', 'ketualpm@example.com')->firstOrFail();
 
-        $statuses = ['draft', 'submitted', 'approved', 'rejected'];
+        $scenarios = [
+            ['status' => 'approved', 'achievement' => 'over'],
+            ['status' => 'submitted', 'achievement' => 'random'],
+            ['status' => 'approved', 'achievement' => 'under'],
+            ['status' => 'rejected', 'achievement' => 'random'],
+            ['status' => 'draft', 'achievement' => 'random'],
+            ['status' => 'submitted', 'achievement' => 'over'],
+        ];
 
-        foreach ($targets->take(6) as $index => $target) {
-            $status = $statuses[$index % 4];
+        foreach ($targets as $index => $target) {
+            $scenario = $scenarios[$index % count($scenarios)];
 
             Auth::setUser($admin);
 
-            $actualValue = match ($status) {
-                'approved' => (float) $target->target_value + fake()->randomFloat(2, 0, 20),
-                default => fake()->randomFloat(2, 40, 120),
+            $actualValue = match ($scenario['achievement']) {
+                'over' => (float) $target->target_value + fake()->randomFloat(2, 5, 25),
+                'under' => max(1, (float) $target->target_value - fake()->randomFloat(2, 5, 25)),
+                default => fake()->randomFloat(2, 30, 140),
             };
 
             $realization = Realization::query()->create([
@@ -36,25 +44,25 @@ class RealizationSeeder extends Seeder
                 'organization_unit_id' => $unit->id,
                 'actual_value' => $actualValue,
                 'score' => fake()->randomFloat(2, 50, 100),
-                'notes' => 'Realisasi capaian untuk ' . $target->indicator->name,
-                'status' => $status,
+                'notes' => 'Realisasi capaian untuk ' . $target->indicator->name . ' (' . $unit->name . ')',
+                'status' => $scenario['status'],
                 'created_by' => (string) $admin->id,
                 'updated_by' => (string) $admin->id,
             ]);
 
-            if ($status === 'submitted') {
+            if ($scenario['status'] === 'submitted') {
                 $realization->update([
                     'submitted_by' => (string) $kaprodi->id,
                     'submitted_at' => now()->subDays(3),
                 ]);
-            } elseif ($status === 'approved') {
+            } elseif ($scenario['status'] === 'approved') {
                 $realization->update([
                     'submitted_by' => (string) $kaprodi->id,
                     'submitted_at' => now()->subDays(5),
                     'approved_by' => (string) $ketuaLpm->id,
                     'approved_at' => now()->subDays(2),
                 ]);
-            } elseif ($status === 'rejected') {
+            } elseif ($scenario['status'] === 'rejected') {
                 $realization->update([
                     'submitted_by' => (string) $kaprodi->id,
                     'submitted_at' => now()->subDays(4),

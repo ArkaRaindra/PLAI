@@ -2,8 +2,10 @@
 
 namespace App\Filament\SuperAdmin\Pages;
 
+use App\Models\IndicatorOwner;
 use App\Models\QualityPeriod;
 use App\Models\Realization;
+use App\Models\Target;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -34,12 +36,16 @@ class TargetAchievementMonitoring extends Page implements HasTable
     {
         return $table
             ->query(
-                Realization::query()->with(['target.indicator', 'target.qualityPeriod', 'organizationUnit'])
+                IndicatorOwner::query()
+                    ->with([
+                        'indicator.targets.realizations',
+                        'organizationUnit',
+                    ])
             )
             ->heading('Monitoring Capaian Target')
-            ->description('Achievement, Progress pelaporan, dan Status setiap realisasi target')
+            ->description('Menampilkan seluruh pasangan indikator-unit yang wajib melapor pada periode terpilih')
             ->columns([
-                TextColumn::make('target.indicator.name')
+                TextColumn::make('indicator.name')
                     ->label('Indikator')
                     ->searchable()
                     ->sortable()
@@ -48,76 +54,116 @@ class TargetAchievementMonitoring extends Page implements HasTable
                     ->label('Unit Organisasi')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('target.qualityPeriod.code')
+                TextColumn::make('period_label')
                     ->label('Periode')
-                    ->sortable(),
-                TextColumn::make('target.target_value')
+                    ->state(fn (): string => $this->currentPeriod()?->name ?? 'Pilih periode di atas'),
+                TextColumn::make('target_value')
                     ->label('Target')
-                    ->numeric(decimalPlaces: 2)
-                    ->sortable(),
+                    ->state(fn (IndicatorOwner $record): string => $this->targetFor($record)?->target_value !== null
+                        ? number_format((float) $this->targetFor($record)->target_value, 2)
+                        : '-'),
                 TextColumn::make('actual_value')
                     ->label('Realisasi')
-                    ->numeric(decimalPlaces: 2)
-                    ->sortable(),
+                    ->state(fn (IndicatorOwner $record): string => $this->realizationFor($record)?->actual_value !== null
+                        ? number_format((float) $this->realizationFor($record)->actual_value, 2)
+                        : '-'),
                 TextColumn::make('achievement_percentage')
                     ->label('Achievement')
-                    ->state(fn (Realization $record): string => $this->achievementPercentage($record) !== null
+                    ->state(fn (IndicatorOwner $record): string => $this->achievementPercentage($record) !== null
                         ? number_format($this->achievementPercentage($record), 1).'%'
                         : '-')
                     ->badge()
-                    ->color(fn (Realization $record): string => $this->achievementColor($this->achievementPercentage($record))),
+                    ->color(fn (IndicatorOwner $record): string => $this->achievementColor($record)),
                 TextColumn::make('progress_percentage')
                     ->label('Progress')
-                    ->description(fn (Realization $record): ?string => $this->progressDescription($record))
-                    ->state(fn (Realization $record): string => $this->progressPercentage($record) !== null
-                        ? number_format($this->progressPercentage($record), 1).'%'
+                    ->description(fn (IndicatorOwner $record): ?string => $this->progressDescription($record))
+                    ->state(fn (IndicatorOwner $record): string => $this->progressPercentage() !== null
+                        ? number_format($this->progressPercentage(), 1).'%'
                         : '-')
                     ->badge()
-                    ->color(fn (Realization $record): string => $this->progressColor($record)),
+                    ->color(fn (IndicatorOwner $record): string => $this->progressColor($record)),
                 TextColumn::make('overall_status')
                     ->label('Status')
-                    ->state(fn (Realization $record): string => $this->statusLabel($record))
+                    ->state(fn (IndicatorOwner $record): string => $this->statusLabel($record))
                     ->badge()
-                    ->color(fn (Realization $record): string => $this->statusColor($record)),
+                    ->color(fn (IndicatorOwner $record): string => $this->statusColor($record)),
             ])
             ->filters([
                 SelectFilter::make('quality_period_id')
                     ->label('Periode')
                     ->options(fn () => QualityPeriod::query()->pluck('name', 'id'))
+                    ->default(fn () => QualityPeriod::query()->where('is_active', true)->value('id'))
                     ->query(fn ($query, array $data) => $query->when(
                         $data['value'] ?? null,
-                        fn ($q, $value) => $q->whereHas('target', fn ($tq) => $tq->where('quality_period_id', $value)),
+                        fn ($q, $value) => $q->whereHas('indicator.targets', fn ($tq) => $tq->where('quality_period_id', $value)),
                     )),
 
                 SelectFilter::make('organization_unit_id')
                     ->label('Unit Organisasi')
                     ->relationship('organizationUnit', 'name'),
-
-                SelectFilter::make('status')
-                    ->label('Status Realisasi')
-                    ->options([
-                        'draft' => 'Draft',
-                        'submitted' => 'Diajukan',
-                        'approved' => 'Disetujui',
-                        'rejected' => 'Ditolak',
-                    ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('organization_unit_id');
     }
 
-    private function achievementPercentage(Realization $record): ?float
+    private function currentPeriod(): ?QualityPeriod
     {
-        $targetValue = (float) ($record->target->target_value ?? 0);
+        $periodId = $this->getTableFilterState('quality_period_id')['value'] ?? null;
 
-        if ($targetValue === 0) {
+        if ($periodId) {
+            return QualityPeriod::find($periodId);
+        }
+
+        return QualityPeriod::query()->where('is_active', true)->first();
+    }
+
+    private function targetFor(IndicatorOwner $record): ?Target
+    {
+        $period = $this->currentPeriod();
+
+        if (! $period) {
             return null;
         }
 
-        return ((float) $record->actual_value / $targetValue) * 100;
+        return $record->indicator->targets->firstWhere('quality_period_id', $period->id);
     }
 
-    private function achievementColor(?float $achievement): string
+    private function realizationFor(IndicatorOwner $record): ?Realization
     {
+        $target = $this->targetFor($record);
+
+        if (! $target) {
+            return null;
+        }
+
+        return $target->realizations->firstWhere('organization_unit_id', $record->organization_unit_id);
+    }
+
+    private function achievementPercentage(IndicatorOwner $record): ?float
+    {
+        $target = $this->targetFor($record);
+        $realization = $this->realizationFor($record);
+
+        $targetValue = (float) ($target?->target_value ?? 0);
+
+        if ($realization === null || $targetValue === 0) {
+            return null;
+        }
+
+        return ((float) $realization->actual_value / $targetValue) * 100;
+    }
+
+    private function achievementColor(IndicatorOwner $record): string
+    {
+        if ($this->targetFor($record) === null) {
+            return 'gray';
+        }
+
+        if ($this->realizationFor($record) === null) {
+            return 'danger';
+        }
+
+        $achievement = $this->achievementPercentage($record);
+
         return match (true) {
             $achievement === null => 'gray',
             $achievement >= 100 => 'success',
@@ -125,10 +171,9 @@ class TargetAchievementMonitoring extends Page implements HasTable
             default => 'danger',
         };
     }
-
-    private function progressPercentage(Realization $record): ?float
+    private function progressPercentage(): ?float
     {
-        $period = $record->target?->qualityPeriod;
+        $period = $this->currentPeriod();
 
         if (! $period?->start_date || ! $period?->end_date) {
             return null;
@@ -141,6 +186,7 @@ class TargetAchievementMonitoring extends Page implements HasTable
         if ($today->lessThanOrEqualTo($start)) {
             return 0.0;
         }
+
         if ($today->greaterThanOrEqualTo($end)) {
             return 100.0;
         }
@@ -151,20 +197,25 @@ class TargetAchievementMonitoring extends Page implements HasTable
         return round(($elapsedDays / $totalDays) * 100, 1);
     }
 
-    private function progressColor(Realization $record): string
+    private function progressColor(IndicatorOwner $record): string
     {
-        $progress = $this->progressPercentage($record);
-        $achievement = $this->achievementPercentage($record);
+        $progress = $this->progressPercentage();
 
         if ($progress === null) {
             return 'gray';
         }
 
+        if ($this->realizationFor($record) === null) {
+            return $progress >= 50 ? 'danger' : 'warning';
+        }
+
+        $achievement = $this->achievementPercentage($record);
+
         if ($achievement === null) {
             return 'gray';
         }
 
-        if ($record->status === 'approved' && $achievement >= 100) {
+        if ($this->realizationFor($record)?->status === 'approved' && $achievement >= 100) {
             return 'success';
         }
 
@@ -175,17 +226,22 @@ class TargetAchievementMonitoring extends Page implements HasTable
         };
     }
 
-    private function progressDescription(Realization $record): ?string
+    private function progressDescription(IndicatorOwner $record): ?string
     {
-        $progress = $this->progressPercentage($record);
-        $achievement = $this->achievementPercentage($record);
+        $progress = $this->progressPercentage();
 
         if ($progress === null) {
             return 'Periode tanpa tanggal mulai/selesai';
         }
 
+        if ($this->realizationFor($record) === null) {
+            return "Belum ada realisasi";
+        }
+
+        $achievement = $this->achievementPercentage($record);
+
         if ($achievement === null) {
-            return $progress >= 100 ? 'Periode berakhir (tidak ada target)' : 'Periode berjalan (tidak ada target)';
+            return 'Waktu periode berjalan';
         }
 
         return $achievement >= $progress
@@ -193,13 +249,23 @@ class TargetAchievementMonitoring extends Page implements HasTable
             : 'Tertinggal dari jadwal periode';
     }
 
-    private function statusLabel(Realization $record): string
+    private function statusLabel(IndicatorOwner $record): string
     {
-        if ($record->status === 'rejected') {
+        if ($this->targetFor($record) === null) {
+            return 'Target Belum Ditetapkan';
+        }
+
+        $realization = $this->realizationFor($record);
+
+        if ($realization === null) {
+            return 'Belum Melapor';
+        }
+
+        if ($realization->status === 'rejected') {
             return 'Ditolak';
         }
 
-        if ($record->status !== 'approved') {
+        if ($realization->status !== 'approved') {
             return 'Dalam Proses';
         }
 
@@ -212,13 +278,23 @@ class TargetAchievementMonitoring extends Page implements HasTable
         };
     }
 
-    private function statusColor(Realization $record): string
+    private function statusColor(IndicatorOwner $record): string
     {
-        if ($record->status === 'rejected') {
+        if ($this->targetFor($record) === null) {
+            return 'gray';
+        }
+
+        $realization = $this->realizationFor($record);
+
+        if ($realization === null) {
             return 'danger';
         }
 
-        if ($record->status !== 'approved') {
+        if ($realization->status === 'rejected') {
+            return 'danger';
+        }
+
+        if ($realization->status !== 'approved') {
             return 'info';
         }
 

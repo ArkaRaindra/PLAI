@@ -15,7 +15,7 @@ class IndicatorOwnerSeeder extends Seeder
     {
         $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
         $indicators = Indicator::all();
-        $unit = OrganizationUnit::where('code', 'UPM')->firstOrFail();
+        $unit = OrganizationUnit::where('code', 'TI')->firstOrFail();
         $userPosition = UserPosition::first();
 
         foreach ($indicators as $indicator) {
