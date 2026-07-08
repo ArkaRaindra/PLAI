@@ -6,6 +6,7 @@ use App\Blameable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 
 class Realization extends Model
@@ -153,5 +154,10 @@ class Realization extends Model
     {
         return $this->hasMany(RealizationStatusHistory::class)
             ->latest();
+    }
+
+    public function selfAssessmentDetail(): HasOne
+    {
+        return $this->hasOne(SelfAssessmentDetail::class);
     }
 }

@@ -21,7 +21,7 @@ class CreateSelfAssessment extends CreateRecord
             'status' => 'draft',
             'details' => [
                 [
-                    'indicator_id' => null,
+                    'realization_id' => null,
                     'score' => null,
                     'analysis' => null,
                     'strength' => null,

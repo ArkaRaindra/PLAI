@@ -2,10 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Indicator;
 use App\Models\OrganizationUnit;
 use App\Models\QualityPeriod;
+use App\Models\Realization;
 use App\Models\SelfAssessment;
 use App\Models\SelfAssessmentDetail;
+use App\Models\Target;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -28,15 +31,40 @@ class SelfAssessmentSeeder extends Seeder
                 'organization_unit_id' => $unit->id,
                 'quality_period_id' => $period->id,
                 'status' => $status,
-                'summary' => 'Self assessment untuk periode ' . $period->name . ' - ' . $unit->name,
+                'summary' => 'Self assessment untuk periode '.$period->name.' - '.$unit->name,
+                'created_by' => (string) $admin->id,
+                'updated_by' => (string) $admin->id,
+            ]);
+
+            $indicator = Indicator::factory()->create([
+                'code' => 'IND-'.fake()->unique()->numerify('###'),
+                'name' => 'Indikator '.fake()->words(3, true),
+                'created_by' => (string) $admin->id,
+                'updated_by' => (string) $admin->id,
+            ]);
+
+            $target = Target::query()->create([
+                'indicator_id' => $indicator->id,
+                'quality_period_id' => $period->id,
+                'target_value' => 100,
+                'created_by' => (string) $admin->id,
+                'updated_by' => (string) $admin->id,
+            ]);
+
+            $realization = Realization::query()->create([
+                'target_id' => $target->id,
+                'organization_unit_id' => $unit->id,
+                'actual_value' => 10,
+                'score' => fake()->randomFloat(2, 60, 95),
+                'status' => 'approved',
                 'created_by' => (string) $admin->id,
                 'updated_by' => (string) $admin->id,
             ]);
 
             SelfAssessmentDetail::query()->create([
                 'self_assessment_id' => $selfAssessment->id,
-                'indicator_id' => 1,
-                'score' => fake()->randomFloat(2, 60, 95),
+                'realization_id' => $realization->id,
+                'score' => $realization->score,
                 'analysis' => 'Analisis capaian indikator',
                 'strength' => 'Kekuatan:Tim yang solid',
                 'weakness' => 'Kelemahan: Kurangnya dokumentasi',
