@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\Events\TraceabilityRecorded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class SelfAssessmentDetail extends Model
 {
@@ -43,8 +46,39 @@ class SelfAssessmentDetail extends Model
             $selfAssessment->saveQuietly();
         };
 
-        static::saved($syncParentFinalScore);
+        static::saved(function (SelfAssessmentDetail $detail) use ($syncParentFinalScore): void {
+            $detail->recordEvaluationTraceability();
+            $syncParentFinalScore($detail);
+        });
         static::deleted($syncParentFinalScore);
+    }
+
+    public function recordEvaluationTraceability(): void
+    {
+        if (! Auth::check()) {
+            return;
+        }
+
+        $this->loadMissing('realization', 'selfAssessment');
+
+        if ($this->realization === null || $this->selfAssessment === null) {
+            return;
+        }
+
+        $measuredByPerformedAt = TraceabilityLinks::query()
+            ->where('source_type', 'realization')
+            ->where('source_id', $this->realization_id)
+            ->where('relation_type', 'measured_by')
+            ->value('performed_at');
+
+        TraceabilityRecorded::dispatch(
+            source: $this->realization,
+            target: $this->selfAssessment,
+            relationType: 'evaluated_in',
+            performedAt: $measuredByPerformedAt
+                ? Carbon::parse($measuredByPerformedAt)->addSecond()
+                : now(),
+        );
     }
 
     public function selfAssessment(): BelongsTo
