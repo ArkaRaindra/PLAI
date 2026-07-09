@@ -21,7 +21,7 @@ class TraceabilityLinkScopeResolverTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_apply_returns_no_results_without_standard_source(): void
+    public function test_apply_returns_no_results_without_self_assessment(): void
     {
         $admin = User::factory()->create();
         $indicator = Indicator::factory()->create([
@@ -39,40 +39,14 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             'created_by' => $admin->id,
         ]);
 
-        $results = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [])->get();
-
-        $this->assertCount(0, $results);
+        $this->assertCount(0, TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [])->get());
     }
 
-    public function test_apply_includes_links_for_entities_within_standard_source_scope(): void
+    public function test_apply_includes_links_for_entities_within_self_assessment_scope(): void
     {
-        $admin = User::factory()->create();
-        $source = StandardSource::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-        $otherSource = StandardSource::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
+        [$selfAssessment, $indicator, $standard] = $this->createSelfAssessmentContext(withRealization: true);
 
-        $indicator = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-        $indicator->loadMissing('standardVersion.standard');
-        $standard = $indicator->standardVersion?->standard;
-        $standard?->update(['standard_source_id' => $source->id]);
-
-        $otherIndicator = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-        $otherIndicator->loadMissing('standardVersion.standard');
-        $otherStandard = $otherIndicator->standardVersion?->standard;
-        $otherStandard?->update(['standard_source_id' => $otherSource->id]);
-
-        $this->actingAs($admin);
+        $this->actingAs(User::factory()->create());
 
         TraceabilityRecorded::dispatch(
             source: $standard,
@@ -80,59 +54,112 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             relationType: 'defines',
         );
 
-        TraceabilityRecorded::dispatch(
-            source: $otherStandard,
-            target: $otherIndicator,
-            relationType: 'defines',
-        );
-
         $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
-            'standard_source_id' => $source->id,
+            'self_assessment_id' => $selfAssessment->id,
         ])->get();
 
         $this->assertCount(1, $scoped);
         $this->assertSame($indicator->id, $scoped->first()->target_id);
     }
 
-    public function test_apply_narrows_results_by_standard_id(): void
+    public function test_apply_includes_realization_to_self_assessment_link_in_scope(): void
     {
-        $admin = User::factory()->create();
-        $source = StandardSource::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
+        [$selfAssessment, $indicator, $standard, $realization] = $this->createSelfAssessmentContext(withRealization: true);
 
-        $indicatorA = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-        $indicatorA->loadMissing('standardVersion.standard');
-        $standardA = $indicatorA->standardVersion?->standard;
-        $standardA?->update(['standard_source_id' => $source->id]);
+        $this->actingAs(User::factory()->create());
 
-        $indicatorB = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-        $indicatorB->loadMissing('standardVersion.standard');
-        $standardB = $indicatorB->standardVersion?->standard;
-        $standardB?->update(['standard_source_id' => $source->id]);
-
-        $this->actingAs($admin);
-
-        TraceabilityRecorded::dispatch(source: $standardA, target: $indicatorA, relationType: 'defines');
-        TraceabilityRecorded::dispatch(source: $standardB, target: $indicatorB, relationType: 'defines');
+        TraceabilityRecorded::dispatch(
+            source: $realization,
+            target: $selfAssessment,
+            relationType: 'evaluated_in',
+        );
 
         $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
-            'standard_source_id' => $source->id,
-            'standard_id' => $standardA->id,
+            'self_assessment_id' => $selfAssessment->id,
         ])->get();
 
         $this->assertCount(1, $scoped);
-        $this->assertSame($indicatorA->id, $scoped->first()->target_id);
+        $this->assertSame('evaluated_in', $scoped->first()->relation_type);
     }
 
-    public function test_apply_includes_standard_to_standard_source_mapping(): void
+    public function test_apply_includes_evaluated_in_link_for_scoped_self_assessment_even_without_realization_in_scope(): void
+    {
+        [$selfAssessment, $indicator, $standard] = $this->createSelfAssessmentContext(withRealization: false);
+        $admin = User::factory()->create();
+
+        $target = Target::query()->create([
+            'indicator_id' => $indicator->id,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
+            'target_value' => 100,
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $selfAssessment->organization_unit_id,
+            'actual_value' => 10,
+            'score' => 80,
+            'status' => 'approved',
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $this->actingAs($admin);
+
+        TraceabilityRecorded::dispatch(
+            source: $realization,
+            target: $selfAssessment,
+            relationType: 'evaluated_in',
+        );
+
+        $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
+            'self_assessment_id' => $selfAssessment->id,
+        ])->get();
+
+        $this->assertTrue($scoped->contains(
+            fn (TraceabilityLinks $link): bool => $link->relation_type === 'evaluated_in'
+                && $link->target_id === $selfAssessment->id,
+        ));
+    }
+
+    public function test_apply_excludes_links_when_only_one_endpoint_is_in_scope(): void
+    {
+        [$selfAssessment, $indicator] = $this->createSelfAssessmentContext(withRealization: true);
+        $otherIndicator = Indicator::factory()->create([
+            'created_by' => User::factory()->create()->id,
+            'updated_by' => User::factory()->create()->id,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        TraceabilityRecorded::dispatch(
+            source: $indicator,
+            target: $otherIndicator,
+            relationType: 'mapped_to',
+        );
+
+        $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
+            'self_assessment_id' => $selfAssessment->id,
+        ])->get();
+
+        $this->assertCount(0, $scoped);
+    }
+
+    public function test_resolve_from_self_assessment_collects_related_entity_ids(): void
+    {
+        [$selfAssessment, $indicator, $standard, $realization, $target] = $this->createSelfAssessmentContext(withRealization: true);
+
+        $scope = TraceabilityLinkScopeResolver::resolveFromSelfAssessment($selfAssessment->id);
+
+        $this->assertNotNull($scope);
+        $this->assertContains($selfAssessment->id, $scope['self_assessment_ids']);
+        $this->assertContains($realization->id, $scope['realization_ids']);
+        $this->assertContains($target->id, $scope['target_ids']);
+        $this->assertContains($indicator->id, $scope['indicator_ids']);
+        $this->assertContains($standard->id, $scope['standard_ids']);
+        $this->assertContains($selfAssessment->organization_unit_id, $scope['organization_unit_ids']);
+    }
+
+    public function test_resolve_from_self_assessment_includes_ancestor_standards(): void
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create([
@@ -140,7 +167,7 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             'updated_by' => $admin->id,
         ]);
 
-        $standard = Standard::create([
+        $rootStandard = Standard::create([
             'code' => 'ROOT',
             'name' => 'Root Standard',
             'standard_source_id' => $source->id,
@@ -149,36 +176,21 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             'updated_by' => $admin->id,
         ]);
 
-        $this->actingAs($admin);
-
-        TraceabilityRecorded::dispatch(
-            source: $standard,
-            target: $source,
-            relationType: 'mapped_to',
-        );
-
-        $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
+        $childStandard = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
             'standard_source_id' => $source->id,
-        ])->get();
-
-        $this->assertCount(1, $scoped);
-        $this->assertSame('mapped_to', $scoped->first()->relation_type);
-    }
-
-    public function test_apply_includes_realization_to_self_assessment_link_in_scope(): void
-    {
-        $admin = User::factory()->create();
-        $source = StandardSource::factory()->create([
+            'is_active' => true,
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
-        ]);
+        ], $rootStandard);
+
         $indicator = Indicator::factory()->create([
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
-        $indicator->loadMissing('standardVersion.standard');
-        $indicator->standardVersion?->standard?->update(['standard_source_id' => $source->id]);
-        $qualityPeriodId = $indicator->standardVersion->quality_period_id;
+        $indicator->loadMissing('standardVersion');
+        $indicator->standardVersion?->update(['standard_id' => $childStandard->id]);
 
         $organizationUnit = OrganizationUnit::query()->create([
             'code' => 'UNIT-A',
@@ -188,9 +200,16 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             'created_by' => (string) $admin->id,
         ]);
 
+        $selfAssessment = SelfAssessment::query()->create([
+            'organization_unit_id' => $organizationUnit->id,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
+            'status' => 'draft',
+            'created_by' => (string) $admin->id,
+        ]);
+
         $target = Target::query()->create([
             'indicator_id' => $indicator->id,
-            'quality_period_id' => $qualityPeriodId,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
             'target_value' => 100,
             'created_by' => (string) $admin->id,
         ]);
@@ -204,10 +223,81 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             'created_by' => (string) $admin->id,
         ]);
 
+        SelfAssessmentDetail::query()->create([
+            'self_assessment_id' => $selfAssessment->id,
+            'realization_id' => $realization->id,
+            'score' => 80,
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $scope = TraceabilityLinkScopeResolver::resolveFromSelfAssessment($selfAssessment->id);
+
+        $this->assertNotNull($scope);
+        $this->assertContains($rootStandard->id, $scope['standard_ids']);
+        $this->assertContains($childStandard->id, $scope['standard_ids']);
+    }
+
+    public function test_apply_includes_standard_source_and_parent_standard_links(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create([
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $rootStandard = Standard::create([
+            'code' => 'ROOT',
+            'name' => 'Root Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $childStandard = Standard::create([
+            'code' => 'CHILD',
+            'name' => 'Child Standard',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ], $rootStandard);
+
+        $indicator = Indicator::factory()->create([
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+        $indicator->loadMissing('standardVersion');
+        $indicator->standardVersion?->update(['standard_id' => $childStandard->id]);
+
+        $organizationUnit = OrganizationUnit::query()->create([
+            'code' => 'UNIT-A',
+            'name' => 'Unit A',
+            'type' => 'UNIT',
+            'is_active' => true,
+            'created_by' => (string) $admin->id,
+        ]);
+
         $selfAssessment = SelfAssessment::query()->create([
             'organization_unit_id' => $organizationUnit->id,
-            'quality_period_id' => $qualityPeriodId,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
             'status' => 'draft',
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $target = Target::query()->create([
+            'indicator_id' => $indicator->id,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
+            'target_value' => 100,
+            'created_by' => (string) $admin->id,
+        ]);
+
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $organizationUnit->id,
+            'actual_value' => 10,
+            'score' => 80,
+            'status' => 'approved',
             'created_by' => (string) $admin->id,
         ]);
 
@@ -221,30 +311,52 @@ class TraceabilityLinkScopeResolverTest extends TestCase
         $this->actingAs($admin);
 
         TraceabilityRecorded::dispatch(
+            source: $rootStandard,
+            target: $source,
+            relationType: 'mapped_to',
+        );
+
+        TraceabilityRecorded::dispatch(
+            source: $rootStandard,
+            target: $childStandard,
+            relationType: 'related_to',
+        );
+
+        TraceabilityRecorded::dispatch(
+            source: $childStandard,
+            target: $indicator,
+            relationType: 'defines',
+        );
+
+        TraceabilityRecorded::dispatch(
             source: $realization,
             target: $selfAssessment,
             relationType: 'evaluated_in',
         );
 
         $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
-            'standard_source_id' => $source->id,
+            'self_assessment_id' => $selfAssessment->id,
         ])->get();
 
+        $this->assertCount(4, $scoped);
+        $this->assertTrue($scoped->contains(
+            fn (TraceabilityLinks $link): bool => $link->relation_type === 'mapped_to'
+                && $link->source_type === 'standard'
+                && $link->target_type === 'standard_source',
+        ));
         $this->assertTrue($scoped->contains(
             fn (TraceabilityLinks $link): bool => $link->relation_type === 'evaluated_in'
-                && $link->target_type === 'self_assessment'
-                && $link->target_id === $selfAssessment->id,
+                && $link->target_type === 'self_assessment',
         ));
     }
 
-    public function test_apply_excludes_links_when_only_one_endpoint_is_in_scope(): void
+    /**
+     * @return array{0: SelfAssessment, 1: Indicator, 2: Standard, 3?: Realization, 4?: Target}
+     */
+    private function createSelfAssessmentContext(bool $withRealization = false): array
     {
         $admin = User::factory()->create();
         $source = StandardSource::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-        $otherSource = StandardSource::factory()->create([
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
@@ -254,64 +366,51 @@ class TraceabilityLinkScopeResolverTest extends TestCase
             'updated_by' => $admin->id,
         ]);
         $indicator->loadMissing('standardVersion.standard');
-        $indicator->standardVersion?->standard?->update(['standard_source_id' => $source->id]);
+        $standard = $indicator->standardVersion?->standard;
+        $standard?->update(['standard_source_id' => $source->id]);
 
-        $otherIndicator = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
+        $organizationUnit = OrganizationUnit::query()->create([
+            'code' => 'UNIT-A',
+            'name' => 'Unit A',
+            'type' => 'UNIT',
+            'is_active' => true,
+            'created_by' => (string) $admin->id,
         ]);
 
-        $this->actingAs($admin);
-
-        TraceabilityRecorded::dispatch(
-            source: $indicator,
-            target: $otherIndicator,
-            relationType: 'mapped_to',
-        );
-
-        $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
-            'standard_source_id' => $source->id,
-        ])->get();
-
-        $this->assertCount(0, $scoped);
-    }
-
-    public function test_apply_narrows_results_by_quality_period(): void
-    {
-        $admin = User::factory()->create();
-        $source = StandardSource::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
+        $selfAssessment = SelfAssessment::query()->create([
+            'organization_unit_id' => $organizationUnit->id,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
+            'status' => 'draft',
+            'created_by' => (string) $admin->id,
         ]);
 
-        $indicatorA = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
+        if (! $withRealization) {
+            return [$selfAssessment, $indicator, $standard];
+        }
+
+        $target = Target::query()->create([
+            'indicator_id' => $indicator->id,
+            'quality_period_id' => $indicator->standardVersion->quality_period_id,
+            'target_value' => 100,
+            'created_by' => (string) $admin->id,
         ]);
-        $indicatorA->loadMissing('standardVersion.standard');
-        $standardA = $indicatorA->standardVersion?->standard;
-        $standardA?->update(['standard_source_id' => $source->id]);
-        $periodA = $indicatorA->standardVersion->quality_period_id;
 
-        $indicatorB = Indicator::factory()->create([
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
+        $realization = Realization::query()->create([
+            'target_id' => $target->id,
+            'organization_unit_id' => $organizationUnit->id,
+            'actual_value' => 10,
+            'score' => 80,
+            'status' => 'approved',
+            'created_by' => (string) $admin->id,
         ]);
-        $indicatorB->loadMissing('standardVersion.standard');
-        $standardB = $indicatorB->standardVersion?->standard;
-        $standardB?->update(['standard_source_id' => $source->id]);
 
-        $this->actingAs($admin);
+        SelfAssessmentDetail::query()->create([
+            'self_assessment_id' => $selfAssessment->id,
+            'realization_id' => $realization->id,
+            'score' => 80,
+            'created_by' => (string) $admin->id,
+        ]);
 
-        TraceabilityRecorded::dispatch(source: $standardA, target: $indicatorA, relationType: 'defines');
-        TraceabilityRecorded::dispatch(source: $standardB, target: $indicatorB, relationType: 'defines');
-
-        $scoped = TraceabilityLinkScopeResolver::apply(TraceabilityLinks::query(), [
-            'standard_source_id' => $source->id,
-            'quality_period_id' => $periodA,
-        ])->get();
-
-        $this->assertCount(1, $scoped);
-        $this->assertSame($indicatorA->id, $scoped->first()->target_id);
+        return [$selfAssessment, $indicator, $standard, $realization, $target];
     }
 }

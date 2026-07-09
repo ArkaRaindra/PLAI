@@ -23,7 +23,7 @@ class DataTrailsTable
     {
         return $table
             ->heading('Jejak Ketertelusuran')
-            ->description('Riwayat hubungan antar entitas dalam sistem penjaminan mutu. Pilih lingkup data terlebih dahulu.')
+            ->description('Riwayat hubungan antar entitas pada penilaian mandiri yang dipilih.')
             ->modifyQueryUsing(fn (Builder $query): Builder => $query
                 ->with(['source', 'target'])
                 ->orderBy(DB::raw('COALESCE(performed_at, created_at)')))
@@ -91,7 +91,7 @@ class DataTrailsTable
                     ->orderQueryUsing(fn (Builder $query): Builder => $query->orderBy(DB::raw('COALESCE(performed_at, created_at)')))
             )
             ->emptyStateHeading('Belum ada jejak data')
-            ->emptyStateDescription('Pilih sumber standar pada filter di atas untuk menampilkan jejak ketertelusuran dalam lingkup yang dipilih.')
+            ->emptyStateDescription('Belum ada jejak ketertelusuran untuk penilaian mandiri yang dipilih.')
             ->recordActions([
                 ViewAction::make(),
             ])
