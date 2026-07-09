@@ -71,18 +71,20 @@ class SelfAssessmentInfolist
                         ])->columnSpan(1),
 
                         Group::make([
-                            Section::make('Penilaian per Indikator')
+                            Section::make('Penilaian per Realisasi')
                                 ->schema([
                                     RepeatableEntry::make('details')
                                         ->label('')
                                         ->schema([
-                                            TextEntry::make('indicator.name')->label('Indikator'),
-                                            TextEntry::make('score')->label('Skor')->numeric(decimalPlaces: 2),
+                                            TextEntry::make('realization.target.indicator.code')->label('Kode Indikator'),
+                                            TextEntry::make('realization.target.indicator.name')->label('Indikator'),
+                                            TextEntry::make('realization.score')->label('Skor Realisasi')->numeric(decimalPlaces: 2),
+                                            TextEntry::make('score')->label('Skor Penilaian')->numeric(decimalPlaces: 2),
                                             TextEntry::make('analysis')->label('Analisis')->placeholder('-')->columnSpanFull(),
                                             TextEntry::make('strength')->label('Kekuatan')->placeholder('-')->columnSpanFull(),
                                             TextEntry::make('weakness')->label('Kelemahan')->placeholder('-')->columnSpanFull(),
                                         ])
-                                        ->columns(2),
+                                        ->columns(3),
                                 ]),
                         ])->columnSpan(1),
                     ]),
