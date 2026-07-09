@@ -3,7 +3,7 @@
 namespace App\Filament\SuperAdmin\Widgets;
 
 use App\Models\Indicator;
-use App\Models\Realization;
+use App\Models\IndicatorOwner;
 use App\Models\Target;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -23,22 +23,29 @@ class PpeppKpiOverviewWidget extends BaseWidget
             ->when($periodId, fn ($query) => $query->where('quality_period_id', $periodId))
             ->count();
 
-        $realizationsInScope = Realization::query()
-            ->whereHas('target', fn ($query) => $query->when(
-                $periodId,
-                fn ($q) => $q->where('quality_period_id', $periodId),
-            ));
+        $obligations = IndicatorOwner::query()
+            ->with(['indicator.targets' => fn ($query) => $query
+                ->when($periodId, fn ($q) => $q->where('quality_period_id', $periodId))
+                ->with('realizations')])
+            ->get()
+            ->filter(fn (IndicatorOwner $owner) => $owner->indicator->targets->isNotEmpty());
 
-        $totalRealizations = (clone $realizationsInScope)->count();
+        $totalExpected = $obligations->count();
 
-        $approvedRealizations = (clone $realizationsInScope)
-            ->where('status', 'approved')
-            ->with('target')
-            ->get();
+        $pairs = $obligations->map(function (IndicatorOwner $owner) {
+            $target = $owner->indicator->targets->first();
 
-        $achievements = $approvedRealizations
-            ->filter(fn (Realization $realization) => $realization->target?->target_value > 0)
-            ->map(fn (Realization $realization) => ((float) $realization->actual_value / (float) $realization->target->target_value) * 100);
+            return [
+                'target' => $target,
+                'realization' => $target->realizations->firstWhere('organization_unit_id', $owner->organization_unit_id),
+            ];
+        });
+
+        $approvedPairs = $pairs->filter(fn (array $pair) => $pair['realization']?->status === 'approved');
+
+        $achievements = $approvedPairs
+            ->filter(fn (array $pair) => (float) $pair['target']->target_value > 0)
+            ->map(fn (array $pair) => ((float) $pair['realization']->actual_value / (float) $pair['target']->target_value) * 100);
 
         $averageAchievement = $achievements->isNotEmpty() ? $achievements->avg() : null;
 
@@ -53,10 +60,10 @@ class PpeppKpiOverviewWidget extends BaseWidget
                 ->icon('heroicon-o-flag')
                 ->color('info'),
 
-            Stat::make('Realisasi Disetujui', "{$approvedRealizations->count()} / {$totalRealizations}")
-                ->description('Realisasi yang disetujui dari seluruh realisasi periode ini')
+            Stat::make('Realisasi Disetujui', "{$approvedPairs->count()} / {$totalExpected}")
+                ->description('Indikator unit yang sudah disetujui')
                 ->icon('heroicon-o-check-circle')
-                ->color('success'),
+                ->color($totalExpected > 0 && $approvedPairs->count() < $totalExpected ? 'warning' : 'success'),
 
             Stat::make('Rata-rata Capaian', $averageAchievement !== null ? number_format($averageAchievement, 1).'%' : '-')
                 ->description('Rata-rata realisasi disetujui terhadap target')

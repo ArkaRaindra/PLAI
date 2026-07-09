@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Widgets;
 
+use App\Models\OrganizationUnit;
 use App\Models\Realization;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -12,34 +13,44 @@ class PpeppAchievementChartWidget extends ChartWidget
 
     protected ?string $heading = 'Capaian Realisasi per Unit Organisasi';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
         $periodId = $this->filters['quality_period_id'] ?? null;
 
+        $units = OrganizationUnit::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         $realizationsByUnit = Realization::query()
             ->where('status', 'approved')
-            ->whereHas('target', fn($query) => $query->when(
+            ->whereHas('target', fn ($query) => $query->when(
                 $periodId,
-                fn($q) => $q->where('quality_period_id', $periodId),
+                fn ($q) => $q->where('quality_period_id', $periodId),
             ))
-            ->with(['target', 'organizationUnit'])
+            ->with('target')
             ->get()
-            ->filter(fn(Realization $realization) => $realization->target?->target_value > 0)
+            ->filter(fn (Realization $realization) => (float) ($realization->target?->target_value ?? 0) > 0)
             ->groupBy('organization_unit_id');
 
         $labels = [];
         $values = [];
 
-        foreach ($realizationsByUnit as $unitId => $realizations) {
-            $labels[] = $realizations->first()->organizationUnit?->name ?? "Unit #{$unitId}";
+        foreach ($units as $unit) {
+            $labels[] = $unit->name;
 
-            $average = $realizations
-                ->map(fn(Realization $realization) => ((float) $realization->actual_value / (float) $realization->target->target_value) * 100)
-                ->avg();
+            $unitRealizations = $realizationsByUnit->get($unit->id);
 
-            $values[] = round($average, 1);
+            $values[] = $unitRealizations
+                ? round(
+                    $unitRealizations
+                        ->map(fn (Realization $realization) => ((float) $realization->actual_value / (float) $realization->target->target_value) * 100)
+                        ->avg(),
+                    1,
+                )
+                : 0.0;
         }
 
         return [
