@@ -3,8 +3,7 @@
 namespace App\Filament\SuperAdmin\Resources\Indicators\Tables;
 
 use App\Enums\CalculationMethod;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use App\Support\Filament\TableContextMenu;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,9 +39,9 @@ class IndicatorsTable
                     ->numeric(decimalPlaces: 2)
                     ->sortable(),
             ])
-            ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+            ->contextMenuActions([
+                TableContextMenu::edit(),
+                TableContextMenu::delete(),
             ]);
     }
 }

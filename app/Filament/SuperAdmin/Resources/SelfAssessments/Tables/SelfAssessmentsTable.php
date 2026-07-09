@@ -3,10 +3,9 @@
 namespace App\Filament\SuperAdmin\Resources\SelfAssessments\Tables;
 
 use App\Filament\SuperAdmin\Resources\SelfAssessments\SelfAssessmentResource;
+use App\Support\Filament\TableContextMenu;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -55,12 +54,12 @@ class SelfAssessmentsTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                SelfAssessmentResource::submitAction(),
-                SelfAssessmentResource::approveAction(),
-                SelfAssessmentResource::rejectAction(),
+            ->contextMenuActions([
+                TableContextMenu::view(),
+                TableContextMenu::edit(),
+                TableContextMenu::submit(SelfAssessmentResource::submitAction()),
+                TableContextMenu::approve(SelfAssessmentResource::approveAction()),
+                TableContextMenu::reject(SelfAssessmentResource::rejectAction()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -2,9 +2,9 @@
 
 namespace App\Filament\SuperAdmin\Resources\Roles\Tables;
 
+use App\Support\Filament\TableContextMenu;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -32,8 +32,8 @@ class RolesTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
+            ->contextMenuActions([
+                TableContextMenu::edit(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
