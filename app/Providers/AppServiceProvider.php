@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\TraceabilityRecorded;
 use App\Listeners\RecordTraceabilityListener;
+use App\Models\Evidences;
 use App\Models\Indicator;
 use App\Models\OrganizationUnit;
 use App\Models\Realization;
@@ -53,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
             'target' => Target::class,
             'self_assessment' => SelfAssessment::class,
             'user' => User::class,
+            'evidence' => Evidences::class,
         ]);
 
         Event::listen(TraceabilityRecorded::class, RecordTraceabilityListener::class);

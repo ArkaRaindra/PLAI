@@ -58,7 +58,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $period->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -102,7 +101,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $period->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -112,7 +110,7 @@ class StandardVersionTest extends TestCase
         $this->assertDatabaseHas('standard_versions', [
             'standard_id' => $standard->id,
             'quality_period_id' => $period->id,
-            'version' => 'v1',
+            'version' => '1.0',
         ]);
         $this->assertDatabaseCount('quality_periods', 1);
     }
@@ -144,7 +142,6 @@ class StandardVersionTest extends TestCase
                 'is_active' => true,
             ],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -157,7 +154,7 @@ class StandardVersionTest extends TestCase
         ]);
         $this->assertDatabaseHas('standard_versions', [
             'standard_id' => $standard->id,
-            'version' => 'v1',
+            'version' => '1.0',
         ]);
     }
 
@@ -179,7 +176,7 @@ class StandardVersionTest extends TestCase
         StandardVersion::factory()->create([
             'standard_id' => $standard->id,
             'quality_period_id' => $period->id,
-            'version' => 'v1',
+            'version' => '1.0',
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
@@ -225,7 +222,7 @@ class StandardVersionTest extends TestCase
         StandardVersion::factory()->create([
             'standard_id' => $standardA->id,
             'quality_period_id' => $periodA->id,
-            'version' => 'v1',
+            'version' => '1.0',
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
@@ -233,7 +230,7 @@ class StandardVersionTest extends TestCase
         StandardVersion::factory()->create([
             'standard_id' => $standardB->id,
             'quality_period_id' => $periodB->id,
-            'version' => 'v1',
+            'version' => '1.0',
             'created_by' => $admin->id,
             'updated_by' => $admin->id,
         ]);
@@ -350,7 +347,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $period->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -371,7 +367,7 @@ class StandardVersionTest extends TestCase
         $this->assertDatabaseHas('standard_versions', [
             'standard_id' => $child->id,
             'quality_period_id' => $period->id,
-            'version' => 'v1',
+            'version' => '1.0',
         ]);
     }
 
@@ -415,7 +411,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $periodA->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -432,7 +427,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $periodB->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v2',
                 'start_date' => now()->toDateString(),
                 'status' => 'active',
                 'is_active' => true,
@@ -442,9 +436,9 @@ class StandardVersionTest extends TestCase
         $child->refresh()->load('standardVersion');
         $grandchild->refresh()->load('standardVersion');
 
-        $this->assertSame('v2', $root->fresh()->standardVersion?->version);
-        $this->assertSame('v2', $child->standardVersion?->version);
-        $this->assertSame('v2', $grandchild->standardVersion?->version);
+        $this->assertSame('2.0', $root->fresh()->standardVersion?->version);
+        $this->assertSame('2.0', $child->standardVersion?->version);
+        $this->assertSame('2.0', $grandchild->standardVersion?->version);
         $this->assertSame($periodB->id, $child->standardVersion?->quality_period_id);
         $this->assertSame($periodB->id, $grandchild->standardVersion?->quality_period_id);
     }
@@ -470,7 +464,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $period->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -490,7 +483,7 @@ class StandardVersionTest extends TestCase
 
         $child->update(['name' => 'Updated Child Name']);
 
-        $this->assertSame('v1', $child->fresh()->standardVersion?->version);
+        $this->assertSame('1.0', $child->fresh()->standardVersion?->version);
         $this->assertSame($period->id, $child->fresh()->standardVersion?->quality_period_id);
     }
 
@@ -515,7 +508,6 @@ class StandardVersionTest extends TestCase
             'quality_period_id' => $period->id,
             'qualityPeriod' => [],
             'standardVersion' => [
-                'version' => 'v1',
                 'start_date' => now()->toDateString(),
                 'status' => 'draft',
                 'is_active' => true,
@@ -542,6 +534,95 @@ class StandardVersionTest extends TestCase
         $this->assertDatabaseMissing('standard_versions', ['id' => $childVersionId]);
         $this->assertDatabaseHas('standards', ['id' => $parent->id]);
         $this->assertDatabaseCount('standard_versions', 1);
+    }
+
+    public function test_edit_same_quality_period_does_not_bump_version(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $period = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $standard = Standard::create([
+            'code' => 'EDIT-VER',
+            'name' => 'Standard Edit Version',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        StandardVersionPersister::sync($standard, [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $period->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ]);
+
+        StandardVersionPersister::sync($standard->fresh(), [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $period->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'start_date' => now()->addDay()->toDateString(),
+                'status' => 'active',
+                'is_active' => true,
+            ],
+        ]);
+
+        $this->assertDatabaseCount('standard_versions', 1);
+        $this->assertSame('1.0', $standard->fresh()->standardVersion?->version);
+        $this->assertSame('active', $standard->fresh()->standardVersion?->status->value);
+    }
+
+    public function test_quality_period_change_creates_new_version_row(): void
+    {
+        $admin = User::factory()->create();
+        $source = StandardSource::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $periodA = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+        $periodB = QualityPeriod::factory()->create(['created_by' => $admin->id, 'updated_by' => $admin->id]);
+
+        $standard = Standard::create([
+            'code' => 'NEW-VER',
+            'name' => 'Standard New Version',
+            'standard_source_id' => $source->id,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        StandardVersionPersister::sync($standard, [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $periodA->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'start_date' => now()->toDateString(),
+                'status' => 'draft',
+                'is_active' => true,
+            ],
+        ]);
+
+        StandardVersionPersister::sync($standard->fresh(), [
+            'include_standard_version' => true,
+            'quality_period_mode' => 'existing',
+            'quality_period_id' => $periodB->id,
+            'qualityPeriod' => [],
+            'standardVersion' => [
+                'start_date' => now()->toDateString(),
+                'status' => 'active',
+                'is_active' => true,
+            ],
+        ]);
+
+        $this->assertDatabaseCount('standard_versions', 2);
+        $this->assertSame('2.0', $standard->fresh()->standardVersion?->version);
+        $this->assertSame($periodB->id, $standard->fresh()->standardVersion?->quality_period_id);
     }
 
     public function test_create_child_standard_redirects_when_parent_has_no_version(): void

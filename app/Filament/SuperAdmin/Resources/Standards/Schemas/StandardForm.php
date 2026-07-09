@@ -156,8 +156,9 @@ class StandardForm
                             ->columnSpanFull(),
                         TextInput::make('standardVersion.version')
                             ->label('Versi')
-                            ->required()
-                            ->maxLength(255),
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->visible(fn (string $operation): bool => $operation === 'edit'),
                         DatePicker::make('standardVersion.start_date')
                             ->label('Tanggal Mulai')
                             ->default(now())

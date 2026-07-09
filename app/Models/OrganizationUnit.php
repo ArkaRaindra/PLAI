@@ -57,4 +57,9 @@ class OrganizationUnit extends Model
     {
         return $this->hasMany(SelfAssessment::class, 'organization_unit_id');
     }
+
+    public function evidences(): HasMany
+    {
+        return $this->hasMany(Evidences::class, 'organization_unit_id');
+    }
 }

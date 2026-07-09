@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\QualityPeriod;
 use App\Models\Standard;
 use App\Models\StandardVersion;
+use App\Services\Versioning\VersionGeneratorService;
 
 class StandardVersionPersister
 {
@@ -17,7 +18,11 @@ class StandardVersionPersister
             return false;
         }
 
-        return filled(data_get($data, 'standardVersion.version'));
+        if (($data['quality_period_mode'] ?? 'existing') === 'new') {
+            return filled(data_get($data, 'qualityPeriod.code'));
+        }
+
+        return filled($data['quality_period_id'] ?? null);
     }
 
     /**
@@ -93,18 +98,44 @@ class StandardVersionPersister
     protected static function persistVersion(Standard $standard, array $versionData): void
     {
         if (! self::shouldPersist($versionData)) {
-            $standard->standardVersion?->delete();
+            $standard->standardVersions()->delete();
 
             return;
         }
 
         $attributes = self::buildVersionAttributes($standard, $versionData);
+        $existingVersion = $standard->standardVersion;
+        $newQualityPeriodId = (int) $attributes['quality_period_id'];
+        $inheritedVersion = data_get($versionData, 'standardVersion.version');
 
-        if ($standard->standardVersion) {
-            $standard->standardVersion->update($attributes);
-        } else {
+        if ($existingVersion === null) {
+            $attributes['version'] = filled($inheritedVersion)
+                ? (string) $inheritedVersion
+                : app(VersionGeneratorService::class)->next(
+                    StandardVersion::class,
+                    'standard_id',
+                    $standard->id,
+                );
+
             StandardVersion::query()->create($attributes);
+
+            return;
         }
+
+        if ((int) $existingVersion->quality_period_id !== $newQualityPeriodId) {
+            $attributes['version'] = app(VersionGeneratorService::class)->next(
+                StandardVersion::class,
+                'standard_id',
+                $standard->id,
+            );
+
+            StandardVersion::query()->create($attributes);
+
+            return;
+        }
+
+        unset($attributes['version']);
+        $existingVersion->update($attributes);
     }
 
     /**
@@ -150,7 +181,6 @@ class StandardVersionPersister
         return [
             'standard_id' => $standard->id,
             'quality_period_id' => self::resolveQualityPeriodId($versionData),
-            'version' => $standardVersion['version'],
             'start_date' => $standardVersion['start_date'] ?? now()->toDateString(),
             'end_date' => $standardVersion['end_date'] ?? null,
             'status' => $standardVersion['status'] ?? 'draft',
