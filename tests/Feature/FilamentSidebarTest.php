@@ -2,6 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Filament\SuperAdmin\Pages\ManageStandards;
+use App\Filament\SuperAdmin\Resources\Indicators\IndicatorResource;
+use App\Filament\SuperAdmin\Resources\Realizations\RealizationResource;
+use App\Filament\SuperAdmin\Resources\Standards\StandardResource;
+use App\Filament\SuperAdmin\Resources\Targets\TargetResource;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\View\PanelsIconAlias;
@@ -35,5 +40,22 @@ class FilamentSidebarTest extends TestCase
     {
         $this->assertSame('heroicon-s-bars-3', FilamentIcon::resolve(PanelsIconAlias::SIDEBAR_COLLAPSE_BUTTON));
         $this->assertSame('heroicon-s-bars-3', FilamentIcon::resolve(PanelsIconAlias::SIDEBAR_EXPAND_BUTTON));
+    }
+
+    public function test_target_navigation_stays_active_on_realization_routes(): void
+    {
+        $pattern = TargetResource::getNavigationItemActiveRoutePattern();
+
+        $this->assertContains(TargetResource::getRouteBaseName().'.*', $pattern);
+        $this->assertContains(RealizationResource::getRouteBaseName().'.*', $pattern);
+    }
+
+    public function test_manage_standards_navigation_stays_active_on_indicator_and_standard_routes(): void
+    {
+        $pattern = ManageStandards::getNavigationItemActiveRoutePattern();
+
+        $this->assertContains(ManageStandards::getRouteName(), $pattern);
+        $this->assertContains(IndicatorResource::getRouteBaseName().'.*', $pattern);
+        $this->assertContains(StandardResource::getRouteBaseName().'.*', $pattern);
     }
 }
