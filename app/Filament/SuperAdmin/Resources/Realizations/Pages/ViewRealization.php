@@ -8,6 +8,7 @@ use App\Filament\SuperAdmin\Resources\Targets\TargetResource;
 use App\Models\EvidenceVersions;
 use App\Models\Realization;
 use App\Models\Target;
+use App\Support\Filament\TableContextMenu;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,8 +20,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -29,6 +30,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
+use LaraZeus\Tabler\Tabler;
 
 class ViewRealization extends ViewRecord implements HasTable
 {
@@ -62,7 +64,7 @@ class ViewRealization extends ViewRecord implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn(): Builder => $this->record->evidenceVersionsQuery())
+            ->query(fn (): Builder => $this->record->evidenceVersionsQuery())
             ->heading('Bukti')
             ->description('Riwayat versi bukti pendukung realisasi.')
             ->columns([
@@ -74,7 +76,7 @@ class ViewRealization extends ViewRecord implements HasTable
                     ->searchable(),
                 TextColumn::make('type')
                     ->label('Tipe')
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'file' => 'File',
                         'url' => 'URL',
                         default => $state,
@@ -91,7 +93,7 @@ class ViewRealization extends ViewRecord implements HasTable
                 Action::make('addEvidence')
                     ->label('Tambah Bukti')
                     ->icon(Heroicon::Plus)
-                    ->visible(fn(): bool => $this->record->canManageEvidence())
+                    ->visible(fn (): bool => $this->record->canManageEvidence())
                     ->schema(self::evidenceFormSchema(requireFile: true))
                     ->action(function (array $data): void {
                         $this->storeEvidence($data);
@@ -102,49 +104,58 @@ class ViewRealization extends ViewRecord implements HasTable
                             ->send();
                     }),
             ])
-            ->recordActions([
-                Action::make('previewEvidence')
-                    ->label('Pratinjau')
-                    ->icon(Heroicon::ArrowTopRightOnSquare)
-                    ->url(fn(EvidenceVersions $record): ?string => self::evidencePreviewUrl($record))
-                    ->openUrlInNewTab()
-                    ->visible(fn(EvidenceVersions $record): bool => self::evidencePreviewUrl($record) !== null),
-                Action::make('viewEvidence')
-                    ->label('Lihat')
-                    ->icon(Heroicon::Eye)
-                    ->modalHeading('Detail Bukti')
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Tutup')
-                    ->schema(function (Action $action): array {
-                        $record = $action->getRecord();
+            ->contextMenuActions([
+                TableContextMenu::urlAction(
+                    Action::make('previewEvidence')
+                        ->label('Pratinjau')
+                        ->url(fn (EvidenceVersions $record): ?string => self::evidencePreviewUrl($record))
+                        ->openUrlInNewTab()
+                        ->visible(fn (EvidenceVersions $record): bool => self::evidencePreviewUrl($record) !== null),
+                    Tabler::ExternalLink,
+                    'info',
+                ),
+                TableContextMenu::modal(
+                    Action::make('viewEvidence')
+                        ->label('Lihat')
+                        ->modalHeading('Detail Bukti')
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Tutup')
+                        ->schema(function (Action $action): array {
+                            $record = $action->getRecord();
 
-                        if (!$record instanceof EvidenceVersions) {
-                            return [];
-                        }
+                            if (! $record instanceof EvidenceVersions) {
+                                return [];
+                            }
 
-                        return self::evidenceViewSchema($record);
-                    }),
-                Action::make('editEvidence')
-                    ->label('Edit')
-                    ->icon(Heroicon::PencilSquare)
-                    ->visible(fn(EvidenceVersions $record): bool => $this->record->canManageEvidence() &&
-                        $record->evidence?->evidenceVersions()->count() === 1)
-                    ->fillForm(fn(EvidenceVersions $record): array => [
-                        'title' => $record->evidence?->title,
-                        'description' => $record->evidence?->description,
-                        'type' => $record->type,
-                        'file_path' => $record->file_path,
-                        'url_path' => $record->url_path,
-                    ])
-                    ->schema(self::evidenceFormSchema(requireFile: false))
-                    ->action(function (EvidenceVersions $record, array $data): void {
-                        $this->storeEvidence($data);
+                            return self::evidenceViewSchema($record);
+                        }),
+                    Tabler::Eye,
+                    'info',
+                ),
+                TableContextMenu::modal(
+                    Action::make('editEvidence')
+                        ->label('Edit')
+                        ->visible(fn (EvidenceVersions $record): bool => $this->record->canManageEvidence() &&
+                            $record->evidence?->evidenceVersions()->count() === 1)
+                        ->fillForm(fn (EvidenceVersions $record): array => [
+                            'title' => $record->evidence?->title,
+                            'description' => $record->evidence?->description,
+                            'type' => $record->type,
+                            'file_path' => $record->file_path,
+                            'url_path' => $record->url_path,
+                        ])
+                        ->schema(self::evidenceFormSchema(requireFile: false))
+                        ->action(function (EvidenceVersions $record, array $data): void {
+                            $this->storeEvidence($data);
 
-                        Notification::make()
-                            ->title('Bukti berhasil diperbarui')
-                            ->success()
-                            ->send();
-                    }),
+                            Notification::make()
+                                ->title('Bukti berhasil diperbarui')
+                                ->success()
+                                ->send();
+                        }),
+                    Tabler::Pencil,
+                    'warning',
+                ),
             ])
             ->emptyStateHeading('Belum ada bukti')
             ->emptyStateDescription('Tambahkan bukti pendukung untuk realisasi ini.')
@@ -178,13 +189,13 @@ class ViewRealization extends ViewRecord implements HasTable
                 ->disk('local')
                 ->directory('evidences')
                 ->visibility('private')
-                ->visible(fn(Get $get): bool => $get('type') === 'file')
-                ->required(fn(Get $get): bool => $requireFile && $get('type') === 'file'),
+                ->visible(fn (Get $get): bool => $get('type') === 'file')
+                ->required(fn (Get $get): bool => $requireFile && $get('type') === 'file'),
             TextInput::make('url_path')
                 ->label('URL Bukti')
                 ->url()
-                ->visible(fn(Get $get): bool => $get('type') === 'url')
-                ->required(fn(Get $get): bool => $get('type') === 'url'),
+                ->visible(fn (Get $get): bool => $get('type') === 'url')
+                ->required(fn (Get $get): bool => $get('type') === 'url'),
         ];
     }
 
@@ -221,13 +232,13 @@ class ViewRealization extends ViewRecord implements HasTable
                 ->label('File')
                 ->state(new HtmlString(
                     '<div class="flex flex-wrap gap-3">'
-                    . '<a class="text-primary-600 underline" href="'
-                    . e(route('evidence-files.preview', $record))
-                    . '" target="_blank" rel="noopener">Pratinjau file</a>'
-                    . '<a class="text-primary-600 underline" href="'
-                    . e(route('evidence-files.download', $record))
-                    . '" target="_blank" rel="noopener">Unduh file</a>'
-                    . '</div>'
+                    .'<a class="text-primary-600 underline" href="'
+                    .e(route('evidence-files.preview', $record))
+                    .'" target="_blank" rel="noopener">Pratinjau file</a>'
+                    .'<a class="text-primary-600 underline" href="'
+                    .e(route('evidence-files.download', $record))
+                    .'" target="_blank" rel="noopener">Unduh file</a>'
+                    .'</div>'
                 ));
         }
 
@@ -236,8 +247,8 @@ class ViewRealization extends ViewRecord implements HasTable
                 ->label('URL')
                 ->state(new HtmlString(
                     '<a class="text-primary-600 underline" href="'
-                    . e($record->url_path)
-                    . '" target="_blank" rel="noopener">Pratinjau URL</a>'
+                    .e($record->url_path)
+                    .'" target="_blank" rel="noopener">Pratinjau URL</a>'
                 ));
         }
 
@@ -312,10 +323,10 @@ class ViewRealization extends ViewRecord implements HasTable
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
             EditAction::make()
-                ->authorize(fn(Realization $record): bool => auth()->user()?->can('update', $record) ?? false),
+                ->authorize(fn (Realization $record): bool => auth()->user()?->can('update', $record) ?? false),
             RealizationResource::submitAction(),
             DeleteAction::make()
-                ->authorize(fn(Realization $record): bool => auth()->user()?->can('delete', $record) ?? false)
+                ->authorize(fn (Realization $record): bool => auth()->user()?->can('delete', $record) ?? false)
                 ->successRedirectUrl(RealizationResource::getListUrl($this->record->target_id)),
             RealizationResource::approveAction(),
             RealizationResource::rejectAction(),
@@ -326,6 +337,6 @@ class ViewRealization extends ViewRecord implements HasTable
     {
         $target->loadMissing(['indicator:id,name', 'qualityPeriod:id,code']);
 
-        return trim(($target->indicator?->name ?? '') . ' — ' . ($target->qualityPeriod?->code ?? ''));
+        return trim(($target->indicator?->name ?? '').' — '.($target->qualityPeriod?->code ?? ''));
     }
 }

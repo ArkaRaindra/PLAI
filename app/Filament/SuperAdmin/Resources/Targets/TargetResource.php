@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Targets;
 
+use App\Filament\SuperAdmin\Resources\Realizations\RealizationResource;
 use App\Filament\SuperAdmin\Resources\Targets\Pages\CreateTarget;
 use App\Filament\SuperAdmin\Resources\Targets\Pages\EditTarget;
 use App\Filament\SuperAdmin\Resources\Targets\Pages\ListTargets;
@@ -31,6 +32,17 @@ class TargetResource extends Resource
     protected static string|\UnitEnum|null $navigationGroup = 'Indikator';
 
     protected static ?string $navigationLabel = 'Target';
+
+    /**
+     * @return string|array<string>
+     */
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [
+            static::getRouteBaseName().'.*',
+            RealizationResource::getRouteBaseName().'.*',
+        ];
+    }
 
     public static function form(Schema $schema): Schema
     {

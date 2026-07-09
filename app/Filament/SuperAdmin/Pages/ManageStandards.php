@@ -60,6 +60,18 @@ class ManageStandards extends NestedsetPage
 
     protected string $view = 'filament.super-admin.pages.manage-standards';
 
+    /**
+     * @return string|array<string>
+     */
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [
+            static::getRouteName(),
+            IndicatorResource::getRouteBaseName().'.*',
+            StandardResource::getRouteBaseName().'.*',
+        ];
+    }
+
     public function hasSelectedSource(): bool
     {
         return filled($this->standardSourceId);
