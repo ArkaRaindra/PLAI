@@ -49,7 +49,10 @@ class EditRealization extends EditRecord
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
             ViewAction::make(),
-            DeleteAction::make()->icon(Heroicon::Trash),
+            DeleteAction::make()
+                ->icon(Heroicon::Trash)
+                ->authorize(fn (): bool => auth()->user()?->can('delete', $this->record) ?? false)
+                ->successRedirectUrl(RealizationResource::getListUrl($this->record->target_id)),
         ];
     }
 
@@ -66,13 +69,13 @@ class EditRealization extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return RealizationResource::getListUrl($this->record->target_id);
+        return RealizationResource::getUrl('view', ['record' => $this->record]);
     }
 
     protected function getCancelFormAction(): Action
     {
         return parent::getCancelFormAction()
-            ->url(RealizationResource::getListUrl($this->record->target_id));
+            ->url(RealizationResource::getUrl('view', ['record' => $this->record]));
     }
 
     protected function getTargetLabel(Target $target): string

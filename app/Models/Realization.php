@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Blameable;
 use App\HasTraceability;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Auth;
 
 class Realization extends Model
@@ -160,5 +163,75 @@ class Realization extends Model
     public function selfAssessmentDetail(): HasOne
     {
         return $this->hasOne(SelfAssessmentDetail::class);
+    }
+
+    public function evidenceLinks(): MorphMany
+    {
+        return $this->morphMany(EvidenceLinks::class, 'reference');
+    }
+
+    public function evidenceLink(): MorphOne
+    {
+        return $this->morphOne(EvidenceLinks::class, 'reference');
+    }
+
+    public function evidenceVersionsQuery(): Builder
+    {
+        $this->loadMissing('evidenceLink');
+
+        $evidenceId = $this->evidenceLink?->evidence_id;
+
+        if ($evidenceId === null) {
+            return EvidenceVersions::query()->whereKey([]);
+        }
+
+        return EvidenceVersions::query()
+            ->where('evidence_id', $evidenceId)
+            ->with(['evidence.evidenceVersions', 'uploadedBy'])
+            ->orderByDesc('id');
+    }
+
+    public function latestEvidenceVersion(): ?EvidenceVersions
+    {
+        $this->loadMissing('evidenceLink.evidence');
+
+        $evidence = $this->evidenceLink?->evidence;
+
+        if ($evidence === null) {
+            return null;
+        }
+
+        return $evidence->evidenceVersions()
+            ->where('version', $evidence->current_version)
+            ->first()
+            ?? $evidence->evidenceVersions()->latest('id')->first();
+    }
+
+    public function canManageEvidence(): bool
+    {
+        return in_array($this->status, ['draft', 'rejected'], true);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function evidenceFormData(): ?array
+    {
+        $this->loadMissing('evidenceLink.evidence');
+
+        $evidence = $this->evidenceLink?->evidence;
+        $version = $this->latestEvidenceVersion();
+
+        if ($evidence === null || $version === null) {
+            return null;
+        }
+
+        return [
+            'title' => $evidence->title,
+            'description' => $evidence->description,
+            'type' => $version->type,
+            'file_path' => $version->file_path,
+            'url_path' => $version->url_path,
+        ];
     }
 }

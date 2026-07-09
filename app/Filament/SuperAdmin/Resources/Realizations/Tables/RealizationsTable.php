@@ -3,8 +3,9 @@
 namespace App\Filament\SuperAdmin\Resources\Realizations\Tables;
 
 use App\Filament\SuperAdmin\Resources\Realizations\RealizationResource;
-use Filament\Actions\ActionGroup;
+use App\Models\Realization;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -57,14 +58,13 @@ class RealizationsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()
+                    ->authorize(fn (Realization $record): bool => auth()->user()?->can('update', $record) ?? false),
                 RealizationResource::submitAction(),
                 RealizationResource::approveAction(),
                 RealizationResource::rejectAction(),
-                // ActionGroup::make(RealizationResource::workflowActions())
-                //     ->label('Workflow')
-                //     ->button()
-                //     ->color('gray'),
+                // DeleteAction::make()
+                //     ->authorize(fn (Realization $record): bool => auth()->user()?->can('delete', $record) ?? false),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

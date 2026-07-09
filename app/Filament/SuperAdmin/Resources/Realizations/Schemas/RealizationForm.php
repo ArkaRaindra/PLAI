@@ -2,8 +2,10 @@
 
 namespace App\Filament\SuperAdmin\Resources\Realizations\Schemas;
 
+use App\Models\IndicatorOwner;
 use App\Models\OrganizationUnit;
 use App\Models\Realization;
+use App\Models\Target;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -32,6 +34,16 @@ class RealizationForm
                                 return $query->whereRaw('1 = 0');
                             }
 
+                            $indicatorOwnerUnitIds = IndicatorOwner::query()
+                                ->where('indicator_id', Target::query()
+                                    ->whereKey($targetId)
+                                    ->value('indicator_id'))
+                                ->pluck('organization_unit_id');
+
+                            if ($indicatorOwnerUnitIds->isEmpty()) {
+                                return $query->whereRaw('1 = 0');
+                            }
+
                             $usedUnitIds = Realization::query()
                                 ->where('target_id', $targetId)
                                 ->when(
@@ -42,6 +54,7 @@ class RealizationForm
 
                             return $query
                                 ->where('is_active', true)
+                                ->whereIn('id', $indicatorOwnerUnitIds)
                                 ->when(
                                     $usedUnitIds->isNotEmpty(),
                                     fn (Builder $query) => $query->whereNotIn('id', $usedUnitIds),
@@ -72,21 +85,9 @@ class RealizationForm
                     ->required()
                     ->minValue(0)
                     ->step(0.01),
-                Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'draft' => 'Draft',
-                        'submitted' => 'Diajukan',
-                        'approved' => 'Disetujui',
-                        'rejected' => 'Ditolak',
-                    ])
-                    ->default('draft')
-                    ->required()
-                    ->live()
-                    ->native(false),
                 Hidden::make('status')
                     ->default('draft')
-                    ->dehydrated(fn (string $operation): bool => $operation === 'create'),
+                    ->dehydrated(),
                 Textarea::make('note_rejected')
                     ->label('Catatan Penolakan')
                     ->visible(fn (Get $get): bool => $get('status') === 'rejected')

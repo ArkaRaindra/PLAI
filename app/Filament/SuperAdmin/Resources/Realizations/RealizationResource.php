@@ -88,11 +88,11 @@ class RealizationResource extends Resource
     public static function submitAction(): Action
     {
         return Action::make('submit')
-            ->label('Ajukan')
+            ->label('Pengajuan')
             ->icon(Heroicon::PaperAirplane)
             ->color('info')
             ->requiresConfirmation()
-            ->modalHeading('Ajukan Realisasi')
+            ->modalHeading('Pengajuan Realisasi')
             ->modalDescription('Realisasi akan diajukan untuk disetujui. Data tidak dapat diubah lagi setelah diajukan.')
             ->modalSubmitActionLabel('Ya, Ajukan')
             ->authorize(fn (Realization $record): bool => Auth::user()?->can('submit', $record) ?? false)

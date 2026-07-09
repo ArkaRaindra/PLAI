@@ -98,7 +98,7 @@ class CreateRealization extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return RealizationResource::getListUrl($this->targetId);
+        return RealizationResource::getUrl('view', ['record' => $this->record]);
     }
 
     protected function getCancelFormAction(): Action
