@@ -6,13 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('evidence_reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('evidence_id')->constrained('evidences')->cascadeOnDelete();
-            $table->foreignId('reviewer_id')->nullable()->constrained('users')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'revision_needed'])->default('prnding');
+            $table->foreignId('reviewer_id')->constrained('users')->cascadeOnDelete();
+            $table->enum('status', ['pending', 'approved', 'rejected', 'revision_needed'])->default('pending');
             $table->text('review_notes')->nullable();
             $table->foreignId('assigned_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('assigned_at')->nullable();
@@ -26,6 +29,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('evidence_reviews');

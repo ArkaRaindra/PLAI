@@ -36,4 +36,9 @@ class Evidences extends Model
     {
         return $this->hasMany(EvidenceLinks::class, 'evidence_id');
     }
+
+    public function evidenceReviews(): HasMany
+    {
+        return $this->hasMany(EvidenceReview::class, 'evidence_id');
+    }
 }

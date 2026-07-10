@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\Evidences;
 
+use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
 use App\Filament\SuperAdmin\Resources\Evidences\Pages\CreateEvidences;
 use App\Filament\SuperAdmin\Resources\Evidences\Pages\EditEvidences;
 use App\Filament\SuperAdmin\Resources\Evidences\Pages\ListEvidences;
@@ -23,6 +24,14 @@ class EvidencesResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'Evidences';
+
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [
+            static::getRouteBaseName().'.*',
+            EvidenceReviewResource::getRouteBaseName().'.*',
+        ];
+    }
 
     public static function form(Schema $schema): Schema
     {

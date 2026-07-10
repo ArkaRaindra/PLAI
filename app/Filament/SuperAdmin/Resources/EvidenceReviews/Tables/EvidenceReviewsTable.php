@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Filament\SuperAdmin\Resources\EvidenceReviews\Tables;
+
+use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
+use App\Models\EvidenceReview;
+use App\Support\Filament\TableContextMenu;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+
+class EvidenceReviewsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('reviewer.name')
+                    ->label('Reviewer')
+                    ->Searchable()
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->label('Status Review')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Menunggu',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                        'revision_needed' => 'Perlu Revisi',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'gray',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        'revision_needed' => 'warning',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+                TextColumn::make('review_notes')
+                    ->label('Catatan Review')
+                    ->limit(50)
+                    ->placeholder('-'),
+                TextColumn::make('assignedBy.name')
+                    ->label('Ditugaskan Oleh')
+                    ->placeholder('-'),
+                TextColumn::make('assigned_at')
+                    ->label('ditugaskan Pada')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('reviewed_at')
+                    ->label('Direview Pada')
+                    ->dateTime()
+                    ->placeholder('-')
+                    ->sortable(),
+            ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->label('Status Review')
+                    ->options([
+                        'pending' => 'Menunggu',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                        'revision_needed' => 'Perlu Revisi',
+                    ]),
+            ])
+            ->contextMenuActions([
+                TableContextMenu::view(),
+                TableContextMenu::edit(EditAction::make()
+                    ->authorize(fn (EvidenceReview $record): bool => auth()->user()?->can('update', $record) ?? false)),
+                TableContextMenu::approve(EvidenceReviewResource::approveAction()),
+                TableContextMenu::reject(EvidenceReviewResource::rejectAction()),
+                TableContextMenu::delete(DeleteAction::make()
+                    ->authorize(fn (EvidenceReview $record): bool => auth()->user()?->can('delete', $record) ?? false)),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}
