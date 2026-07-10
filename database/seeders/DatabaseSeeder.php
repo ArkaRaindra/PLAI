@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             // TargetSeeder::class,
             // RealizationSeeder::class,
             // SelfAssessmentSeeder::class,
+            // EvidenceReviewSeeder::class,
         ]);
     }
 }
