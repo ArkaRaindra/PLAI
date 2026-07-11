@@ -2,10 +2,12 @@
 
 namespace App\Filament\SuperAdmin\Resources\SelfAssessments\Schemas;
 
+use App\Models\Indicator;
 use App\Models\OrganizationUnit;
 use App\Models\QualityPeriod;
 use App\Models\Realization;
 use App\Models\SelfAssessment;
+use App\Models\Target;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -14,6 +16,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Validation\Rules\Unique;
 
@@ -86,9 +89,9 @@ class SelfAssessmentForm
                             ->columnSpan(7)
                             ->relationship('details')
                             ->schema([
-                                Select::make('realization_id')
-                                    ->label('Realisasi')
-                                    ->searchable()
+                                Select::make('indicator_id')
+                                    ->label('Indikator')
+                                    ->dehydrated(false)
                                     ->options(function (Get $get): array {
                                         $organizationUnitId = $get('../../organization_unit_id');
                                         $qualityPeriodId = $get('../../quality_period_id');
@@ -97,50 +100,91 @@ class SelfAssessmentForm
                                             return [];
                                         }
 
+                                        return Indicator::query()
+                                            ->whereHas('targets', fn ($q) => $q->where('quality_period_id', $qualityPeriodId))
+                                            ->whereHas('targets.realizations', fn ($q) => $q->where('organization_unit_id', $organizationUnitId))
+                                            ->orderBy('code')
+                                            ->get()
+                                            ->mapWithKeys(fn (Indicator $record): array => [$record->id => "[{$record->code}] — {$record->name}"])
+                                            ->all();
+                                    })
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(fn (Set $set) => $set('target_id', null))
+                                    ->required(),
+                                Select::make('target_id')
+                                    ->label('Target')
+                                    ->dehydrated(false)
+                                    ->options(function (Get $get): array {
+                                        $indicatorId = $get('indicator_id');
+                                        $organizationUnitId = $get('../../organization_unit_id');
+                                        $qualityPeriodId = $get('../../quality_period_id');
+
+                                        if ($indicatorId === null || $organizationUnitId === null || $qualityPeriodId === null) {
+                                            return [];
+                                        }
+
+                                        return Target::query()
+                                            ->where('indicator_id', $indicatorId)
+                                            ->where('quality_period_id', $qualityPeriodId)
+                                            ->whereHas('realizations', fn ($q) => $q->where('organization_unit_id', $organizationUnitId))
+                                            ->orderByDesc('id')
+                                            ->get()
+                                            ->mapWithKeys(fn (Target $record): array => [$record->id => "Target: {$record->target_value} ({$record->qualityPeriod->code})"])
+                                            ->all();
+                                    })
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(fn (Set $set) => $set('realization_id', null))
+                                    ->required(),
+                                Select::make('realization_id')
+                                    ->label('Realisasi')
+                                    ->options(function (Get $get): array {
+                                        $targetId = $get('target_id');
+                                        $organizationUnitId = $get('../../organization_unit_id');
+
+                                        if ($targetId === null || $organizationUnitId === null) {
+                                            return [];
+                                        }
+
                                         return Realization::query()
                                             ->with('target.indicator')
+                                            ->where('target_id', $targetId)
                                             ->where('organization_unit_id', $organizationUnitId)
-                                            ->whereHas('target', fn ($q) => $q->where('quality_period_id', $qualityPeriodId))
                                             ->whereDoesntHave('selfAssessmentDetail')
                                             ->orderByDesc('id')
                                             ->limit(100)
                                             ->get()
                                             ->mapWithKeys(function (Realization $record): array {
                                                 $indicator = $record->target?->indicator;
-                                                $label = $indicator
-                                                    ? "[{$indicator->code}] — {$indicator->name} (Skor: {$record->score})"
-                                                    : "Realisasi #{$record->id} (Skor: {$record->score})";
 
-                                                return [$record->id => $label];
+                                                return [$record->id => "Realisasi #{$record->id} (Skor: {$record->score})"];
                                             })
                                             ->all();
                                     })
                                     ->getSearchResultsUsing(function (string $search, Get $get): array {
+                                        $targetId = $get('target_id');
                                         $organizationUnitId = $get('../../organization_unit_id');
-                                        $qualityPeriodId = $get('../../quality_period_id');
 
-                                        if ($organizationUnitId === null || $qualityPeriodId === null) {
+                                        if ($targetId === null || $organizationUnitId === null) {
                                             return [];
                                         }
 
                                         return Realization::query()
                                             ->with('target.indicator')
+                                            ->where('target_id', $targetId)
                                             ->where('organization_unit_id', $organizationUnitId)
-                                            ->whereHas('target', fn ($q) => $q->where('quality_period_id', $qualityPeriodId))
                                             ->whereDoesntHave('selfAssessmentDetail')
-                                            ->whereHas('target.indicator', fn ($q) => $q
-                                                ->where('code', 'like', "%{$search}%")
-                                                ->orWhere('name', 'like', "%{$search}%"))
+                                            ->where('id', 'like', "%{$search}%")
                                             ->orderByDesc('id')
                                             ->limit(50)
                                             ->get()
                                             ->mapWithKeys(function (Realization $record): array {
                                                 $indicator = $record->target?->indicator;
-                                                $label = $indicator
-                                                    ? "[{$indicator->code}] — {$indicator->name} (Skor: {$record->score})"
-                                                    : "Realisasi #{$record->id} (Skor: {$record->score})";
 
-                                                return [$record->id => $label];
+                                                return [$record->id => "Realisasi #{$record->id} (Skor: {$record->score})"];
                                             })
                                             ->all();
                                     })
@@ -157,11 +201,7 @@ class SelfAssessmentForm
                                             return null;
                                         }
 
-                                        $indicator = $record->target?->indicator;
-
-                                        return $indicator
-                                            ? "[{$indicator->code}] — {$indicator->name} (Skor: {$record->score})"
-                                            : "Realisasi #{$record->id} (Skor: {$record->score})";
+                                        return "Realisasi #{$record->id} (Skor: {$record->score})";
                                     })
                                     ->required()
                                     ->distinct()
@@ -190,12 +230,7 @@ class SelfAssessmentForm
                             ->reorderable(false)
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['realization_id'] ?? null
-                                ? Realization::query()
-                                    ->with('target.indicator')
-                                    ->find($state['realization_id'])
-                                    ?->target
-                                    ?->indicator
-                                    ?->name
+                                ? 'Realisasi #'.$state['realization_id']
                                 : 'Realisasi Baru'),
                     ]),
             ]);

@@ -24,47 +24,43 @@ class RealizationForm
                 Hidden::make('target_id'),
                 Select::make('organization_unit_id')
                     ->label('Unit Organisasi')
-                    ->relationship(
-                        name: 'organizationUnit',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query, Get $get): Builder {
-                            $targetId = $get('target_id');
+                    ->options(function (Get $get): array {
+                        $targetId = $get('target_id');
 
-                            if (blank($targetId)) {
-                                return $query->whereRaw('1 = 0');
-                            }
+                        if (blank($targetId)) {
+                            return [];
+                        }
 
-                            $indicatorOwnerUnitIds = IndicatorOwner::query()
-                                ->where('indicator_id', Target::query()
-                                    ->whereKey($targetId)
-                                    ->value('indicator_id'))
-                                ->pluck('organization_unit_id');
+                        $indicatorOwnerUnitIds = IndicatorOwner::query()
+                            ->where('indicator_id', Target::query()
+                                ->whereKey($targetId)
+                                ->value('indicator_id'))
+                            ->pluck('organization_unit_id');
 
-                            if ($indicatorOwnerUnitIds->isEmpty()) {
-                                return $query->whereRaw('1 = 0');
-                            }
+                        if ($indicatorOwnerUnitIds->isEmpty()) {
+                            return [];
+                        }
 
-                            $usedUnitIds = Realization::query()
-                                ->where('target_id', $targetId)
-                                ->when(
-                                    filled($get('id')),
-                                    fn (Builder $query) => $query->where('id', '!=', $get('id')),
-                                )
-                                ->pluck('organization_unit_id');
+                        $usedUnitIds = Realization::query()
+                            ->where('target_id', $targetId)
+                            ->when(
+                                filled($get('id')),
+                                fn (Builder $query) => $query->where('id', '!=', $get('id')),
+                            )
+                            ->pluck('organization_unit_id');
 
-                            return $query
-                                ->where('is_active', true)
-                                ->whereIn('id', $indicatorOwnerUnitIds)
-                                ->when(
-                                    $usedUnitIds->isNotEmpty(),
-                                    fn (Builder $query) => $query->whereNotIn('id', $usedUnitIds),
-                                )
-                                ->orderBy('name');
-                        },
-                    )
-                    ->getOptionLabelFromRecordUsing(
-                        fn (OrganizationUnit $record): string => "{$record->code} — {$record->name}",
-                    )
+                        return OrganizationUnit::query()
+                            ->where('is_active', true)
+                            ->whereIn('id', $indicatorOwnerUnitIds)
+                            ->when(
+                                $usedUnitIds->isNotEmpty(),
+                                fn (Builder $query) => $query->whereNotIn('id', $usedUnitIds),
+                            )
+                            ->orderBy('name')
+                            ->get()
+                            ->mapWithKeys(fn (OrganizationUnit $record): array => [$record->id => "{$record->code} — {$record->name}"])
+                            ->all();
+                    })
                     ->searchable(['code', 'name'])
                     ->preload()
                     ->required()
