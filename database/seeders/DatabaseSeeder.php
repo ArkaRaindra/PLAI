@@ -22,12 +22,13 @@ class DatabaseSeeder extends Seeder
             // StandardSeeder::class,
             // StandardVersionSeeder::class,
             // IndicatorSeeder::class,
-            // IndicatorMappingSeeder::class,
-            // IndicatorOwnerSeeder::class,
-            // UserPositionSeeder::class,
             // TargetSeeder::class,
             // RealizationSeeder::class,
             // SelfAssessmentSeeder::class,
+            // UserPositionSeeder::class,
+            // IndicatorMappingSeeder::class,
+            // IndicatorOwnerSeeder::class,
+            // EvidenceSeeder::class,
             // EvidenceReviewSeeder::class,
         ]);
     }

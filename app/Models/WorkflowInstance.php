@@ -38,7 +38,7 @@ class WorkflowInstance extends Model
      * @var array<class-string, array<string, list<string>>>
      */
     protected static array $transitionRegistry = [
-        Evidences::class => [
+        'evidence' => [
             'draft' => ['submitted'],
             'submitted' => ['review'],
             'review' => ['approved', 'rejected'],

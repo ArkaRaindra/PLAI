@@ -19,7 +19,7 @@ class EvidenceReview extends Model
         'revision_needed' => ['pending'],
         'approved' => [],
         'rejected' => [],
-     ];
+    ];
 
     protected $fillable = [
         'evidence_id',
@@ -67,7 +67,7 @@ class EvidenceReview extends Model
         return in_array($status, self::TRANSITIONS[$this->status] ?? [], true);
     }
 
-    public function applystatusTransitionGuard(): void
+    public function applyStatusTransitionGuard(): void
     {
         if (! $this->isDirty('status')) {
             return;

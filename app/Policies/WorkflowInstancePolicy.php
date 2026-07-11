@@ -14,7 +14,7 @@ class WorkflowInstancePolicy
     public function view(User $user, WorkflowInstance $workflowInstance): bool
     {
         return match ($workflowInstance->entity_type) {
-            Evidences::class => $user->can('evidence.view'),
+            'evidence' => $user->can('evidence.view'),
             default => false,
         };
     }
@@ -29,7 +29,7 @@ class WorkflowInstancePolicy
         }
 
         return match ($workflowInstance->entity_type) {
-            Evidences::class => $this->isEvidenceOwnerOrManager($user, $workflowInstance),
+            'evidence' => $this->isEvidenceOwnerOrManager($user, $workflowInstance),
             default => false,
         };
     }
@@ -44,7 +44,7 @@ class WorkflowInstancePolicy
         }
 
         return match ($workflowInstance->entity_type) {
-            Evidences::class => $user->can('evidence.review'),
+            'evidence' => $user->can('evidence.review'),
             default => false,
         };
     }
@@ -59,7 +59,7 @@ class WorkflowInstancePolicy
         }
 
         return match ($workflowInstance->entity_type) {
-            Evidences::class => $user->can('evidence.approve'),
+            'evidence' => $user->can('evidence.approve'),
             default => false,
         };
     }
@@ -74,7 +74,7 @@ class WorkflowInstancePolicy
         }
 
         return match ($workflowInstance->entity_type) {
-            Evidences::class => $user->can('evidence.reject'),
+            'evidence' => $user->can('evidence.reject'),
             default => false,
         };
     }
@@ -89,7 +89,7 @@ class WorkflowInstancePolicy
         }
 
         return match ($workflowInstance->entity_type) {
-            Evidences::class => $user->can('evidence.publish'),
+            'evidence' => $user->can('evidence.publish'),
             default => false,
         };
     }

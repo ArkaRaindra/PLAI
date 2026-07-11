@@ -8,6 +8,7 @@ use App\Models\QualityPeriod;
 use App\Models\Realization;
 use App\Models\SelfAssessment;
 use App\Models\SelfAssessmentDetail;
+use App\Models\StandardVersion;
 use App\Models\Target;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -53,6 +54,7 @@ class SelfAssessmentSeeder extends Seeder
                 $detail = $existingDetail;
             } else {
                 $indicator = Indicator::create([
+                    'standard_version_id' => StandardVersion::first()->id,
                     'code' => 'IND-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
                     'name' => 'Indikator Capaian '.$unit->code,
                     'created_by' => (string) $admin->id,

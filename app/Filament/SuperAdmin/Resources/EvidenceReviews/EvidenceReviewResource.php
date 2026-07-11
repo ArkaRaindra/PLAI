@@ -73,7 +73,14 @@ class EvidenceReviewResource extends Resource
 
     public static function getListUrl(int|string $evidenceId): string
     {
-        return static::getUrl('create'). '?'.http_build_query([
+        return static::getUrl('index').'?'.http_build_query([
+            'evidenceId' => $evidenceId,
+        ]);
+    }
+
+    public static function getCreateUrl(int|string $evidenceId): string
+    {
+        return static::getUrl('create').'?'.http_build_query([
             'evidenceId' => $evidenceId,
         ]);
     }

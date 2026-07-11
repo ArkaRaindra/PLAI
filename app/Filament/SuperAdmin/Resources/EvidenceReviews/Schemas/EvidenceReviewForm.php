@@ -21,7 +21,7 @@ class EvidenceReviewForm
                         titleAttribute: 'name',
                         modifyQueryUsing: fn ($query) => $query->permission('evidence.review')->where('is_active', true),
                     )
-                    ->seacrhable(['name', 'email'])
+                    ->searchable(['name', 'email'])
                     ->preload()
                     ->required(),
                 Textarea::make('review_notes')

@@ -17,6 +17,12 @@ class ViewEvidences extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('back')
+                ->label('Kembali')
+                ->url(fn (): string => route('filament.super-admin.resources.evidences.index'))
+                ->button()
+                ->color('gray')
+                ->icon(Heroicon::ArrowLeft),
             Action::make('manageReviews')
                 ->label('Kelola Review')
                 ->icon(Heroicon::ClipboardDocumentCheck)
