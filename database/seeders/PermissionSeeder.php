@@ -15,7 +15,7 @@ class PermissionSeeder extends Seeder
     public const MODULES = [
         'master-data' => ['view', 'create', 'update', 'delete'],
         'ppepp' => ['view', 'create', 'update', 'delete', 'approve'],
-        'evidence' => ['view', 'upload', 'review', 'approve', 'reject'],
+        'evidence' => ['view', 'upload', 'review', 'approve', 'reject', 'publish'],
         'audit' => ['view', 'create', 'update', 'verify', 'close'],
         'capa' => ['view', 'create', 'update', 'verify', 'close'],
         'rtm' => ['view', 'create', 'update', 'approve'],

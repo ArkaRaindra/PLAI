@@ -138,7 +138,7 @@ class EvidenceReview extends Model
         return $this->status === 'pending';
     }
 
-    public function isDEcided(): bool
+    public function isDecided(): bool
     {
         return in_array($this->status, ['approved', 'rejected'], true);
     }

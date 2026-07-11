@@ -17,6 +17,9 @@ class ViewEvidenceReview extends ViewRecord
 
     protected static ?string $breadcrumb = 'Detail Review Evidence';
 
+    /**
+     * @return array<string, string>
+     */
     public function getBreadcrumbs(): array
     {
         return [

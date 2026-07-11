@@ -6,7 +6,6 @@ use App\Blameable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Evidences extends Model
 {
@@ -41,11 +40,5 @@ class Evidences extends Model
     public function evidenceReviews(): HasMany
     {
         return $this->hasMany(EvidenceReview::class, 'evidence_id');
-    }
-
-    public function workflowInstance(): MorphOne
-    {
-        return $this->morphOne(WorkflowInstance::class, 'entity')
-            ->where('workflow_type', 'evidence_approval');
     }
 }

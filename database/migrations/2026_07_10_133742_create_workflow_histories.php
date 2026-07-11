@@ -14,15 +14,11 @@ return new class extends Migration
         Schema::create('workflow_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('workflow_instance_id')->constrained('workflow_instances')->cascadeOnDelete();
-            $table->string('from_status')->nullable();
             $table->string('status');
-            $table->string('action');
             $table->text('notes')->nullable();
             $table->foreignId('acted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('acted_at');
             $table->timestamps();
-
-             $table->index(['workflow_instance_id', 'acted_at']);
         });
     }
 

@@ -171,14 +171,14 @@ class EvidenceReviewResource extends Resource
     public static function reopenAction(): Action
     {
         return Action::make('reopen')
-            ->label('Buka kembali')
+            ->label('Buka Kembali')
             ->icon(Heroicon::ArrowPath)
             ->color('info')
             ->requiresConfirmation()
             ->modalHeading('Buka Kembali Review')
             ->modalDescription('Review akan dikembalikan ke status menunggu untuk diperiksa ulang oleh reviewer.')
             ->modalSubmitActionLabel('Ya, Buka Kembali')
-            ->authorize(fn (EvidenceReview $record): bool => Auth::user()?->can('reopen', $record ?? false))
+            ->authorize(fn (EvidenceReview $record): bool => Auth::user()?->can('reopen', $record) ?? false)
             ->action(function (EvidenceReview $record): void {
                 $record->update(['status' => 'pending']);
 

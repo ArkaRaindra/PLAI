@@ -8,6 +8,7 @@ use App\Models\Evidences;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
+use Livewire\Attributes\Url;
 
 class CreateEvidenceReview extends CreateRecord
 {
@@ -33,6 +34,9 @@ class CreateEvidenceReview extends CreateRecord
         parent::mount();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getBreadcrumbs(): array
     {
         if (blank($this->evidenceId)) {
@@ -57,7 +61,7 @@ class CreateEvidenceReview extends CreateRecord
         if (blank($this->evidenceId)) {
             return [];
         }
-        
+
         return [
             Action::make('back')
                 ->label('Kembali')
@@ -66,5 +70,35 @@ class CreateEvidenceReview extends CreateRecord
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
         ];
+    }
+
+    protected function fillForm(): void
+    {
+        $this->form->fill([
+            'evidence_id' => (int) $this->evidenceId,
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['evidence_id'] = (int) $this->evidenceId;
+        $data['status'] = 'pending';
+
+        return $data;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return EvidenceReviewResource::getUrl('view', ['record' => $this->record]);
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return parent::getCancelFormAction()
+            ->url(EvidenceReviewResource::getListUrl($this->evidenceId));
     }
 }

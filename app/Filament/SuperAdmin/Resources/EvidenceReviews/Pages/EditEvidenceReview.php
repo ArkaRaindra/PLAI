@@ -17,6 +17,9 @@ class EditEvidenceReview extends EditRecord
 
     protected static ?string $breadcrumb = 'Ubah Review Evidence';
 
+    /**
+     * @return array<string, string>
+     */
     public function getBreadcrumbs(): array
     {
         return [
@@ -42,6 +45,10 @@ class EditEvidenceReview extends EditRecord
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $data['evidence_id'] = $this->record->evidence_id;

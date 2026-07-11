@@ -2,193 +2,153 @@
 
 namespace App\Models;
 
-use App\Blameable;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Generic, reusable approval-workflow engine.
+ *
+ * A WorkflowInstance tracks the current_status of any "workflowable" entity
+ * (identified polymorphically via entity_type/entity_id), while every
+ * transition is appended to workflow_histories for a full audit trail.
+ *
+ * This is intentionally NOT evidence-specific: other modules (CAPA, AMI
+ * Findings, RTM, etc.) can plug into the same engine by registering their
+ * own transition map via WorkflowInstance::registerTransitions().
+ */
 class WorkflowInstance extends Model
 {
-    use Blameable;
-
     protected $table = 'workflow_instances';
 
-    public const array TRANSITIONS = [
-        'draft' => ['submitted'],
-        'submitted' => ['review'. 'rejected'],
-        'review' => ['approved', 'rejected'],
-        'rejected' => ['draft'],
-        'approved' => ['published'],
-        'published' => [],
-    ];
+    public const string DEFAULT_INITIAL_STATUS = 'draft';
 
     protected $fillable = [
-        'entitu_type',
+        'entity_type',
         'entity_id',
         'current_status',
-        'workflow_type',
-        'submitted_by',
-        'submitted_at',
-        'reviewed_by',
-        'reviewed_at',
-        'approved_by',
-        'approved_at',
-        'rejected_by',
-        'rejected_at',
-        'rejection_reason',
-        'published_by',
-        'oublished_at',
-        'created_by',
-        'updated_by',
     ];
 
-    protected function casts(): array
+    /**
+     * Per-entity-type transition maps. Register additional entries from
+     * another module's service provider via registerTransitions() to reuse
+     * this engine without modifying this class.
+     *
+     * @var array<class-string, array<string, list<string>>>
+     */
+    protected static array $transitionRegistry = [
+        Evidences::class => [
+            'draft' => ['submitted'],
+            'submitted' => ['review'],
+            'review' => ['approved', 'rejected'],
+            'approved' => ['published'],
+            'rejected' => ['draft'],
+            'published' => [],
+        ],
+    ];
+
+    /**
+     * Register (or override) the transition map for a workflowable entity type.
+     *
+     * @param  array<string, list<string>>  $transitions
+     */
+    public static function registerTransitions(string $entityType, array $transitions): void
     {
-        return [
-            'submitted_at' => 'datetime',
-            'reviewed_at' => 'datetime',
-            'approved_at' => 'datetime',
-            'rejected_at' => 'datetime',
-            'published_at' => 'datetime,'
-        ];
+        self::$transitionRegistry[$entityType] = $transitions;
     }
 
-    protected static function booted(): void
+    /**
+     * @return array<string, list<string>>
+     */
+    public static function transitionsFor(string $entityType): array
     {
-        static::saving(function (WorkflowInstance $instance): void {
-            $instance->applyStatusTransitionAudit();
-        });
-
-        static::created(function (WorkflowInstance $instance): void {
-            $instance->histories()->create([
-                'from_status' => null,
-                'status' => $instance->current_status,
-                'action' => 'created',
-                'acted_by' => Auth::id(),
-                'acted_at' => now(),
-            ]);
-        });
-
-        static::updated(function (WorkflowInstance $instance): void {
-            if ($instance->wasChanged('current_status')) {
-                $instance->histories()->create([
-                    'from_status' => $instance->getOriginal('current_status'),
-                    'status' => $instance->current_status,
-                    'action' => $instance->current_status,
-                    'acted_by' => Auth::id(),
-                    'acted_at' => now(),
-                    'notes' => $instance->current_status === 'rejected' ? $instance->rejection_reason : null,
-                ]);
-            }
-        });
+        return self::$transitionRegistry[$entityType] ?? [];
     }
 
-    public static function openFor(Model $entity, string $workflowType = 'evidence_approval'): self
+    /**
+     * Find the workflow instance belonging to a given entity, if any.
+     */
+    public static function for(Model $entity): ?self
     {
-        return static::query()->firstOrCreate([
+        return self::query()
+            ->where('entity_type', $entity->getMorphClass())
+            ->where('entity_id', $entity->getKey())
+            ->first();
+    }
+
+    /**
+     * Get or create the workflow instance for a given entity, initializing
+     * it (with an initial history entry) the first time it's called.
+     */
+    public static function initialize(
+        Model $entity,
+        string $initialStatus = self::DEFAULT_INITIAL_STATUS,
+        ?int $actedBy = null,
+    ): self {
+        $instance = self::for($entity);
+
+        if ($instance !== null) {
+            return $instance;
+        }
+
+        $instance = self::query()->create([
             'entity_type' => $entity->getMorphClass(),
             'entity_id' => $entity->getKey(),
-            'workflow_type' => $workflowType,
-        ], [
-            'current_status' => 'draft',
+            'current_status' => $initialStatus,
         ]);
-    }
 
-    public function canTransitionTo(string $status): bool
-    {
-        return in_array($status, self::TRANSITIONS[$this->current_status] ?? [], true);
-    }
+        $instance->histories()->create([
+            'status' => $initialStatus,
+            'notes' => null,
+            'acted_by' => $actedBy ?? Auth::id(),
+            'acted_at' => now(),
+        ]);
 
-    public function applyStatusTransitionAudit(): void
-    {
-        if (! $this->isDirty('current_status')) {
-            return;
-        }
-
-        if ($this->exists) {
-            $from = $this->getOriginal('current_status');
-            $to = $this->status;
-
-            if (! in_array($to, self::TRANSITIONS[$from] ?? [], true)) {
-                throw new \RuntimeException(
-                    "Transisi status workflow dari '{$from}' ke '{$to}' tidak diizinkan"
-                );
-            }
-        }
-
-        $userId = Auth::id();
-
-        if ($this->current_status === 'submitted') {
-            $this->submitted_by = $userId;
-            $this->submitted_at = now();
-        }
-
-        if ($this->current_status === 'review') {
-            $this->reviewed_by = $userId;
-            $this->reviewed_at = now();
-        }
-
-        if ($this->current_status === 'approved') {
-            $this->approved_by = $userId;
-            $this->approved_at = now();
-        }
-
-        if ($this->current_status === 'rejected') {
-            $this->rejected_by = $userId;
-            $this->rejected_at = now();
-        }
-
-        if ($this->current_status === 'published') {
-            $this->published_by = $userId;
-            $this->published_at = now();
-        }
+        return $instance;
     }
 
     public function entity(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo('entity', 'entity_type', 'entity_id');
     }
 
     public function histories(): HasMany
     {
-        return $this->hasMany(WorkflowHistory::class)->latest('acted_at');
+        return $this->hasMany(WorkflowHistory::class)->orderByDesc('acted_at');
     }
 
-    public function submittedBy(): BelongsTo
+    public function canTransitionTo(string $status): bool
     {
-        return $this->belongsTo(User::class, 'submitted_by');
+        $transitions = self::transitionsFor($this->entity_type);
+
+        return in_array($status, $transitions[$this->current_status] ?? [], true);
     }
 
-    public function reviewedBy(): BelongsTo
+    /**
+     * Move the workflow to a new status (if allowed) and append a history entry.
+     */
+    public function transitionTo(string $status, ?string $notes = null, ?int $actedBy = null): void
     {
-        return $this->belongsTo(User::class, 'reviewed_by');
+        if (! $this->canTransitionTo($status)) {
+            throw new \RuntimeException(
+                "Transisi workflow dari '{$this->current_status}' ke '{$status}' tidak diizinkan"
+            );
+        }
+
+        $this->current_status = $status;
+        $this->save();
+
+        $this->histories()->create([
+            'status' => $status,
+            'notes' => $notes,
+            'acted_by' => $actedBy ?? Auth::id(),
+            'acted_at' => now(),
+        ]);
     }
 
-    public function approvedBy(): BelongsTo
+    public function isAt(string $status): bool
     {
-        return $this->belongsTo(User::class, 'approved_by');
-    }
-
-    public function rejectedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'rejected_by');
-    }
-
-    public function publishedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'published_by');
-    }
-
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function updatedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->current_status === $status;
     }
 }

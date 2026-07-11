@@ -11,6 +11,7 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Url;
 
 class ListEvidenceReviews extends ListRecords
 {
@@ -34,6 +35,9 @@ class ListEvidenceReviews extends ListRecords
         parent::mount();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getBreadcrumbs(): array
     {
         if (blank($this->evidenceId)) {

@@ -11,9 +11,7 @@ class WorkflowHistory extends Model
 
     protected $fillable = [
         'workflow_instance_id',
-        'from_status',
         'status',
-        'action',
         'notes',
         'acted_by',
         'acted_at',
@@ -33,6 +31,6 @@ class WorkflowHistory extends Model
 
     public function actor(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'actec_by');
+        return $this->belongsTo(User::class, 'acted_by');
     }
 }
