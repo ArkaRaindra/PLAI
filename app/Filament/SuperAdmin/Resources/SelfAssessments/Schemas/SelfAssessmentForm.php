@@ -7,6 +7,7 @@ use App\Models\OrganizationUnit;
 use App\Models\QualityPeriod;
 use App\Models\Realization;
 use App\Models\SelfAssessment;
+use App\Models\SelfAssessmentDetail;
 use App\Models\Target;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
@@ -112,6 +113,17 @@ class SelfAssessmentForm
                                     ->preload()
                                     ->live()
                                     ->afterStateUpdated(fn (Set $set) => $set('target_id', null))
+                                    ->afterStateHydrated(function (?string $state, Set $set, ?SelfAssessmentDetail $record) {
+                                        if (! $record?->realization_id) {
+                                            return;
+                                        }
+
+                                        $realization = Realization::query()
+                                            ->with('target.indicator')
+                                            ->find($record->realization_id);
+
+                                        $set('indicator_id', $realization?->target?->indicator_id);
+                                    })
                                     ->required(),
                                 Select::make('target_id')
                                     ->label('Target')
@@ -138,6 +150,17 @@ class SelfAssessmentForm
                                     ->preload()
                                     ->live()
                                     ->afterStateUpdated(fn (Set $set) => $set('realization_id', null))
+                                    ->afterStateHydrated(function (?string $state, Set $set, ?SelfAssessmentDetail $record) {
+                                        if (! $record?->realization_id) {
+                                            return;
+                                        }
+
+                                        $realization = Realization::query()
+                                            ->with('target.indicator')
+                                            ->find($record->realization_id);
+
+                                        $set('target_id', $realization?->target_id);
+                                    })
                                     ->required(),
                                 Select::make('realization_id')
                                     ->label('Realisasi')
