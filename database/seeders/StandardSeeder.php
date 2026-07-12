@@ -11,10 +11,13 @@ class StandardSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
-        $ikuSource = StandardSource::where('code', 'SRC-IKU')->firstOrFail();
-        $banptSource = StandardSource::where('code', 'SRC-BANPT')->firstOrFail();
-        $isoSource = StandardSource::where('code', 'SRC-ISO')->firstOrFail();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
+
+        $sources = StandardSource::all();
+
+        $ikuSource = $sources->firstWhere('code', 'SRC-IKU') ?? $sources->first();
+        $banptSource = $sources->firstWhere('code', 'SRC-BANPT') ?? $sources->first();
+        $isoSource = $sources->firstWhere('code', 'SRC-ISO') ?? $sources->first();
 
         $standards = [
             [

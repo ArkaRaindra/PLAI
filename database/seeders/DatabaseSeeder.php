@@ -6,16 +6,13 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
-            PositionSeeder::class,
             UserSeeder::class,
+            PositionSeeder::class,
             OrganizationUnitSeeder::class,
             QualityPeriodSeeder::class,
             StandardSourceSeeder::class,
@@ -24,10 +21,10 @@ class DatabaseSeeder extends Seeder
             // IndicatorSeeder::class,
             // TargetSeeder::class,
             // RealizationSeeder::class,
-            // SelfAssessmentSeeder::class,
             // UserPositionSeeder::class,
-            // IndicatorMappingSeeder::class,
             // IndicatorOwnerSeeder::class,
+            // IndicatorMappingSeeder::class,
+            // SelfAssessmentSeeder::class,
             // EvidenceSeeder::class,
             // EvidenceReviewSeeder::class,
         ]);

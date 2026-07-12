@@ -12,14 +12,14 @@ class EvidenceReviewSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
-        $auditor = User::where('email', 'auditor@example.com')->firstOrFail();
-        $adminMutu = User::where('email', 'adminmutu@example.com')->firstOrFail();
-        $ketuaLpm = User::where('email', 'ketualpm@example.com')->firstOrFail();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
+        $auditor = User::where('email', 'auditor@example.com')->first() ?? User::first();
+        $adminMutu = User::where('email', 'adminmutu@example.com')->first() ?? User::where('role', 'admin-mutu')->first() ?? User::first();
+        $ketuaLpm = User::where('email', 'ketualpm@example.com')->first() ?? User::where('role', 'ketua-lpm')->first() ?? User::first();
 
         Auth::setUser($admin);
 
-        $evidences = Evidences::orderBy('id')->get();
+        $evidences = Evidences::all();
 
         if ($evidences->isEmpty()) {
             return;
@@ -27,43 +27,39 @@ class EvidenceReviewSeeder extends Seeder
 
         $reviewers = [$auditor, $adminMutu, $ketuaLpm];
 
-        $scenarios = [
-            [
-                'status' => 'pending',
-                'review_notes' => null,
-            ],
-            [
-                'status' => 'approved',
-                'review_notes' => 'Bukti sudah lengkap dan sesuai standar.',
-            ],
-            [
-                'status' => 'rejected',
-                'review_notes' => 'Bukti tidak relevan dengan indikator yang dinilai.',
-            ],
-            [
-                'status' => 'revision_needed',
-                'review_notes' => 'Mohon lampirkan dokumen pendukung tambahan.',
-            ],
+        $reviewNotes = [
+            'pending' => null,
+            'approved' => 'Bukti sudah lengkap dan sesuai standar.',
+            'rejected' => 'Bukti tidak relevan dengan indikator yang dinilai.',
+            'revision_needed' => 'Mohon lampirkan dokumen pendukung tambahan.',
         ];
 
-        foreach ($evidences->values() as $index => $evidence) {
-            $scenario = $scenarios[$index % count($scenarios)];
+        foreach ($evidences as $index => $evidence) {
             $reviewer = $reviewers[$index % count($reviewers)];
 
-            EvidenceReview::query()->firstOrCreate(
+            $statusOptions = ['pending', 'approved', 'rejected', 'revision_needed'];
+            $status = $statusOptions[$index % count($statusOptions)];
+
+            $review = EvidenceReview::query()->firstOrCreate(
                 [
                     'evidence_id' => $evidence->id,
                     'reviewer_id' => $reviewer->id,
                 ],
                 [
-                    'status' => $scenario['status'],
-                    'review_notes' => $scenario['review_notes'],
+                    'status' => $status,
+                    'review_notes' => $reviewNotes[$status],
                     'assigned_by' => $admin->id,
                     'assigned_at' => now()->subDays(7 - ($index % 7)),
                     'created_by' => (string) $admin->id,
                     'updated_by' => (string) $admin->id,
-                ],
+                ]
             );
+
+            if (in_array($status, ['approved', 'rejected', 'revision_needed'], true)) {
+                $review->update([
+                    'reviewed_at' => now()->subDays(1),
+                ]);
+            }
         }
     }
 }

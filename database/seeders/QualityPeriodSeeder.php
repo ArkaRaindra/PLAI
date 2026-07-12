@@ -8,16 +8,9 @@ use Illuminate\Database\Seeder;
 
 class QualityPeriodSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->first();
-
-        if (! $admin) {
-            $admin = User::first();
-        }
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
 
         $data = [
             [
@@ -58,8 +51,8 @@ class QualityPeriodSeeder extends Seeder
             QualityPeriod::query()->firstOrCreate(
                 ['code' => $item['code']],
                 array_merge($item, [
-                    'created_by' => $admin?->id,
-                    'updated_by' => $admin?->id,
+                    'created_by' => $admin->id,
+                    'updated_by' => $admin->id,
                 ])
             );
         }

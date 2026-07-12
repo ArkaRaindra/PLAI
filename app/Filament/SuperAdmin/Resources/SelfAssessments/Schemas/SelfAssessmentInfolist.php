@@ -81,7 +81,6 @@ class SelfAssessmentInfolist
                                             TextEntry::make('realization.target.target_value')->label('Nilai Target')->numeric(decimalPlaces: 2),
                                             TextEntry::make('realization.id')->label('Realisasi #'),
                                             TextEntry::make('realization.score')->label('Skor Realisasi')->numeric(decimalPlaces: 2),
-                                            TextEntry::make('score')->label('Skor Penilaian')->numeric(decimalPlaces: 2),
                                             TextEntry::make('analysis')->label('Analisis')->placeholder('-')->columnSpanFull(),
                                             TextEntry::make('strength')->label('Kekuatan')->placeholder('-')->columnSpanFull(),
                                             TextEntry::make('weakness')->label('Kelemahan')->placeholder('-')->columnSpanFull(),

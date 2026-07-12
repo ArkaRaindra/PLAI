@@ -10,7 +10,7 @@ class OrganizationUnitSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
 
         $units = [
             [

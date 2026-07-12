@@ -8,16 +8,9 @@ use Illuminate\Database\Seeder;
 
 class PositionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->first();
-
-        if (! $admin) {
-            $admin = User::first();
-        }
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
 
         $data = [
             [
@@ -68,8 +61,8 @@ class PositionSeeder extends Seeder
                 [
                     'name' => $item['name'],
                     'description' => $item['description'],
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => (string) $admin->id,
+                    'updated_by' => (string) $admin->id,
                 ]
             );
         }

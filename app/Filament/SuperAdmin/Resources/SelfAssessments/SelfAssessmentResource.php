@@ -34,7 +34,9 @@ class SelfAssessmentResource extends Resource
 
     protected static ?string $slug = 'self-assessments';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Evaluasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Indikator';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationLabel = 'Self Assessemnt';
 

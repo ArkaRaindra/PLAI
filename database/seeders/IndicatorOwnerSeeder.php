@@ -13,22 +13,32 @@ class IndicatorOwnerSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
         $indicators = Indicator::all();
-        $unit = OrganizationUnit::where('code', 'TI')->firstOrFail();
-        $userPosition = UserPosition::first();
+        $units = OrganizationUnit::whereIn('type', ['PROGRAM STUDI', 'UPM', 'P3M'])->get();
+        $userPositions = UserPosition::all();
 
-        foreach ($indicators as $indicator) {
-            IndicatorOwner::query()->firstOrCreate([
-                'indicator_id' => $indicator->id,
-                'organization_unit_id' => $unit->id,
-                'user_position_id' => $userPosition?->id,
-            ], [
-                'is_primary' => true,
-                'notes' => 'Penanggungjawab indikator ' . $indicator->name,
-                'created_by' => (string) $admin->id,
-                'updated_by' => (string) $admin->id,
-            ]);
+        if ($indicators->isEmpty() || $units->isEmpty()) {
+            return;
+        }
+
+        foreach ($indicators as $index => $indicator) {
+            $unit = $units[$index % $units->count()];
+            $userPosition = $userPositions->first();
+
+            IndicatorOwner::query()->firstOrCreate(
+                [
+                    'indicator_id' => $indicator->id,
+                    'organization_unit_id' => $unit->id,
+                    'user_position_id' => $userPosition?->id,
+                ],
+                [
+                    'is_primary' => true,
+                    'notes' => 'Penanggungjawab indikator '.$indicator->name.' di '.$unit->name,
+                    'created_by' => (string) $admin->id,
+                    'updated_by' => (string) $admin->id,
+                ]
+            );
         }
     }
 }

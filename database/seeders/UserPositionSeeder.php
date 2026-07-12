@@ -12,27 +12,33 @@ class UserPositionSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
         $positions = Position::all();
-        $unit = OrganizationUnit::where('code', 'UPM')->firstOrFail();
+        $units = OrganizationUnit::whereIn('type', ['PROGRAM STUDI', 'UPM', 'P3M'])->get();
         $users = User::all();
 
-        foreach ($users->take(4) as $index => $user) {
-            $position = $positions->get($index % $positions->count());
+        if ($positions->isEmpty() || $units->isEmpty() || $users->isEmpty()) {
+            return;
+        }
 
-            if ($position) {
-                UserPosition::query()->firstOrCreate([
+        foreach ($users as $userIndex => $user) {
+            $position = $positions[$userIndex % $positions->count()];
+            $unit = $units[$userIndex % $units->count()];
+
+            UserPosition::query()->firstOrCreate(
+                [
                     'user_id' => $user->id,
                     'position_id' => $position->id,
                     'organization_unit_id' => $unit->id,
-                ], [
+                ],
+                [
                     'start_date' => now()->subYear(),
                     'end_date' => null,
                     'is_active' => true,
                     'created_by' => (string) $admin->id,
                     'updated_by' => (string) $admin->id,
-                ]);
-            }
+                ]
+            );
         }
     }
 }

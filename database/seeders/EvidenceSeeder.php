@@ -12,47 +12,45 @@ class EvidenceSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
-        $units = OrganizationUnit::whereIn('code', ['FT', 'TI', 'TM', 'UPM', 'P3M', 'SPI'])->get();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
+        $units = OrganizationUnit::whereIn('type', ['PROGRAM STUDI', 'UPM', 'P3M', 'SPI'])->get();
 
-        $categories = [
-            EvidenceCategory::Sop,
-            EvidenceCategory::Sk,
-            EvidenceCategory::Pedoman,
-            EvidenceCategory::Laporan,
-            EvidenceCategory::Audit,
-            EvidenceCategory::Rtm,
-            EvidenceCategory::Kerjasama,
-            EvidenceCategory::Penelitian,
-            EvidenceCategory::Pkm,
-            EvidenceCategory::Akreditasi,
+        if ($units->isEmpty()) {
+            return;
+        }
+
+        $evidenceTemplates = [
+            ['title' => 'SOP Penjaminan Mutu Internal', 'category' => EvidenceCategory::Sop],
+            ['title' => 'SK Pendirian Program Studi', 'category' => EvidenceCategory::Sk],
+            ['title' => 'Pedoman Evaluasi Dosen', 'category' => EvidenceCategory::Pedoman],
+            ['title' => 'Laporan Audit Mutu 2025', 'category' => EvidenceCategory::Laporan],
+            ['title' => 'Hasil Review Standar ISO', 'category' => EvidenceCategory::Audit],
+            ['title' => 'RTM Meeting Minutes Q3', 'category' => EvidenceCategory::Rtm],
+            ['title' => 'MoD dengan Industri Mitra', 'category' => EvidenceCategory::Kerjasama],
+            ['title' => 'Laporan Penelitian Dosen', 'category' => EvidenceCategory::Penelitian],
+            ['title' => 'Laporan PKM Mahasiswa', 'category' => EvidenceCategory::Pkm],
+            ['title' => 'Bukti Akreditasi Unggulan', 'category' => EvidenceCategory::Akreditasi],
+            ['title' => 'Dokumen Rencana Strategis', 'category' => EvidenceCategory::Pedoman],
+            ['title' => 'Laporan Kinerja Semester', 'category' => EvidenceCategory::Laporan],
         ];
 
-        $titles = [
-            'SOP Penjaminan Mutu Internal',
-            'SK Pendirian Program Studi',
-            'Pedoman Evaluasi Dosen',
-            'Laporan Audit Mutu 2025',
-            'Hasil Review Standar ISO',
-            'RTM Meeting Minutes',
-            'MoD dengan industri mitra',
-            'Laporan Penelitian Dosen',
-            'Laporan PKM Mahasiswa',
-            'Bukti Akreditasi Unggulan',
-        ];
+        foreach ($evidenceTemplates as $template) {
+            $unit = $units->random();
+            $uniqueTitle = $template['title'].' - '.$unit->name;
 
-        foreach ($titles as $index => $title) {
-            $unit = $units->get($index % $units->count());
-
-            Evidences::query()->create([
-                'organization_unit_id' => $unit->id,
-                'title' => $title,
-                'description' => 'Bukti akreditasi untuk '.$title.' di '.$unit->name,
-                'category' => $categories[$index % count($categories)]->value,
-                'current_version' => 'v1',
-                'created_by' => (string) $admin->id,
-                'updated_by' => (string) $admin->id,
-            ]);
+            Evidences::query()->firstOrCreate(
+                [
+                    'title' => $uniqueTitle,
+                    'organization_unit_id' => $unit->id,
+                ],
+                [
+                    'description' => 'Bukti akreditasi untuk '.$template['title'].' di '.$unit->name,
+                    'category' => $template['category']->value,
+                    'current_version' => 'v1',
+                    'created_by' => (string) $admin->id,
+                    'updated_by' => (string) $admin->id,
+                ]
+            );
         }
     }
 }

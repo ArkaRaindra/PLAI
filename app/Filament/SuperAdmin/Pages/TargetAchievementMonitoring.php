@@ -28,7 +28,7 @@ class TargetAchievementMonitoring extends Page implements HasTable
 
     protected static string|\UnitEnum|null $navigationGroup = 'Indikator';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     protected string $view = 'filament.super-admin.pages.target-achievement-monitoring';
 

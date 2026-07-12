@@ -2,100 +2,69 @@
 
 namespace Database\Seeders;
 
-use App\Models\Indicator;
 use App\Models\OrganizationUnit;
 use App\Models\QualityPeriod;
 use App\Models\Realization;
 use App\Models\SelfAssessment;
 use App\Models\SelfAssessmentDetail;
-use App\Models\StandardVersion;
-use App\Models\Target;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
 
 class SelfAssessmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'superadmin@example.com')->firstOrFail();
-        $units = OrganizationUnit::whereIn('code', ['TI', 'TM', 'UPM', 'P3M'])->get();
-        $period = QualityPeriod::where('status', 'active')->firstOrFail();
-        $kaprodi = User::where('email', 'kaprodi@example.com')->firstOrFail();
-        $ketuaLpm = User::where('email', 'ketualpm@example.com')->firstOrFail();
+        $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
+        $kaprodi = User::where('email', 'kaprodi@example.com')->first() ?? User::where('role', 'kaprodi')->first() ?? User::first();
+        $ketuaLpm = User::where('email', 'ketualpm@example.com')->first() ?? User::where('role', 'ketua-lpm')->first() ?? User::first();
+
+        $units = OrganizationUnit::whereIn('type', ['PROGRAM STUDI', 'UPM', 'P3M'])->get();
+        $activePeriod = QualityPeriod::where('status', 'active')->first();
+
+        if ($units->isEmpty() || ! $activePeriod) {
+            return;
+        }
 
         $statuses = ['draft', 'submitted', 'approved', 'rejected'];
 
-        foreach ($statuses as $index => $status) {
-            $unit = $units->get($index);
-
-            if (! $unit) {
-                continue;
-            }
+        foreach ($units->take(4) as $index => $unit) {
+            $status = $statuses[$index] ?? 'draft';
 
             $selfAssessment = SelfAssessment::firstOrCreate(
                 [
                     'organization_unit_id' => $unit->id,
-                    'quality_period_id' => $period->id,
+                    'quality_period_id' => $activePeriod->id,
                 ],
                 [
-                    'status' => $status,
-                    'summary' => 'Self assessment untuk periode '.$period->name.' - '.$unit->name,
+                    'status' => 'draft',
+                    'summary' => 'Self assessment untuk periode '.$activePeriod->name.' - '.$unit->name,
                     'created_by' => (string) $admin->id,
                     'updated_by' => (string) $admin->id,
                 ]
             );
 
-            $existingDetail = SelfAssessmentDetail::where('self_assessment_id', $selfAssessment->id)->first();
+            $approvedRealizations = Realization::where('organization_unit_id', $unit->id)
+                ->where('status', 'approved')
+                ->with('target.indicator')
+                ->get();
 
-            if ($existingDetail) {
-                $indicator = $existingDetail->realization->target->indicator;
-                $target = $existingDetail->realization->target;
-                $realization = $existingDetail->realization;
-                $detail = $existingDetail;
-            } else {
-                $indicator = Indicator::create([
-                    'standard_version_id' => StandardVersion::first()->id,
-                    'code' => 'IND-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
-                    'name' => 'Indikator Capaian '.$unit->code,
-                    'created_by' => (string) $admin->id,
-                    'updated_by' => (string) $admin->id,
-                ]);
+            if ($approvedRealizations->isEmpty()) {
+                continue;
+            }
 
-                $target = Target::firstOrCreate(
-                    [
-                        'indicator_id' => $indicator->id,
-                        'quality_period_id' => $period->id,
-                    ],
-                    [
-                        'target_value' => 100,
-                        'created_by' => (string) $admin->id,
-                        'updated_by' => (string) $admin->id,
-                    ]
-                );
+            foreach ($approvedRealizations->take(3) as $realization) {
+                $indicator = $realization->target->indicator;
 
-                $realization = Realization::firstOrCreate(
-                    [
-                        'target_id' => $target->id,
-                        'organization_unit_id' => $unit->id,
-                    ],
-                    [
-                        'actual_value' => 10,
-                        'score' => fake()->randomFloat(2, 60, 95),
-                        'status' => 'approved',
-                        'created_by' => (string) $admin->id,
-                        'updated_by' => (string) $admin->id,
-                    ]
-                );
-
-                $detail = SelfAssessmentDetail::firstOrCreate(
+                SelfAssessmentDetail::firstOrCreate(
                     [
                         'self_assessment_id' => $selfAssessment->id,
                         'realization_id' => $realization->id,
                     ],
                     [
                         'score' => $realization->score,
-                        'analysis' => 'Analisis capaian indikator',
-                        'strength' => 'Kekuatan:Tim yang solid',
+                        'analysis' => 'Analisis capaian indikator '.$indicator->name,
+                        'strength' => 'Kekuatan: Tim yang solid',
                         'weakness' => 'Kelemahan: Kurangnya dokumentasi',
                         'created_by' => (string) $admin->id,
                         'updated_by' => (string) $admin->id,
@@ -104,27 +73,44 @@ class SelfAssessmentSeeder extends Seeder
             }
 
             if ($selfAssessment->wasRecentlyCreated) {
+                Auth::setUser($kaprodi);
+
                 if ($status === 'submitted') {
                     $selfAssessment->update([
+                        'status' => 'submitted',
                         'submitted_by' => (string) $kaprodi->id,
                         'submitted_at' => now()->subDays(3),
                     ]);
                 } elseif ($status === 'approved') {
                     $selfAssessment->update([
+                        'status' => 'submitted',
                         'submitted_by' => (string) $kaprodi->id,
                         'submitted_at' => now()->subDays(5),
+                    ]);
+
+                    Auth::setUser($ketuaLpm);
+                    $selfAssessment->update([
+                        'status' => 'approved',
                         'approved_by' => (string) $ketuaLpm->id,
                         'approved_at' => now()->subDays(2),
                     ]);
                 } elseif ($status === 'rejected') {
                     $selfAssessment->update([
+                        'status' => 'submitted',
                         'submitted_by' => (string) $kaprodi->id,
                         'submitted_at' => now()->subDays(4),
+                    ]);
+
+                    Auth::setUser($ketuaLpm);
+                    $selfAssessment->update([
+                        'status' => 'rejected',
                         'rejected_by' => (string) $ketuaLpm->id,
                         'rejected_at' => now()->subDays(1),
                         'note_rejected' => 'Analisis capaian belum lengkap',
                     ]);
                 }
+
+                Auth::setUser($admin);
             }
         }
     }
