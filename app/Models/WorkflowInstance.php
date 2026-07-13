@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\WorkflowTransitioned;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -136,6 +137,8 @@ class WorkflowInstance extends Model
             );
         }
 
+        $fromStatus = $this->current_status;
+
         $this->current_status = $status;
         $this->save();
 
@@ -145,6 +148,8 @@ class WorkflowInstance extends Model
             'acted_by' => $actedBy ?? Auth::id(),
             'acted_at' => now(),
         ]);
+        
+        event(new WorkflowTransitioned($this, $fromStatus, $status));
     }
 
     public function isAt(string $status): bool

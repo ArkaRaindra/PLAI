@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Events\TraceabilityRecorded;
+use App\Events\WorkflowTransitioned;
 use App\Listeners\RecordTraceabilityListener;
+use App\Listeners\SendEvidenceWorkflowNotifications;
 use App\Models\Evidences;
 use App\Models\Indicator;
 use App\Models\OrganizationUnit;
@@ -58,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Event::listen(TraceabilityRecorded::class, RecordTraceabilityListener::class);
+        Event::listen(WorkflowTransitioned::class, SendEvidenceWorkflowNotifications::class);
     }
 
     protected function configureFilamentIcons(): void
