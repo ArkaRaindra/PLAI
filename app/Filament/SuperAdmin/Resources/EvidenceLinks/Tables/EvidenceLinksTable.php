@@ -3,7 +3,7 @@
 namespace App\Filament\SuperAdmin\Resources\EvidenceLinks\Tables;
 
 use App\Models\EvidenceLinks;
-use App\Support\Filament\TableContextMenu;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -35,12 +35,12 @@ class EvidenceLinksTable
             ->filters([
                 //
             ])
-            ->contextMenuActions([
-                TableContextMenu::edit(EditAction::make()
-                    ->authorize(fn (EvidenceLinks $record): bool => auth()->user()?->can('update', $record) ?? false)),
-                TableContextMenu::delete(DeleteAction::make()
-                    ->authorize(fn (EvidenceLinks $record): bool => auth()->user()?->can('delete', $record) ?? false)),
-            ])
+            ->recordActions(ActionGroup::make([
+                EditAction::make()
+                    ->authorize(fn (EvidenceLinks $record): bool => auth()->user()?->can('update', $record) ?? false),
+                DeleteAction::make()
+                    ->authorize(fn (EvidenceLinks $record): bool => auth()->user()?->can('delete', $record) ?? false),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

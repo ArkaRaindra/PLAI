@@ -3,8 +3,9 @@
 namespace App\Filament\SuperAdmin\Resources\DataTrails\Tables;
 
 use App\Models\TraceabilityLinks;
-use App\Support\Filament\TableContextMenu;
 use App\Support\TraceabilityLinks\TraceabilityLinkPresenter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\TextSize;
@@ -92,9 +93,9 @@ class DataTrailsTable
             )
             ->emptyStateHeading('Belum ada jejak data')
             ->emptyStateDescription('Belum ada jejak ketertelusuran untuk penilaian mandiri yang dipilih.')
-            ->contextMenuActions([
-                TableContextMenu::view(),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+            ]))
             ->paginated(false)
             ->asTimeline();
     }

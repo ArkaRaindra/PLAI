@@ -4,11 +4,12 @@ namespace App\Filament\SuperAdmin\Resources\EvidenceReviews\Tables;
 
 use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
 use App\Models\EvidenceReview;
-use App\Support\Filament\TableContextMenu;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -68,15 +69,15 @@ class EvidenceReviewsTable
                         'revision_needed' => 'Perlu Revisi',
                     ]),
             ])
-            ->contextMenuActions([
-                TableContextMenu::view(),
-                TableContextMenu::edit(EditAction::make()
-                    ->authorize(fn (EvidenceReview $record): bool => auth()->user()?->can('update', $record) ?? false)),
-                TableContextMenu::approve(EvidenceReviewResource::approveAction()),
-                TableContextMenu::reject(EvidenceReviewResource::rejectAction()),
-                TableContextMenu::delete(DeleteAction::make()
-                    ->authorize(fn (EvidenceReview $record): bool => auth()->user()?->can('delete', $record) ?? false)),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+                EditAction::make()
+                    ->authorize(fn (EvidenceReview $record): bool => auth()->user()?->can('update', $record) ?? false),
+                EvidenceReviewResource::approveAction(),
+                EvidenceReviewResource::rejectAction(),
+                DeleteAction::make()
+                    ->authorize(fn (EvidenceReview $record): bool => auth()->user()?->can('delete', $record) ?? false),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

@@ -2,9 +2,10 @@
 
 namespace App\Filament\SuperAdmin\Resources\EvidenceVersions\Tables;
 
-use App\Support\Filament\TableContextMenu;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class EvidenceVersionsTable
@@ -13,18 +14,26 @@ class EvidenceVersionsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('version')
+                    ->label('Versi')
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->label('Tipe')
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Dibuat')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
-            ->contextMenuActions([
-                TableContextMenu::view(),
-                TableContextMenu::edit(),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    // DeleteBulkAction::make(),
                 ]),
             ]);
     }
