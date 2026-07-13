@@ -3,10 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Evidences;
-use App\Models\Notification as AppNotification;
 use App\Models\OrganizationUnit;
 use App\Models\User;
-use App\Models\WorkflowInstance;
 use App\Notifications\EvidenceApprovedNotification;
 use App\Notifications\EvidenceRejectedNotification;
 use App\Notifications\EvidenceSubmittedNotification;
@@ -85,10 +83,13 @@ class EvidenceNotificationTest extends TestCase
         $dosen->notify(new EvidenceApprovedNotification($evidence));
 
         $this->assertDatabaseHas('notifications', [
-            'user_id' => $dosen->id,
-            'title' => 'Evidence Disetujui',
-            'is_read' => false,
+            'notifiable_type' => $dosen->getMorphClass(),
+            'notifiable_id' => $dosen->id,
+            'read_at' => null,
         ]);
+
+        $notification = $dosen->notifications()->first();
+        $this->assertSame('Evidence Disetujui', $notification->data['title']);
     }
 
     public function test_unread_scope_and_mark_as_read(): void
@@ -98,13 +99,13 @@ class EvidenceNotificationTest extends TestCase
 
         $dosen->notify(new EvidenceApprovedNotification($evidence));
 
-        $notification = AppNotification::query()->where('user_id', $dosen->id)->first();
+        $notification = $dosen->notifications()->first();
 
-        $this->assertSame(1, AppNotification::query()->unread()->count());
+        $this->assertSame(1, $dosen->unreadNotifications()->count());
 
         $notification->markAsRead();
 
-        $this->assertSame(0, AppNotification::query()->unread()->count());
+        $this->assertSame(0, $dosen->unreadNotifications()->count());
     }
 
     public function test_no_reviewers_means_no_exception_is_thrown(): void

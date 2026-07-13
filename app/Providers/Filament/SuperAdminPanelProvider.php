@@ -40,6 +40,8 @@ class SuperAdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/super-admin/theme.css')
             ->brandLogo(asset('assets/images/logo/logo.png'))
             ->brandLogoHeight('3rem')
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->globalSearch(false)
             ->login(Login::class)
             ->navigationGroups([

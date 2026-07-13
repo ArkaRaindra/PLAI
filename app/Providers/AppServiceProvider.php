@@ -22,7 +22,6 @@ use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsIconAlias;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -63,10 +62,6 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(TraceabilityRecorded::class, RecordTraceabilityListener::class);
         Event::listen(WorkflowTransitioned::class, SendEvidenceWorkflowNotifications::class);
 
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::TOPBAR_END,
-            fn (): string => Blade::render('@livewire(\'notification-bell\')'),
-        );
     }
 
     protected function configureFilamentIcons(): void

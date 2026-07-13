@@ -3,7 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Evidences;
-use App\Notifications\Channels\InAppChannel;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,7 +30,7 @@ class EvidenceApprovedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', InAppChannel::class];
+        return ['mail', 'database'];
     }
 
     /**
@@ -50,12 +51,18 @@ class EvidenceApprovedNotification extends Notification implements ShouldQueue
      *
      * @return array<string, mixed>
      */
-    public function toInApp(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
-        return [
-            'title' => 'Evidence Disetujui',
-            'message' => "Evidence \"{$this->evidence->title}\" yang anda ajukan telah disetujui",
-            'action_url' => "/super-admin/evidences/{$this->evidence->id}",
-        ];
+        return FilamentNotification::make()
+            ->title('Evidence Disetujui')
+            ->body("Evidence \"{$this->evidence->title}\" yang Anda ajukan telah disetujui.")
+            ->success()
+            ->actions([
+                Action::make('view')
+                    ->label('Lihat Evidence')
+                    ->url("/super-admin/evidences/{$this->evidence->id}")
+                    ->markAsRead(),
+            ])
+            ->getDatabaseMessage();
     }
 }

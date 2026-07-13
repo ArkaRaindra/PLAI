@@ -3,7 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Evidences;
-use App\Notifications\Channels\InAppChannel;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -19,8 +20,7 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
     public function __construct(
         public readonly Evidences $evidence,
         public readonly ?string $reason = null,
-    )
-    {
+    ) {
         //
     }
 
@@ -31,7 +31,7 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', InAppChannel::class];
+        return ['mail', 'database'];
     }
 
     /**
@@ -39,7 +39,7 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-       $mail = (new MailMessage)
+        $mail = (new MailMessage)
             ->subject('Evidence Ditolak')
             ->greeting("Halo {$notifiable->name},")
             ->line("Evidence \"{$this->evidence->title}\" yang anda ajukan ditolak dan perlu direvisi.");
@@ -58,7 +58,7 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
      *
      * @return array<string, mixed>
      */
-    public function toInApp(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
         $message = "Evidence \"{$this->evidence->title}\" yang Anda ajukan ditolak dan perlu direvisi.";
 
@@ -66,10 +66,16 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
             $message = "Alasan: {$this->reason}";
         }
 
-        return [
-            'title' => 'Evidence Ditolak',
-            'message' => $message,
-            'action_url' => "/super-admin/evidences/{$this->evidence->id}",
-        ];
+        return FilamentNotification::make()
+            ->title('Evidence Ditolak')
+            ->body($message)
+            ->danger()
+            ->actions([
+                Action::make('view')
+                    ->label('Perbaiki Evidence')
+                    ->url("/super-admin/evidences/{$this->evidence->id}")
+                    ->markAsRead(),
+            ])
+            ->getDatabaseMessage();
     }
 }
