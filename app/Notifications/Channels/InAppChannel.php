@@ -9,7 +9,7 @@ class InAppChannel
 {
     public function send(object $notifiable, Notification $notification): void
     {
-        if(! method_exists($notification, 'toInApp')) {
+        if (! method_exists($notification, 'toInApp')) {
             return;
         }
 
@@ -19,7 +19,11 @@ class InAppChannel
             'user_id' => $notifiable->getKey(),
             'title' => $payload['title'],
             'message' => $payload['message'],
-            'action_url' => $payload['action_url'] ?? null
+            'action_url' => $payload['action_url'] ?? null,
+            'type' => $notification::class,
+            'notifiable_type' => $notifiable->getMorphClass(),
+            'notifiable_id' => $notifiable->getKey(),
+            'data' => $payload,
         ]);
     }
 }

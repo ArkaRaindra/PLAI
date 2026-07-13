@@ -33,7 +33,7 @@ class SendEvidenceWorkflowNotifications implements ShouldQueue
             'approved' => $this->notifyOwner($evidence, new EvidenceApprovedNotification($evidence)),
             'rejected' => $this->notifyOwner(
                 $evidence,
-                new EvidenceRejectedNotification($evidence, $workflow->histories()->first()?->notes),
+                new EvidenceRejectedNotification($evidence, $workflow->histories()->orderByDesc('id')->first()?->notes),
             ),
             default => null,
         };

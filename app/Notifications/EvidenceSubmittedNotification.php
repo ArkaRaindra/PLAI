@@ -18,8 +18,7 @@ class EvidenceSubmittedNotification extends Notification implements ShouldQueue
      */
     public function __construct(
         public readonly Evidences $evidence
-    )
-    {
+    ) {
         //
     }
 
@@ -56,7 +55,7 @@ class EvidenceSubmittedNotification extends Notification implements ShouldQueue
         return [
             'title' => 'Evidence Baru Menunggu Review',
             'message' => "Evidence \"{$this->evidence->title}\" telah diajukan dan menunggu review Anda",
-            'action_url' => "super-admin/evidences/{$this->evidence->id}"
+            'action_url' => "/super-admin/evidences/{$this->evidence->id}",
         ];
     }
 }
