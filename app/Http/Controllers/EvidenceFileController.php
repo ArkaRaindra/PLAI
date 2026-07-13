@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Evidences;
 use App\Models\EvidenceVersions;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
@@ -38,5 +39,18 @@ class EvidenceFileController extends Controller
         }
 
         return Storage::disk('local')->response($version->file_path);
+    }
+
+    public function downloadEvidence(Evidences $evidence): StreamedResponse|Response
+    {
+        if ($evidence->type !== 'file' || blank($evidence->file_path)) {
+            abort(404);
+        }
+
+        if (! Storage::disk('local')->exists($evidence->file_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->download($evidence->file_path);
     }
 }

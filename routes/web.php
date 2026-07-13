@@ -14,4 +14,6 @@ Route::middleware(['web', 'auth'])->prefix('super-admin')->group(function (): vo
         ->name('evidence-files.preview');
     Route::get('evidence-files/{version}', [EvidenceFileController::class, 'download'])
         ->name('evidence-files.download');
+    Route::get('evidences/{evidence}/download', [EvidenceFileController::class, 'downloadEvidence'])
+        ->name('evidences.download');
 });

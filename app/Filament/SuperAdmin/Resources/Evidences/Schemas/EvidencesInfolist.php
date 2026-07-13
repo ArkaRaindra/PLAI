@@ -3,11 +3,13 @@
 namespace App\Filament\SuperAdmin\Resources\Evidences\Schemas;
 
 use App\Filament\SuperAdmin\Resources\Evidences\EvidencesResource;
+use App\Models\Evidences;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 
 class EvidencesInfolist
 {
@@ -29,7 +31,21 @@ class EvidencesInfolist
                                     'url' => 'URL',
                                     default => $state ?? '-',
                                 }),
-                            TextEntry::make('file_path')->label('File')->placeholder('-'),
+                            TextEntry::make('file_path')
+                                ->label('File')
+                                ->placeholder('-')
+                                ->visible(fn (Evidences $record): bool => $record->type === 'file')
+                                ->formatStateUsing(function (?string $state, Evidences $record): HtmlString {
+                                    if (blank($state)) {
+                                        return new HtmlString('-');
+                                    }
+
+                                    return new HtmlString(
+                                        '<a class="text-primary-600 underline" href="'
+                                        .e(route('evidences.download', $record))
+                                        .'" target="_blank" rel="noopener">Unduh file</a>'
+                                    );
+                                }),
                             TextEntry::make('url_path')->label('URL')->placeholder('-'),
                             TextEntry::make('current_version')->label('Versi Saat Ini')->placeholder('-'),
                             TextEntry::make('createdBy.name')->label('Dibuat Oleh')->placeholder('-'),

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\EvidenceRecorded;
+use App\Models\Evidences;
 use App\Models\EvidenceVersions;
 use App\Models\Indicator;
 use App\Models\IndicatorOwner;
@@ -146,6 +147,54 @@ class EvidenceFileDownloadTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_authenticated_user_can_download_evidence_file(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('evidences/sample.pdf', 'pdf-content');
+
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super-admin');
+        $this->actingAs($admin);
+
+        $unit = $this->createUnit($admin);
+
+        $evidence = Evidences::query()->create([
+            'organization_unit_id' => $unit->id,
+            'title' => 'Bukti File',
+            'type' => 'file',
+            'file_path' => 'evidences/sample.pdf',
+            'created_by' => (string) $admin->id,
+            'updated_by' => (string) $admin->id,
+        ]);
+
+        $this->get(route('evidences.download', $evidence))
+            ->assertOk()
+            ->assertDownload('sample.pdf');
+    }
+
+    public function test_download_returns_not_found_for_url_type_or_missing_file(): void
+    {
+        Storage::fake('local');
+
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super-admin');
+        $this->actingAs($admin);
+
+        $unit = $this->createUnit($admin);
+
+        $evidence = Evidences::query()->create([
+            'organization_unit_id' => $unit->id,
+            'title' => 'Bukti URL',
+            'type' => 'url',
+            'url_path' => 'https://example.com',
+            'created_by' => (string) $admin->id,
+            'updated_by' => (string) $admin->id,
+        ]);
+
+        $this->get(route('evidences.download', $evidence))
+            ->assertNotFound();
+    }
+
     /**
      * @return array{0: Realization, 1: OrganizationUnit}
      */
@@ -188,5 +237,16 @@ class EvidenceFileDownloadTest extends TestCase
         ]);
 
         return [$realization, $organizationUnit];
+    }
+
+    private function createUnit(User $admin): OrganizationUnit
+    {
+        return OrganizationUnit::query()->create([
+            'code' => 'FT-'.fake()->unique()->numerify('###'),
+            'name' => 'Fakultas Teknik',
+            'type' => 'UNIT',
+            'is_active' => true,
+            'created_by' => (string) $admin->id,
+        ]);
     }
 }
