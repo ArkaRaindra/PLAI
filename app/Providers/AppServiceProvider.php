@@ -2,10 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\TraceabilityRecorded;
-use App\Events\WorkflowTransitioned;
-use App\Listeners\RecordTraceabilityListener;
-use App\Listeners\SendEvidenceWorkflowNotifications;
 use App\Models\Evidences;
 use App\Models\Indicator;
 use App\Models\OrganizationUnit;
@@ -24,7 +20,6 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Openplain\FilamentShadcnTheme\Color;
@@ -58,10 +53,6 @@ class AppServiceProvider extends ServiceProvider
             'user' => User::class,
             'evidence' => Evidences::class,
         ]);
-
-        Event::listen(TraceabilityRecorded::class, RecordTraceabilityListener::class);
-        Event::listen(WorkflowTransitioned::class, SendEvidenceWorkflowNotifications::class);
-
     }
 
     protected function configureFilamentIcons(): void
