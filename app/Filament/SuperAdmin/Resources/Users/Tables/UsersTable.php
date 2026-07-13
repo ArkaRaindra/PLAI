@@ -2,9 +2,11 @@
 
 namespace App\Filament\SuperAdmin\Resources\Users\Tables;
 
-use App\Support\Filament\TableContextMenu;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -68,10 +70,10 @@ class UsersTable
             ->filters([
                 //
             ])
-            ->contextMenuActions([
-                TableContextMenu::view(),
-                TableContextMenu::edit(),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+                EditAction::make(),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

@@ -4,11 +4,11 @@ namespace App\Filament\SuperAdmin\Resources\Realizations\Tables;
 
 use App\Filament\SuperAdmin\Resources\Realizations\RealizationResource;
 use App\Models\Realization;
-use App\Support\Filament\TableContextMenu;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -56,16 +56,14 @@ class RealizationsTable
             ->filters([
                 //
             ])
-            ->contextMenuActions([
-                TableContextMenu::view(),
-                TableContextMenu::edit(EditAction::make()
-                    ->authorize(fn (Realization $record): bool => auth()->user()?->can('update', $record) ?? false)),
-                TableContextMenu::submit(RealizationResource::submitAction()),
-                TableContextMenu::approve(RealizationResource::approveAction()),
-                TableContextMenu::reject(RealizationResource::rejectAction()),
-                // TableContextMenu::delete(DeleteAction::make()
-                //     ->authorize(fn (Realization $record): bool => auth()->user()?->can('delete', $record) ?? false)),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+                EditAction::make()
+                    ->authorize(fn (Realization $record): bool => auth()->user()?->can('update', $record) ?? false),
+                RealizationResource::submitAction(),
+                RealizationResource::approveAction(),
+                RealizationResource::rejectAction(),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

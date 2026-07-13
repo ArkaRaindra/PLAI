@@ -6,10 +6,12 @@ use App\Filament\SuperAdmin\Resources\EvidenceLinks\EvidenceLinkResource;
 use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
 use App\Filament\SuperAdmin\Resources\Evidences\EvidencesResource;
 use App\Models\Evidences;
-use App\Support\Filament\TableContextMenu;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -17,7 +19,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use LaraZeus\Tabler\Tabler;
 
 class EvidencesTable
 {
@@ -126,31 +127,23 @@ class EvidencesTable
                         return $indicators;
                     }),
             ])
-            ->contextMenuActions([
-                TableContextMenu::view(),
-                TableContextMenu::edit(),
-                TableContextMenu::urlAction(
-                    Action::make('manageReviews')
-                        ->label('Kelola Review')
-                        ->icon(Heroicon::ClipboardDocumentCheck)
-                        ->url(fn (Evidences $record): string => EvidenceReviewResource::getListUrl($record->id)),
-                    Tabler::ClipboardCheck,
-                    'info',
-                ),
-                TableContextMenu::urlAction(
-                    Action::make('manageLinks')
-                        ->label('Kelola Link')
-                        ->icon(Heroicon::Link)
-                        ->url(fn (Evidences $record): string => EvidenceLinkResource::getListUrl($record->id)),
-                    Tabler::Link,
-                    'info',
-                ),
-                TableContextMenu::submit(EvidencesResource::submitAction()),
-                TableContextMenu::modal(EvidencesResource::startReviewAction(), Tabler::Search, 'warning'),
-                TableContextMenu::approve(EvidencesResource::approveAction()),
-                TableContextMenu::reject(EvidencesResource::rejectAction()),
-                TableContextMenu::modal(EvidencesResource::publishAction(), Tabler::World, 'primary'),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('manageReviews')
+                    ->label('Kelola Review')
+                    ->icon(Heroicon::ClipboardDocumentCheck)
+                    ->url(fn (Evidences $record): string => EvidenceReviewResource::getListUrl($record->id)),
+                Action::make('manageLinks')
+                    ->label('Kelola Link')
+                    ->icon(Heroicon::Link)
+                    ->url(fn (Evidences $record): string => EvidenceLinkResource::getListUrl($record->id)),
+                EvidencesResource::submitAction(),
+                EvidencesResource::startReviewAction(),
+                EvidencesResource::approveAction(),
+                EvidencesResource::rejectAction(),
+                EvidencesResource::publishAction(),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

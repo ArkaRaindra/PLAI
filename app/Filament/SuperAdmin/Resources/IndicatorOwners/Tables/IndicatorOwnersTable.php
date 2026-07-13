@@ -2,10 +2,12 @@
 
 namespace App\Filament\SuperAdmin\Resources\IndicatorOwners\Tables;
 
-use App\Support\Filament\TableContextMenu;
 use Carbon\Carbon;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -43,10 +45,10 @@ class IndicatorOwnersTable
             ->filters([
                 //
             ])
-            ->contextMenuActions([
-                TableContextMenu::view(),
-                TableContextMenu::edit(),
-            ])
+            ->recordActions(ActionGroup::make([
+                ViewAction::make(),
+                EditAction::make(),
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
