@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\EvidenceCategory;
 use App\Models\Evidences;
 use App\Models\OrganizationUnit;
 use App\Models\User;
@@ -50,18 +49,18 @@ class EvidenceSearchTest extends TestCase
         $this->assertSame(2, Evidences::query()->search('')->count());
     }
 
-    public function test_filter_by_category(): void
+    public function test_filter_by_type(): void
     {
         $owner = $this->makeUser();
         $unit = $this->makeUnit($owner);
 
-        $sop = $this->makeEvidence($owner, $unit, ['category' => EvidenceCategory::Sop->value]);
-        $this->makeEvidence($owner, $unit, ['category' => EvidenceCategory::Laporan->value]);
+        $file = $this->makeEvidence($owner, $unit, ['type' => 'file']);
+        $this->makeEvidence($owner, $unit, ['type' => 'url']);
 
-        $results = Evidences::query()->category(EvidenceCategory::Sop)->pluck('id');
+        $results = Evidences::query()->type('file')->pluck('id');
 
         $this->assertCount(1, $results);
-        $this->assertTrue($results->contains($sop->id));
+        $this->assertTrue($results->contains($file->id));
     }
 
     public function test_filter_by_unit(): void
@@ -103,20 +102,20 @@ class EvidenceSearchTest extends TestCase
 
         $target = $this->makeEvidence($owner, $unit, [
             'title' => 'SOP Penerimaan Mahasiswa Baru',
-            'category' => EvidenceCategory::Sop->value,
+            'type' => 'file',
         ]);
         $this->makeEvidence($owner, $unit, [
             'title' => 'SOP Ujian Akhir',
-            'category' => EvidenceCategory::Sop->value,
+            'type' => 'file',
         ]);
         $this->makeEvidence($owner, $unit, [
             'title' => 'Laporan Penerimaan Mahasiswa Baru',
-            'category' => EvidenceCategory::Laporan->value,
+            'type' => 'url',
         ]);
 
         $results = Evidences::query()
             ->search('penerimaan mahasiswa')
-            ->category(EvidenceCategory::Sop)
+            ->type('file')
             ->pluck('id');
 
         $this->assertCount(1, $results);

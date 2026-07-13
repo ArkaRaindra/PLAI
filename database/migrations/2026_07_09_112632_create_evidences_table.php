@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('organization_unit_id')->constrained('organization_units')->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->string('type')->nullable();
+            $table->string('file_path')->nullable();
+            $table->string('url_path')->nullable();
             $table->string('current_version')->nullable();
             $table->string('created_by');
             $table->string('updated_by')->nullable();

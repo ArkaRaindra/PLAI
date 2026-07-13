@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Blameable;
-use App\Enums\EvidenceCategory;
 use App\Models\Concerns\HasWorkflow;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +20,9 @@ class Evidences extends Model
         'organization_unit_id',
         'title',
         'description',
-        'category',
+        'type',
+        'file_path',
+        'url_path',
         'current_version',
         'created_by',
         'updated_by',
@@ -30,7 +31,6 @@ class Evidences extends Model
     protected function casts(): array
     {
         return [
-            'category' => EvidenceCategory::class,
         ];
     }
 
@@ -83,17 +83,6 @@ class Evidences extends Model
         });
     }
 
-    public function scopeCategory(Builder $query, string|EvidenceCategory|null $category): Builder
-    {
-        if (blank($category)) {
-            return $query;
-        }
-
-        $value = $category instanceof EvidenceCategory ? $category->value : $category;
-
-        return $query->where('category', $value);
-    }
-
     public function scopeUnit(Builder $query, int|string|null $organizationUnitId): Builder
     {
         if (blank($organizationUnitId)) {
@@ -101,6 +90,15 @@ class Evidences extends Model
         }
 
         return $query->where('organization_unit_id', $organizationUnitId);
+    }
+
+    public function scopeType(Builder $query, ?string $type): Builder
+    {
+        if (blank($type)) {
+            return $query;
+        }
+
+        return $query->where('type', $type);
     }
 
     public function scopeStatus(Builder $query, ?string $status): Builder

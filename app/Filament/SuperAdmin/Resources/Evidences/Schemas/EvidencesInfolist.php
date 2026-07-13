@@ -20,13 +20,23 @@ class EvidencesInfolist
                         Grid::make(2)->schema([
                             TextEntry::make('title')->label('Judul'),
                             TextEntry::make('organizationUnit.name')->label('Unit Organisasi'),
-                            TextEntry::make('category')->label('Kategori')->badge()->placeholder('-'),
+                            TextEntry::make('type')
+                                ->label('Tipe')
+                                ->badge()
+                                ->placeholder('-')
+                                ->formatStateUsing(fn (?string $state): string => match ($state) {
+                                    'file' => 'File',
+                                    'url' => 'URL',
+                                    default => $state ?? '-',
+                                }),
+                            TextEntry::make('file_path')->label('File')->placeholder('-'),
+                            TextEntry::make('url_path')->label('URL')->placeholder('-'),
                             TextEntry::make('current_version')->label('Versi Saat Ini')->placeholder('-'),
                             TextEntry::make('createdBy.name')->label('Dibuat Oleh')->placeholder('-'),
                             TextEntry::make('description')->label('Deskripsi')->placeholder('-')->columnSpanFull(),
                         ]),
                     ]),
-                Section::make('Status Workflow')
+                Section::make('Riwayat Status')
                     ->schema([
                         TextEntry::make('workflowInstance.current_status')
                             ->label('Status Saat Ini')
@@ -38,7 +48,7 @@ class EvidencesInfolist
                                 ? (EvidencesResource::workflowStatusColors()[$state] ?? 'gray')
                                 : 'gray'),
                         RepeatableEntry::make('workflowInstance.histories')
-                            ->label('Riwayat Workflow')
+                            ->label('Riwayat')
                             ->schema([
                                 Grid::make(3)->schema([
                                     TextEntry::make('status')

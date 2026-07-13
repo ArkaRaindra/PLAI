@@ -2,7 +2,6 @@
 
 namespace App\Filament\SuperAdmin\Resources\Evidences\Tables;
 
-use App\Enums\EvidenceCategory;
 use App\Filament\SuperAdmin\Resources\EvidenceLinks\EvidenceLinkResource;
 use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
 use App\Filament\SuperAdmin\Resources\Evidences\EvidencesResource;
@@ -35,11 +34,24 @@ class EvidencesTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(60),
-                TextColumn::make('category')
-                    ->label('Kategori')
+                TextColumn::make('type')
+                    ->label('Tipe')
                     ->badge()
-                    ->searchable()
-                    ->sortable(),
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'file' => 'File',
+                        'url' => 'URL',
+                        default => $state ?? '-',
+                    }),
+                TextColumn::make('file_path')
+                    ->label('File')
+                    ->limit(40)
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('url_path')
+                    ->label('URL')
+                    ->limit(40)
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('organizationUnit.name')
                     ->label('Unit Organisasi')
                     ->searchable()
@@ -77,14 +89,6 @@ class EvidencesTable
                         $value = $data['value'] ?? null;
 
                         return $query->status($value);
-                    }),
-                SelectFilter::make('category')
-                    ->label('Kategori')
-                    ->options(EvidenceCategory::class)
-                    ->query(function (Builder $query, array $data): Builder {
-                        $value = $data['value'] ?? null;
-
-                        return $query->category($value);
                     }),
                 SelectFilter::make('organization_unit_id')
                     ->label('Unit Organisasi')

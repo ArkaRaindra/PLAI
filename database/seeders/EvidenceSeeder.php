@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\EvidenceCategory;
 use App\Models\Evidences;
 use App\Models\OrganizationUnit;
 use App\Models\User;
@@ -20,23 +19,23 @@ class EvidenceSeeder extends Seeder
         }
 
         $evidenceTemplates = [
-            ['title' => 'SOP Penjaminan Mutu Internal', 'category' => EvidenceCategory::Sop],
-            ['title' => 'SK Pendirian Program Studi', 'category' => EvidenceCategory::Sk],
-            ['title' => 'Pedoman Evaluasi Dosen', 'category' => EvidenceCategory::Pedoman],
-            ['title' => 'Laporan Audit Mutu 2025', 'category' => EvidenceCategory::Laporan],
-            ['title' => 'Hasil Review Standar ISO', 'category' => EvidenceCategory::Audit],
-            ['title' => 'RTM Meeting Minutes Q3', 'category' => EvidenceCategory::Rtm],
-            ['title' => 'MoD dengan Industri Mitra', 'category' => EvidenceCategory::Kerjasama],
-            ['title' => 'Laporan Penelitian Dosen', 'category' => EvidenceCategory::Penelitian],
-            ['title' => 'Laporan PKM Mahasiswa', 'category' => EvidenceCategory::Pkm],
-            ['title' => 'Bukti Akreditasi Unggulan', 'category' => EvidenceCategory::Akreditasi],
-            ['title' => 'Dokumen Rencana Strategis', 'category' => EvidenceCategory::Pedoman],
-            ['title' => 'Laporan Kinerja Semester', 'category' => EvidenceCategory::Laporan],
+            'SOP Penjaminan Mutu Internal',
+            'SK Pendirian Program Studi',
+            'Pedoman Evaluasi Dosen',
+            'Laporan Audit Mutu 2025',
+            'Hasil Review Standar ISO',
+            'RTM Meeting Minutes Q3',
+            'MoD dengan Industri Mitra',
+            'Laporan Penelitian Dosen',
+            'Laporan PKM Mahasiswa',
+            'Bukti Akreditasi Unggulan',
+            'Dokumen Rencana Strategis',
+            'Laporan Kinerja Semester',
         ];
 
-        foreach ($evidenceTemplates as $template) {
+        foreach ($evidenceTemplates as $title) {
             $unit = $units->random();
-            $uniqueTitle = $template['title'].' - '.$unit->name;
+            $uniqueTitle = $title.' - '.$unit->name;
 
             Evidences::query()->firstOrCreate(
                 [
@@ -44,8 +43,7 @@ class EvidenceSeeder extends Seeder
                     'organization_unit_id' => $unit->id,
                 ],
                 [
-                    'description' => 'Bukti akreditasi untuk '.$template['title'].' di '.$unit->name,
-                    'category' => $template['category']->value,
+                    'description' => 'Bukti akreditasi untuk '.$title.' di '.$unit->name,
                     'current_version' => 'v1',
                     'created_by' => (string) $admin->id,
                     'updated_by' => (string) $admin->id,
