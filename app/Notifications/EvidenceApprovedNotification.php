@@ -42,7 +42,7 @@ class EvidenceApprovedNotification extends Notification implements ShouldQueue
             ->subject('Evidence Disetujui')
             ->greeting("Halo {$notifiable->name}")
             ->line("Evidence \"{$this->evidence->title}\" yang Anda ajukan telah disetujui.")
-            ->action('Lihat Evidence', url("/super-admin/evidences/{$this->evidence->id}"))
+            // ->action('Lihat Evidence', url("/super-admin/evidences/{$this->evidence->id}"))
             ->line('Terimakasih aats kontribusi Anda');
     }
 

@@ -49,7 +49,7 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
         }
 
         return $mail
-            ->action('Perbaiki Evidence', url("/super-admin/evidences/{$this->evidence->id}"))
+            // ->action('Perbaiki Evidence', url("/super-admin/evidences/{$this->evidence->id}"))
             ->line('Silakan perbaiki lalu ajukan kembali');
     }
 
