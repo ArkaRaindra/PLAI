@@ -8,24 +8,14 @@ use App\Filament\SuperAdmin\Widgets\PpeppStageProgressWidget;
 use App\Filament\SuperAdmin\Widgets\PpeppSummaryTableWidget;
 use App\Models\QualityPeriod;
 use Filament\Forms\Components\Select;
-use Filament\Pages\Dashboard;
+use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
-class PpeppDashboard extends Dashboard
+class Dashboard extends BaseDashboard
 {
     use HasFiltersForm;
-
-    protected static string $routePath = 'ppepp-dashboard';
-
-    protected static ?string $navigationLabel = 'Dashboard PPEPP';
-
-    protected static ?string $title = 'Dashboard PPEPP';
-
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBarSquare;
-
-    protected static ?int $navigationSort = -1;
 
     public function filtersForm(Schema $schema): Schema
     {
