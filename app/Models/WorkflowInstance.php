@@ -148,7 +148,35 @@ class WorkflowInstance extends Model
             'acted_by' => $actedBy ?? Auth::id(),
             'acted_at' => now(),
         ]);
-        
+
+        event(new WorkflowTransitioned($this, $fromStatus, $status));
+    }
+
+    /**
+     * Move the workflow to any registered status, bypassing the normal
+     * transition map. Intended for privileged users (e.g. super-admin) who
+     * need to correct or fast-forward an entity's workflow state.
+     */
+    public function forceTransitionTo(string $status, ?string $notes = null, ?int $actedBy = null): void
+    {
+        if (! array_key_exists($status, self::transitionsFor($this->entity_type))) {
+            throw new \RuntimeException(
+                "Status workflow '{$status}' tidak valid untuk entitas ini"
+            );
+        }
+
+        $fromStatus = $this->current_status;
+
+        $this->current_status = $status;
+        $this->save();
+
+        $this->histories()->create([
+            'status' => $status,
+            'notes' => $notes,
+            'acted_by' => $actedBy ?? Auth::id(),
+            'acted_at' => now(),
+        ]);
+
         event(new WorkflowTransitioned($this, $fromStatus, $status));
     }
 

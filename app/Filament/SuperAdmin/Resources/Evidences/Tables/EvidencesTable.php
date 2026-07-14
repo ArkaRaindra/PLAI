@@ -69,10 +69,6 @@ class EvidencesTable
                 TextColumn::make('current_version')
                     ->label('Versi Saat Ini')
                     ->placeholder('-'),
-                TextColumn::make('evidenceReviews_count')
-                    ->label('Review')
-                    ->state(fn (Evidences $record): int => $record->evidenceReviews()->count())
-                    ->badge(),
                 TextColumn::make('createdBy.name')
                     ->label('Diunggah Oleh')
                     ->placeholder('-')
@@ -130,10 +126,6 @@ class EvidencesTable
             ->recordActions(ActionGroup::make([
                 ViewAction::make(),
                 EditAction::make(),
-                Action::make('manageReviews')
-                    ->label('Kelola Review')
-                    ->icon(Heroicon::ClipboardDocumentCheck)
-                    ->url(fn (Evidences $record): string => EvidenceReviewResource::getListUrl($record->id)),
                 Action::make('manageLinks')
                     ->label('Kelola Link')
                     ->icon(Heroicon::Link)

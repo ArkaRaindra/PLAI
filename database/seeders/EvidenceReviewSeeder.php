@@ -13,9 +13,6 @@ class EvidenceReviewSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('email', 'superadmin@example.com')->first() ?? User::first();
-        $auditor = User::where('email', 'auditor@example.com')->first() ?? User::first();
-        $adminMutu = User::where('email', 'adminmutu@example.com')->first() ?? User::where('role', 'admin-mutu')->first() ?? User::first();
-        $ketuaLpm = User::where('email', 'ketualpm@example.com')->first() ?? User::where('role', 'ketua-lpm')->first() ?? User::first();
 
         Auth::setUser($admin);
 
@@ -25,41 +22,23 @@ class EvidenceReviewSeeder extends Seeder
             return;
         }
 
-        $reviewers = [$auditor, $adminMutu, $ketuaLpm];
-
         $reviewNotes = [
-            'pending' => null,
-            'approved' => 'Bukti sudah lengkap dan sesuai standar.',
-            'rejected' => 'Bukti tidak relevan dengan indikator yang dinilai.',
-            'revision_needed' => 'Mohon lampirkan dokumen pendukung tambahan.',
+            null,
+            'Bukti sudah lengkap dan sesuai standar.',
+            'Bukti tidak relevan dengan indikator yang dinilai.',
         ];
 
         foreach ($evidences as $index => $evidence) {
-            $reviewer = $reviewers[$index % count($reviewers)];
+            $note = $reviewNotes[$index % count($reviewNotes)];
 
-            $statusOptions = ['pending', 'approved', 'rejected', 'revision_needed'];
-            $status = $statusOptions[$index % count($statusOptions)];
-
-            $review = EvidenceReview::query()->firstOrCreate(
+            EvidenceReview::query()->firstOrCreate(
+                ['evidence_id' => $evidence->id],
                 [
-                    'evidence_id' => $evidence->id,
-                    'reviewer_id' => $reviewer->id,
-                ],
-                [
-                    'status' => $status,
-                    'review_notes' => $reviewNotes[$status],
-                    'assigned_by' => $admin->id,
-                    'assigned_at' => now()->subDays(7 - ($index % 7)),
+                    'review_notes' => $note,
                     'created_by' => (string) $admin->id,
                     'updated_by' => (string) $admin->id,
                 ]
             );
-
-            if (in_array($status, ['approved', 'rejected', 'revision_needed'], true)) {
-                $review->update([
-                    'reviewed_at' => now()->subDays(1),
-                ]);
-            }
         }
     }
 }

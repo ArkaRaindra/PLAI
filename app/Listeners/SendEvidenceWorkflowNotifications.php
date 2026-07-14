@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\WorkflowTransitioned;
+use App\Models\EvidenceReview;
 use App\Models\Evidences;
 use App\Models\User;
 use App\Notifications\EvidenceApprovedNotification;
@@ -29,7 +30,7 @@ class SendEvidenceWorkflowNotifications implements ShouldQueue
         }
 
         match ($event->toStatus) {
-            'submitted' => $this->notifyReviewers($evidence),
+            'submitted' => $this->openReview($evidence),
             'approved' => $this->notifyOwner($evidence, new EvidenceApprovedNotification($evidence)),
             'rejected' => $this->notifyOwner(
                 $evidence,
@@ -37,6 +38,17 @@ class SendEvidenceWorkflowNotifications implements ShouldQueue
             ),
             default => null,
         };
+    }
+
+    /**
+     * Create the review task (so the evidence appears in the reviewer
+     * queue) and notify all reviewers.
+     */
+    private function openReview(Evidences $evidence): void
+    {
+        EvidenceReview::query()->updateOrCreate(['evidence_id' => $evidence->id]);
+
+        $this->notifyReviewers($evidence);
     }
 
     private function notifyReviewers(Evidences $evidence): void

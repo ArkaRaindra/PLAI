@@ -171,6 +171,7 @@ class TargetAchievementMonitoring extends Page implements HasTable
             default => 'danger',
         };
     }
+
     private function progressPercentage(): ?float
     {
         $period = $this->currentPeriod();
@@ -235,7 +236,7 @@ class TargetAchievementMonitoring extends Page implements HasTable
         }
 
         if ($this->realizationFor($record) === null) {
-            return "Belum ada realisasi";
+            return 'Belum ada realisasi';
         }
 
         $achievement = $this->achievementPercentage($record);

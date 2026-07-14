@@ -14,7 +14,7 @@ class ViewSelfAssessment extends ViewRecord
 {
     protected static string $resource = SelfAssessmentResource::class;
 
-    protected function resolveRecord(int | string $key): Model
+    protected function resolveRecord(int|string $key): Model
     {
         $record = parent::resolveRecord($key);
 
@@ -36,7 +36,7 @@ class ViewSelfAssessment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-             Action::make('back')
+            Action::make('back')
                 ->label('Kembali')
                 ->url(fn (): string => self::$resource::getUrl('index'))
                 ->button()

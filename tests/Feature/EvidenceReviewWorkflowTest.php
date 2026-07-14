@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Events\WorkflowTransitioned;
+use App\Filament\SuperAdmin\Resources\Evidences\EvidencesResource;
 use App\Models\EvidenceReview;
 use App\Models\Evidences;
 use App\Models\OrganizationUnit;
@@ -25,132 +27,129 @@ class EvidenceReviewWorkflowTest extends TestCase
         ]);
     }
 
-    public function test_admin_mutu_can_assign_a_reviewer(): void
+    public function test_review_queue_is_visible_to_reviewers_only(): void
     {
         $adminMutu = $this->makeUser('admin-mutu');
-        $auditor = $this->makeUser('auditor');
-        $evidence = $this->makeEvidence($adminMutu);
-
-        $this->actingAs($adminMutu);
-
-        $this->assertTrue($adminMutu->can('create', EvidenceReview::class));
-
-        $review = EvidenceReview::query()->create([
-            'evidence_id' => $evidence->id,
-            'reviewer_id' => $auditor->id,
-            'created_by' => (string) $adminMutu->id,
-        ]);
-
-        $this->assertSame('pending', $review->status);
-        $this->assertSame($adminMutu->id, $review->assigned_by);
-        $this->assertNotNull($review->assigned_at);
-    }
-
-    public function test_dosen_cannot_assign_a_reviewer(): void
-    {
         $dosen = $this->makeUser('dosen');
 
-        $this->assertFalse($dosen->can('create', EvidenceReview::class));
+        $this->assertTrue($adminMutu->can('viewAny', EvidenceReview::class));
+        $this->assertFalse($dosen->can('viewAny', EvidenceReview::class));
     }
 
-    public function test_assigned_reviewer_can_approve_with_permission(): void
+    public function test_review_record_is_created_when_evidence_is_submitted(): void
     {
         $adminMutu = $this->makeUser('admin-mutu');
         $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $adminMutu, $adminMutu);
 
-        $this->actingAs($adminMutu);
-        $this->assertTrue($adminMutu->can('approve', $review));
+        $evidence->transitionWorkflowTo('submitted');
 
-        $review->update([
-            'status' => 'approved',
-            'review_notes' => 'Dokumen lengkap dan sesuai standar.',
+        $this->assertDatabaseHas('evidence_reviews', [
+            'evidence_id' => $evidence->id,
         ]);
 
-        $review->refresh();
-        $this->assertSame('approved', $review->status);
+        $review = EvidenceReview::forEvidence($evidence->id)->firstOrFail();
+        $this->assertSame(1, EvidenceReview::query()->pending()->count());
+        $this->assertSame('submitted', $review->evidence->workflowInstance->current_status);
+    }
+
+    public function test_reviewer_can_open_review_and_approve_through_evidence_workflow(): void
+    {
+        $adminMutu = $this->makeUser('admin-mutu');
+        $evidence = $this->makeEvidence($adminMutu);
+        $evidence->transitionWorkflowTo('submitted');
+
+        $this->actingAs($adminMutu);
+
+        // Reviewer opens the review (submitted -> review).
+        $this->assertTrue($adminMutu->can('startReview', $evidence->workflowInstance));
+        $evidence->transitionWorkflowTo('review');
+
+        // Approver finalizes (review -> approved) and saves the review notes.
+        $this->assertTrue($adminMutu->can('approve', $evidence->workflowInstance));
+        EvidencesResource::syncReviewNotes($evidence, 'Dokumen lengkap.');
+        $evidence->transitionWorkflowTo('approved');
+
+        $review = EvidenceReview::forEvidence($evidence->id)->firstOrFail();
+        $this->assertSame('Dokumen lengkap.', $review->review_notes);
         $this->assertNotNull($review->reviewed_at);
+
+        // Decided evidence no longer appears in the review queue.
+        $this->assertSame(0, EvidenceReview::query()->pending()->count());
     }
 
     public function test_auditor_without_approve_permission_cannot_approve(): void
     {
-        $adminMutu = $this->makeUser('admin-mutu');
         $auditor = $this->makeUser('auditor');
-        $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $auditor, $adminMutu);
-
-        $this->assertFalse($auditor->can('approve', $review));
-    }
-
-    public function test_auditor_can_request_revision_with_notes(): void
-    {
         $adminMutu = $this->makeUser('admin-mutu');
-        $auditor = $this->makeUser('auditor');
         $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $auditor, $adminMutu);
+        $evidence->transitionWorkflowTo('submitted');
+        $evidence->transitionWorkflowTo('review');
 
-        $this->actingAs($auditor);
-        $this->assertTrue($auditor->can('requestRevision', $review));
-
-        $review->update([
-            'status' => 'revision_needed',
-            'review_notes' => 'Mohon lampirkan dokumen pendukung versi terbaru.',
-        ]);
-
-        $review->refresh();
-        $this->assertSame('revision_needed', $review->status);
-        $this->assertSame('Mohon lampirkan dokumen pendukung versi terbaru.', $review->review_notes);
+        $this->assertFalse($auditor->can('approve', $evidence->workflowInstance));
     }
 
-    public function test_someone_who_is_not_the_assigned_reviewer_cannot_review(): void
-    {
-        $adminMutu = $this->makeUser('admin-mutu');
-        $anotherAdminMutu = $this->makeUser('admin-mutu');
-        $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $adminMutu, $adminMutu);
-
-        $this->assertFalse($anotherAdminMutu->can('approve', $review));
-        $this->assertFalse($anotherAdminMutu->can('reject', $review));
-    }
-
-    public function test_pending_cannot_jump_directly_to_pending_noop_or_skip_rules(): void
+    public function test_rejected_evidence_leaves_the_review_queue(): void
     {
         $adminMutu = $this->makeUser('admin-mutu');
         $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $adminMutu, $adminMutu, 'approved');
+        $evidence->transitionWorkflowTo('submitted');
 
-        $this->actingAs($adminMutu);
+        $this->assertSame(1, EvidenceReview::query()->pending()->count());
+
+        $evidence->transitionWorkflowTo('review');
+        EvidencesResource::syncReviewNotes($evidence, 'Kurang lengkap.');
+        $evidence->transitionWorkflowTo('rejected');
+
+        $review = EvidenceReview::forEvidence($evidence->id)->firstOrFail();
+        $this->assertSame('Kurang lengkap.', $review->review_notes);
+        $this->assertSame(0, EvidenceReview::query()->pending()->count());
+    }
+
+    public function test_review_record_stays_unique_when_submit_event_fires_twice(): void
+    {
+        $adminMutu = $this->makeUser('admin-mutu');
+        $evidence = $this->makeEvidence($adminMutu);
+        $evidence->transitionWorkflowTo('submitted');
+
+        // The submit transition event should be safe to fire more than once.
+        $workflow = $evidence->workflowInstance->fresh();
+        event(new WorkflowTransitioned($workflow, 'draft', 'submitted'));
+        event(new WorkflowTransitioned($workflow, 'draft', 'submitted'));
+
+        $this->assertSame(1, EvidenceReview::forEvidence($evidence->id)->count());
+    }
+
+    public function test_super_admin_can_force_evidence_to_any_status(): void
+    {
+        $superAdmin = $this->makeUser('super-admin');
+        $evidence = $this->makeEvidence($superAdmin);
+
+        // Super-admin can jump straight from draft to approved, bypassing
+        // the normal workflow transition rules.
+        $evidence->workflowInstance->forceTransitionTo('approved', 'Paksa setujui');
+
+        $this->assertSame('approved', $evidence->workflowInstance->fresh()->current_status);
+        $this->assertTrue($superAdmin->hasRole('super-admin'));
+    }
+
+    public function test_normal_workflow_still_guards_invalid_transitions(): void
+    {
+        $adminMutu = $this->makeUser('admin-mutu');
+        $evidence = $this->makeEvidence($adminMutu);
 
         $this->expectException(\RuntimeException::class);
 
-        $review->update(['status' => 'pending']);
+        // draft -> approved is not a valid transition via the normal path.
+        $evidence->transitionWorkflowTo('approved');
     }
 
-    public function test_revision_needed_can_be_reopened_to_pending(): void
+    public function test_only_super_admin_can_force_status(): void
     {
+        $superAdmin = $this->makeUser('super-admin');
         $adminMutu = $this->makeUser('admin-mutu');
-        $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $adminMutu, $adminMutu, 'revision_needed');
 
-        $this->actingAs($adminMutu);
-        $this->assertTrue($adminMutu->can('reopen', $review));
-
-        $review->update(['status' => 'pending']);
-
-        $review->refresh();
-        $this->assertSame('pending', $review->status);
-        $this->assertNull($review->reviewed_at);
-    }
-
-    public function test_approved_is_a_terminal_status_and_cannot_be_edited_further(): void
-    {
-        $adminMutu = $this->makeUser('admin-mutu');
-        $evidence = $this->makeEvidence($adminMutu);
-        $review = $this->makeReview($evidence, $adminMutu, $adminMutu, 'approved');
-
-        $this->actingAs($adminMutu);
-
-        $this->assertFalse($adminMutu->can('update', $review));
+        $this->assertTrue($superAdmin->hasRole('super-admin'));
+        $this->assertFalse($adminMutu->hasRole('super-admin'));
     }
 
     private function makeUser(string $role): User
@@ -176,22 +175,6 @@ class EvidenceReviewWorkflowTest extends TestCase
             'title' => 'Bukti '.fake()->words(3, true),
             'description' => fake()->sentence(),
             'created_by' => (string) $creator->id,
-        ]);
-    }
-
-    private function makeReview(
-        Evidences $evidence,
-        User $reviewer,
-        User $assignedBy,
-        string $status = 'pending',
-    ): EvidenceReview {
-        $this->actingAs($assignedBy);
-
-        return EvidenceReview::query()->create([
-            'evidence_id' => $evidence->id,
-            'reviewer_id' => $reviewer->id,
-            'status' => $status,
-            'created_by' => (string) $assignedBy->id,
         ]);
     }
 }

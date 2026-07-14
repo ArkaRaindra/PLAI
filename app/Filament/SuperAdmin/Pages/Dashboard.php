@@ -11,7 +11,6 @@ use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 
 class Dashboard extends BaseDashboard
 {

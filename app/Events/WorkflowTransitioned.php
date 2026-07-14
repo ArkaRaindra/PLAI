@@ -17,8 +17,7 @@ class WorkflowTransitioned
         public readonly WorkflowInstance $workflowInstance,
         public readonly string $fromStatus,
         public readonly string $toStatus,
-    )
-    {
+    ) {
         //
     }
 }

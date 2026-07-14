@@ -105,7 +105,7 @@ class TargetAchievementMonitoringTest extends TestCase
             'indicator_id' => $indicator->id,
             'organization_unit_id' => $unit->id,
             'is_primary' => true,
-            'notes' => 'Penanggungjawab indikator ' . $indicator->name,
+            'notes' => 'Penanggungjawab indikator '.$indicator->name,
             'created_by' => (string) $creator->id,
             'updated_by' => (string) $creator->id,
         ]);

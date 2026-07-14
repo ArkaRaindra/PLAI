@@ -18,7 +18,7 @@ class EditSelfAssessment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-           Action::make('back')
+            Action::make('back')
                 ->label('Kembali')
                 ->url(fn (): string => self::$resource::getUrl('index'))
                 ->button()

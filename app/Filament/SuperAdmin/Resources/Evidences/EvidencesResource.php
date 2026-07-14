@@ -3,7 +3,6 @@
 namespace App\Filament\SuperAdmin\Resources\Evidences;
 
 use App\Filament\SuperAdmin\Resources\EvidenceLinks\EvidenceLinkResource;
-use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
 use App\Filament\SuperAdmin\Resources\Evidences\Pages\CreateEvidences;
 use App\Filament\SuperAdmin\Resources\Evidences\Pages\EditEvidences;
 use App\Filament\SuperAdmin\Resources\Evidences\Pages\ListEvidences;
@@ -15,6 +14,7 @@ use App\Models\Evidences;
 use App\Models\WorkflowInstance;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -35,7 +35,6 @@ class EvidencesResource extends Resource
     {
         return [
             static::getRouteBaseName().'.*',
-            EvidenceReviewResource::getRouteBaseName().'.*',
             EvidenceLinkResource::getRouteBaseName().'.*',
         ];
     }
@@ -117,10 +116,9 @@ class EvidencesResource extends Resource
             ->modalHeading('Ajukan Evidence')
             ->modalDescription('Evidence akan diajukan untuk masuk ke tahap review.')
             ->modalSubmitActionLabel('Ya, Ajukan')
-            ->visible(fn (Evidences $record): bool => $record->workflowInstance?->isAt('draft') ?? false)
-            ->authorize(fn (Evidences $record): bool => self::authorizeWorkflow('submit', $record))
+            ->authorize(fn (Evidences $record): bool => self::authorizeSuperAdmin($record))
             ->action(function (Evidences $record): void {
-                $record->transitionWorkflowTo('submitted');
+                self::transitionForAction($record, 'submitted');
 
                 Notification::make()->title('Evidence diajukan')->success()->send();
             });
@@ -139,10 +137,9 @@ class EvidencesResource extends Resource
             ->modalHeading('Mulai Review Evidence')
             ->modalDescription('Evidence akan masuk tahap review. Tugaskan reviewer melalui menu "Kelola Review".')
             ->modalSubmitActionLabel('Ya, Mulai Review')
-            ->visible(fn (Evidences $record): bool => $record->workflowInstance?->isAt('submitted') ?? false)
-            ->authorize(fn (Evidences $record): bool => self::authorizeWorkflow('startReview', $record))
+            ->authorize(fn (Evidences $record): bool => self::authorizeSuperAdmin($record))
             ->action(function (Evidences $record): void {
-                $record->transitionWorkflowTo('review');
+                self::transitionForAction($record, 'review');
 
                 Notification::make()->title('Evidence masuk tahap review')->success()->send();
             });
@@ -163,10 +160,10 @@ class EvidencesResource extends Resource
             ->schema([
                 Textarea::make('notes')->label('Catatan')->columnSpanFull(),
             ])
-            ->visible(fn (Evidences $record): bool => $record->workflowInstance?->isAt('review') ?? false)
-            ->authorize(fn (Evidences $record): bool => self::authorizeWorkflow('approve', $record))
+            ->authorize(fn (Evidences $record): bool => self::authorizeSuperAdmin($record))
             ->action(function (Evidences $record, array $data): void {
-                $record->transitionWorkflowTo('approved', $data['notes'] ?? null);
+                self::transitionForAction($record, 'approved', $data['notes'] ?? null);
+                self::syncReviewNotes($record, $data['notes'] ?? null, 'approved');
 
                 Notification::make()->title('Evidence disetujui')->success()->send();
             });
@@ -188,10 +185,10 @@ class EvidencesResource extends Resource
             ->schema([
                 Textarea::make('notes')->label('Alasan Penolakan')->required()->minLength(5)->columnSpanFull(),
             ])
-            ->visible(fn (Evidences $record): bool => $record->workflowInstance?->isAt('review') ?? false)
-            ->authorize(fn (Evidences $record): bool => self::authorizeWorkflow('reject', $record))
+            ->authorize(fn (Evidences $record): bool => self::authorizeSuperAdmin($record))
             ->action(function (Evidences $record, array $data): void {
-                $record->transitionWorkflowTo('rejected', $data['notes']);
+                self::transitionForAction($record, 'rejected', $data['notes']);
+                self::syncReviewNotes($record, $data['notes'], 'rejected');
 
                 Notification::make()->title('Evidence ditolak')->danger()->send();
             });
@@ -210,13 +207,26 @@ class EvidencesResource extends Resource
             ->modalHeading('Publikasikan Evidence')
             ->modalDescription('Evidence yang telah disetujui akan dipublikasikan dan tersedia bagi modul lain.')
             ->modalSubmitActionLabel('Ya, Publikasikan')
-            ->visible(fn (Evidences $record): bool => $record->workflowInstance?->isAt('approved') ?? false)
-            ->authorize(fn (Evidences $record): bool => self::authorizeWorkflow('publish', $record))
+            ->authorize(fn (Evidences $record): bool => self::authorizeSuperAdmin($record))
             ->action(function (Evidences $record): void {
-                $record->transitionWorkflowTo('published');
+                self::transitionForAction($record, 'published');
 
                 Notification::make()->title('Evidence dipublikasikan')->success()->send();
             });
+    }
+
+    private static function authorizeSuperAdmin(Evidences $record): bool
+    {
+        return Auth::user()?->hasRole('super-admin') ?? false;
+    }
+
+    private static function transitionForAction(Evidences $record, string $status, ?string $notes = null): void
+    {
+        if (Auth::user()?->hasRole('super-admin') ?? false) {
+            $record->workflowInstance->forceTransitionTo($status, $notes);
+        } else {
+            $record->transitionWorkflowTo($status, $notes);
+        }
     }
 
     private static function authorizeWorkflow(string $ability, Evidences $record): bool
@@ -228,5 +238,22 @@ class EvidencesResource extends Resource
         }
 
         return Auth::user()?->can($ability, $workflowInstance) ?? false;
+    }
+
+    /**
+     * Persist the review notes (entered during approve/reject) onto the
+     * linked EvidenceReview record so they show up in the review queue.
+     */
+    public static function syncReviewNotes(Evidences $record, ?string $notes, ?string $status = null): void
+    {
+        $review = $record->evidenceReviews()->firstOrNew(['evidence_id' => $record->id]);
+        $review->review_notes = $notes;
+        $review->reviewed_at ??= now();
+
+        if ($status !== null) {
+            $review->status = $status;
+        }
+
+        $review->save();
     }
 }

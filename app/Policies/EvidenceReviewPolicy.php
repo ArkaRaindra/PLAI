@@ -8,11 +8,11 @@ use App\Models\User;
 class EvidenceReviewPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view the review queue.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('evidence.view');
+        return $user->can('evidence.review');
     }
 
     /**
@@ -20,33 +20,17 @@ class EvidenceReviewPolicy
      */
     public function view(User $user, EvidenceReview $evidenceReview): bool
     {
-        return $user->can('evidence.view');
-    }
-
-    /**
-     * Determine whether the user can create models (assign a reviewer).
-     */
-    public function create(User $user): bool
-    {
         return $user->can('evidence.review');
     }
 
     /**
-     * Determine whether the user can update the model (reassign reviewer /
-     * write review notes). Status transitions are authorized separately
-     * below (approve/reject/requestRevision/reopen).
+     * Determine whether the user can update review notes while the
+     * linked evidence is still awaiting review.
      */
     public function update(User $user, EvidenceReview $evidenceReview): bool
     {
-        if ($evidenceReview->isDecided()) {
-            return false;
-        }
-
-        if ($user->can('evidence.review') && $user->id === $evidenceReview->reviewer_id) {
-            return true;
-        }
-
-        return $user->can('evidence.approve');
+        return $user->can('evidence.review')
+            && ! in_array($evidenceReview->status, ['approved', 'rejected'], true);
     }
 
     /**
@@ -54,46 +38,7 @@ class EvidenceReviewPolicy
      */
     public function delete(User $user, EvidenceReview $evidenceReview): bool
     {
-        return ($user->can('evidence.review') || $user->can('evidence.approve'))
-            && $evidenceReview->isPending();
-    }
-
-    /**
-     * Determine whether the user can mark the review as approved.
-     */
-    public function approve(User $user, EvidenceReview $evidenceReview): bool
-    {
         return $user->can('evidence.approve')
-            && $user->id === $evidenceReview->reviewer_id
-            && $evidenceReview->canTransitionTo('approved');
-    }
-
-    /**
-     * Determine whether the user can mark the review as rejected.
-     */
-    public function reject(User $user, EvidenceReview $evidenceReview): bool
-    {
-        return $user->can('evidence.reject')
-            && $user->id === $evidenceReview->reviewer_id
-            && $evidenceReview->canTransitionTo('rejected');
-    }
-
-    /**
-     * Determine whether the user can request a revision from the uploader.
-     */
-    public function requestRevision(User $user, EvidenceReview $evidenceReview): bool
-    {
-        return $user->can('evidence.review')
-            && $user->id === $evidenceReview->reviewer_id
-            && $evidenceReview->canTransitionTo('revision_needed');
-    }
-
-    /**
-     * Determine whether the user can reopen a review (revision_needed -> pending).
-     */
-    public function reopen(User $user, EvidenceReview $evidenceReview): bool
-    {
-        return ($user->can('evidence.review') || $user->can('evidence.approve'))
-            && $evidenceReview->canTransitionTo('pending');
+            && ! in_array($evidenceReview->status, ['approved', 'rejected'], true);
     }
 }
