@@ -10,6 +10,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -66,5 +67,20 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Position::class, 'user_positions')
             ->withPivot(['organization_unit_id', 'start_date', 'end_date', 'is_active'])
             ->withTimestamps();
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->latest();
+    }
+
+    public function unreadNotifications(): HasMany
+    {
+        return $this->notifications()->where('is_read', false);
+    }
+
+    public function readNotifications(): HasMany
+    {
+        return $this->notifications()->where('is_read', true);
     }
 }
