@@ -69,9 +69,12 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->title('Evidence Ditolak')
             ->body($message)
+            ->icon('heroicon-o-x-circle')
+            ->iconColor('danger')
             ->danger()
             ->actions([
                 Action::make('view')
+                    ->button()
                     ->label('Perbaiki Evidence')
                     ->url("/super-admin/evidences/{$this->evidence->id}")
                     ->markAsRead(),

@@ -56,8 +56,12 @@ class EvidenceSubmittedNotification extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->title('Evidence Baru Menunggu Review')
             ->body("Evidence \"{$this->evidence->title}\" telah diajukan dan menunggu review Anda")
+            ->icon('heroicon-o-magnifying-glass')
+            ->iconColor('warning')
+            ->warning()
             ->actions([
                 Action::make('view')
+                    ->button()
                     ->label('Tinjau Evidence')
                     ->url("/super-admin/evidences/{$this->evidence->id}")
                     ->markAsRead(),

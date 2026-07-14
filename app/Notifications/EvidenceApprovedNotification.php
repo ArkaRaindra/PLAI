@@ -56,9 +56,12 @@ class EvidenceApprovedNotification extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->title('Evidence Disetujui')
             ->body("Evidence \"{$this->evidence->title}\" yang Anda ajukan telah disetujui.")
+            ->icon('heroicon-o-check-circle')
+            ->iconColor('success')
             ->success()
             ->actions([
                 Action::make('view')
+                    ->button()
                     ->label('Lihat Evidence')
                     ->url("/super-admin/evidences/{$this->evidence->id}")
                     ->markAsRead(),

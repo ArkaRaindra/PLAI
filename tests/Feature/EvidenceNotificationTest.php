@@ -83,8 +83,8 @@ class EvidenceNotificationTest extends TestCase
         $dosen->notify(new EvidenceApprovedNotification($evidence));
 
         $this->assertDatabaseHas('notifications', [
-            'notifiable_type' => $dosen->getMorphClass(),
-            'notifiable_id' => $dosen->id,
+            'user_id' => $dosen->id,
+            'is_read' => false,
             'read_at' => null,
         ]);
 
