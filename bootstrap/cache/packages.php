@@ -280,13 +280,6 @@
       0 => 'Laravel\\Wayfinder\\WayfinderServiceProvider',
     ),
   ),
-  'leek/filament-right-click' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Leek\\FilamentRightClick\\FilamentRightClickServiceProvider',
-    ),
-  ),
   'livewire/livewire' => 
   array (
     'aliases' => 
