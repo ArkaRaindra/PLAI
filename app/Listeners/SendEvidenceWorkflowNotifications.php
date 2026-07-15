@@ -31,9 +31,11 @@ class SendEvidenceWorkflowNotifications implements ShouldQueue
 
         match ($event->toStatus) {
             'submitted' => $this->openReview($evidence),
-            'approved' => $this->notifyOwner($evidence, new EvidenceApprovedNotification($evidence)),
-            'rejected' => $this->notifyOwner(
+            'review' => $this->markReviewStatus($evidence, 'review'),
+            'approved' => $this->resolveReview($evidence, 'approved', new EvidenceApprovedNotification($evidence)),
+            'rejected' => $this->resolveReview(
                 $evidence,
+                'rejected',
                 new EvidenceRejectedNotification($evidence, $workflow->histories()->orderByDesc('id')->first()?->notes),
             ),
             default => null,
@@ -46,9 +48,31 @@ class SendEvidenceWorkflowNotifications implements ShouldQueue
      */
     private function openReview(Evidences $evidence): void
     {
-        EvidenceReview::query()->updateOrCreate(['evidence_id' => $evidence->id]);
+        EvidenceReview::query()->updateOrCreate(['evidence_id' => $evidence->id], ['status' => 'pending']);
 
         $this->notifyReviewers($evidence);
+    }
+
+    /**
+     * Keep the review task's own status column in sync with the evidence's
+     * workflow status. Without this, EvidenceReview.status stays "pending"
+     * forever after creation — even once the evidence has actually been
+     * approved/rejected — since nothing else in the app writes to it.
+     */
+    private function markReviewStatus(Evidences $evidence, string $status): void
+    {
+        EvidenceReview::query()
+            ->where('evidence_id', $evidence->id)
+            ->update(['status' => $status]);
+    }
+
+    private function resolveReview(Evidences $evidence, string $status, NotificationClass $notification): void
+    {
+        EvidenceReview::query()
+            ->where('evidence_id', $evidence->id)
+            ->update(['status' => $status, 'reviewed_at' => now()]);
+
+        $this->notifyOwner($evidence, $notification);
     }
 
     private function notifyReviewers(Evidences $evidence): void

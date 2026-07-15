@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Blameable;
 use App\HasTraceability;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -233,5 +234,21 @@ class Realization extends Model
             'file_path' => $version->file_path,
             'url_path' => $version->url_path,
         ];
+    }
+
+    protected function displayTitle(): Attribute
+    {
+        return Attribute::make(
+            get: function (): string {
+                $this->loadMissing('target.indicator', 'target.qualityPeriod');
+
+                $indicatorName = $this->target?->indicator?->name;
+                $periodName = $this->target?->qualityPeriod?->name;
+
+                $label = $indicatorName ?? "Realisasi #{$this->id}";
+
+                return $periodName !== null ? "{$label} ({$periodName})" : $label;
+            },
+        );
     }
 }
