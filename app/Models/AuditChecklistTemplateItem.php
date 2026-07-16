@@ -35,7 +35,7 @@ class AuditChecklistTemplateItem extends Model
 
             $item->sequence = ((int) static::query()
                 ->where('template_id', $item->template_id)
-                ->max('sequence')) + 1;
+                ->max('sequence')) + 1.0;
         });
     }
 

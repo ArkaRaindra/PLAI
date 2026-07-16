@@ -54,7 +54,7 @@ class AuditChecklistTemplate extends Model
         return DB::transaction(function () use ($template): self {
             $nextVersionNo = ((int) static::query()
                 ->where('name', $template->name)
-                ->max('version_no')) + 1;
+                ->max('version_no')) + 1.0;
 
             $newTemplate = static::query()->create([
                 'name' => $template->name,

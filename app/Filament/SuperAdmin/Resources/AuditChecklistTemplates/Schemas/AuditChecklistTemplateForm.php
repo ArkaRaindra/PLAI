@@ -22,12 +22,13 @@ class AuditChecklistTemplateForm
                     ->maxLength('255')
                     ->columnSpanFull(),
                 Hidden::make('version_no')
-                    ->default(1)
+                    ->default(1.0)
                     ->dehydrated(fn (string $operation): bool => $operation === 'create'),
                 Repeater::make('items')
                     ->label('Item Checklist')
                     ->relationship('items')
                     ->orderColumn('sequence')
+                    ->visible(fn (string $operation) => $operation === 'create')
                     ->schema([
                         Select::make('standard_version_id')
                             ->label('Versi Standar')
