@@ -80,6 +80,21 @@ class WorkflowInstancePolicy
     }
 
     /**
+     * rejected -> draft (send back for revision after a rejection).
+     */
+    public function revise(User $user, WorkflowInstance $workflowInstance): bool
+    {
+        if (! $workflowInstance->canTransitionTo('draft')) {
+            return false;
+        }
+
+        return match ($workflowInstance->entity_type) {
+            'evidence' => $this->isEvidenceOwnerOrManager($user, $workflowInstance),
+            default => false,
+        };
+    }
+
+    /**
      * approved -> published.
      */
     public function publish(User $user, WorkflowInstance $workflowInstance): bool

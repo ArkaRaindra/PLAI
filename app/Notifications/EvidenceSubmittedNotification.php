@@ -42,7 +42,7 @@ class EvidenceSubmittedNotification extends Notification implements ShouldQueue
             ->subject('Evidence Baru Menunggu Review')
             ->greeting("Halo {$notifiable->name},")
             ->line("Evidence \"{$this->evidence->title}\" telah diajukan dan menunggu review Anda")
-            // ->action('Tinjau Evidence', url("/super-admin/evidences/{$this->evidence->id}"))
+            // ->action('Tinjau Evidence', url("/super-admin/evidences-reviews/{$this->evidence->id}"))
             ->line('Mohon segera ditindaklanjuti');
     }
 
@@ -63,7 +63,7 @@ class EvidenceSubmittedNotification extends Notification implements ShouldQueue
                 Action::make('view')
                     ->button()
                     ->label('Tinjau Evidence')
-                    ->url("/super-admin/evidences/{$this->evidence->id}")
+                    ->url("/super-admin/evidences-reviews/{$this->evidence->id}")
                     ->markAsRead(),
             ])
             ->getDatabaseMessage();

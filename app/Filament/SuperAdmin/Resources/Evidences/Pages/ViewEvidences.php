@@ -30,6 +30,7 @@ class ViewEvidences extends ViewRecord
                 ->url(fn (): string => EvidenceLinkResource::getListUrl($this->record->id)),
             EditAction::make(),
             EvidencesResource::submitAction()->visible(fn (Evidences $record): bool => $record->workflowInstance?->current_status === 'draft'),
+            EvidencesResource::reviseAction()->visible(fn (Evidences $record): bool => $record->workflowInstance?->current_status === 'rejected'),
             EvidencesResource::publishAction()->visible(fn (Evidences $record): bool => $record->workflowInstance?->current_status === 'approved'),
         ];
     }

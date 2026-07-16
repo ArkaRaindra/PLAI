@@ -113,6 +113,32 @@ class EvidenceApprovalWorkflowTest extends TestCase
         $this->assertSame(5, $instance->histories()->count());
     }
 
+    public function test_owner_can_revise_a_rejected_evidence_back_to_draft(): void
+    {
+        $dosen = $this->makeUser('dosen');
+        $evidence = $this->makeEvidence($dosen, 'rejected');
+
+        $instance = $evidence->workflowInstance->fresh();
+
+        $this->assertTrue($dosen->can('revise', $instance));
+        $this->assertFalse($dosen->can('submit', $instance)); // must revise first
+
+        $instance->transitionTo('draft', 'Telah direvisi sesuai catatan.');
+
+        $instance = $instance->fresh();
+        $this->assertSame('draft', $instance->current_status);
+        $this->assertTrue($dosen->can('submit', $instance));
+    }
+
+    public function test_unrelated_user_cannot_revise_someone_elses_rejected_evidence(): void
+    {
+        $dosen = $this->makeUser('dosen');
+        $anotherDosen = $this->makeUser('dosen');
+        $evidence = $this->makeEvidence($dosen, 'rejected');
+
+        $this->assertFalse($anotherDosen->can('revise', $evidence->workflowInstance->fresh()));
+    }
+
     public function test_publish_cannot_be_skipped_from_review(): void
     {
         $dosen = $this->makeUser('dosen');

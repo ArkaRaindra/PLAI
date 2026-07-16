@@ -28,7 +28,8 @@ class EditAuditChecklistTemplate extends EditRecord
                 ->color('primary')
                 ->action(fn () => $this->save())
                 ->url($this->getResource()::getUrl('index')),
-            DeleteAction::make(),      
+            DeleteAction::make()
+                ->label('Hapus'),
         ];
     }
 
