@@ -28,7 +28,7 @@ class AuditChecklistTemplate extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(AuditChecklistTemplate::class, 'template_id')->orderBy('sequence');
+        return $this->hasMany(AuditChecklistTemplateItem::class, 'template_id')->orderBy('sequence');
     }
 
     public function scopeActive(Builder $query): Builder
@@ -45,13 +45,13 @@ class AuditChecklistTemplate extends Model
         $latestVersionNo = static::query()
             ->where('name', $this->name)
             ->max('version_no');
-        
+
         return (int) $latestVersionNo === (int) $this->version_no;
     }
 
     public static function createNewVersion(self $template): self
     {
-        return DB::transaction(function () use ($template): self{
+        return DB::transaction(function () use ($template): self {
             $nextVersionNo = ((int) static::query()
                 ->where('name', $template->name)
                 ->max('version_no')) + 1;

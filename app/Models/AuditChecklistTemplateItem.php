@@ -12,7 +12,7 @@ class AuditChecklistTemplateItem extends Model
 
     protected $fillable = [
         'template_id',
-        'standrard_version_id',
+        'standard_version_id',
         'question',
         'sequence',
         'created_by',
