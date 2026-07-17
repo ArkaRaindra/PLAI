@@ -6,6 +6,7 @@ use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\CreateAuditCycle;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\EditAuditCycle;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\ListAuditCycles;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\ViewAuditCycle;
+use App\Filament\SuperAdmin\Resources\AuditCycles\RelationManagers\AssignmentsRelationManager;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Schemas\AuditCycleForm;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Schemas\AuditCycleInfolist;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Tables\AuditCyclesTable;
@@ -51,7 +52,7 @@ class AuditCycleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AssignmentsRelationManager::class
         ];
     }
 

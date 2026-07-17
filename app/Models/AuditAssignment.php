@@ -26,6 +26,45 @@ class AuditAssignment extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function (AuditAssignment $assignment): void {
+            if (blank($assignment->assigned_at)) {
+                $assignment->assigned_at = now();
+            }
+
+            $auditorPosition = UserPosition::query()->find($assignment->auditor_position_id);
+
+            if (! $auditorPosition || ! $auditorPosition->is_active) {
+                throw new \RuntimeException(
+                    'Auditor yang dipilih tidak memiliki posisi yang aktif.'
+                );
+            }
+
+            $organizationUnit = OrganizationUnit::query()->find($assignment->organization_unit_id);
+
+            if (! $organizationUnit || ! $organizationUnit->is_active) {
+                throw new \RuntimeException(
+                    'Unit organisasi (auditee) yang dipilih tidak aktif.'
+                );
+            }
+
+            if ($auditorPosition->organization_unit_id === $assignment->organization_unit_id) {
+                throw new \RuntimeException(
+                    'Auditor tidak dapat ditugaskan untuk mengaudit unitnya sendiri.'
+                );
+            }
+
+            $cycle = AuditCycle::query()->find($assignment->audit_cycle_id);
+
+            if ($cycle && in_array($cycle->status, ['completed', 'cancelled'], true)) {
+                throw new \RuntimeException(
+                    'Tidak dapat menambah penugasan pada siklus audit yang sudah selesai atau dibatalkan.'
+                );
+            }
+        });
+    }
+
     public function auditCycle(): BelongsTo
     {
         return $this->belongsTo(AuditCycle::class);
