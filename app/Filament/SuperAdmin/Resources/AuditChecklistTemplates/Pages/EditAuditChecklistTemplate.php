@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Icons\Heroicon;
 
 class EditAuditChecklistTemplate extends EditRecord
 {
@@ -29,7 +30,8 @@ class EditAuditChecklistTemplate extends EditRecord
                 ->action(fn () => $this->save())
                 ->url($this->getResource()::getUrl('index')),
             DeleteAction::make()
-                ->label('Hapus'),
+                ->label('Hapus')
+                ->icon(Heroicon::Trash),
         ];
     }
 

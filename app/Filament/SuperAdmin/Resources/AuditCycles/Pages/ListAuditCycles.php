@@ -5,6 +5,7 @@ namespace App\Filament\SuperAdmin\Resources\AuditCycles\Pages;
 use App\Filament\SuperAdmin\Resources\AuditCycles\AuditCycleResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Icons\Heroicon;
 
 class ListAuditCycles extends ListRecords
 {
@@ -13,7 +14,8 @@ class ListAuditCycles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->icon(Heroicon::Plus),
         ];
     }
 }

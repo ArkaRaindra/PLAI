@@ -4,6 +4,7 @@ namespace App\Filament\SuperAdmin\Resources\AuditCycles\RelationManagers;
 
 use App\Models\UserPosition;
 use Closure;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -94,12 +96,13 @@ class AssignmentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->icon(Heroicon::Plus),
             ])
-            ->recordActions([
+            ->recordActions(ActionGroup::make([
                 EditAction::make(),
                 DeleteAction::make(),
-            ])
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

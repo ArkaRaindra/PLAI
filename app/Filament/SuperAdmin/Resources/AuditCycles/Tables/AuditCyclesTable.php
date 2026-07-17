@@ -3,6 +3,7 @@
 namespace App\Filament\SuperAdmin\Resources\AuditCycles\Tables;
 
 use App\Filament\SuperAdmin\Resources\AuditCycles\Schemas\AuditCycleForm;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -50,10 +51,10 @@ class AuditCyclesTable
                     ->options(AuditCycleForm::STATUS_LABELS),
             ])
             ->defaultSort('created_at', 'desc')
-            ->recordActions([
+            ->recordActions(ActionGroup::make([
                 ViewAction::make(),
                 EditAction::make(),
-            ])
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

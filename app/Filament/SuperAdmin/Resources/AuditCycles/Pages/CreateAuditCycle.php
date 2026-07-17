@@ -25,4 +25,9 @@ class CreateAuditCycle extends CreateRecord
             $this->halt();
         }
     }
+
+    protected function getRedirecturl(): string
+    {
+        return static::$resource::getUrl('index');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Tables;
 
 use App\Models\AuditChecklistTemplate;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -44,7 +45,7 @@ class AuditChecklistTemplatesTable
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->recordActions(ActionGroup::make([
                 Action::make('newVersion')
                     ->label('Buat Versi Baru')
                     ->icon(Heroicon::OutlinedDocumentDuplicate)
@@ -62,7 +63,7 @@ class AuditChecklistTemplatesTable
                     }),
                 ViewAction::make(),
                 EditAction::make(),
-            ])
+            ]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
