@@ -6,15 +6,17 @@ use App\Blameable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
 
 class AuditChecklistTemplate extends Model
 {
     use Blameable;
 
     protected $fillable = [
+        'code',
         'name',
-        'version_no',
+        'version',
+        'description',
+        'is_active',
         'created_by',
         'updated_by',
     ];
@@ -22,7 +24,7 @@ class AuditChecklistTemplate extends Model
     protected function casts(): array
     {
         return [
-            'version_no' => 'integer',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -31,45 +33,18 @@ class AuditChecklistTemplate extends Model
         return $this->hasMany(AuditChecklistTemplateItem::class, 'template_id')->orderBy('sequence');
     }
 
+    public function auditCycles(): HasMany
+    {
+        return $this->hasMany(AuditCycle::class, 'checklist_template_id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
-        return $query->whereIn('id', function ($sub): void {
-            $sub->selectRaw('MAX(t2.id)')
-                ->from('audit_checklist_templates as t2')
-                ->whereColumn('t2.name', 'audit_checklist_templates.name');
-        });
+        return $query->where('is_active', true);
     }
-
-    public function isActiveVersion(): bool
+    
+    public function versions(): HasMany
     {
-        $latestVersionNo = static::query()
-            ->where('name', $this->name)
-            ->max('version_no');
-
-        return (int) $latestVersionNo === (int) $this->version_no;
-    }
-
-    public static function createNewVersion(self $template): self
-    {
-        return DB::transaction(function () use ($template): self {
-            $nextVersionNo = ((int) static::query()
-                ->where('name', $template->name)
-                ->max('version_no')) + 1.0;
-
-            $newTemplate = static::query()->create([
-                'name' => $template->name,
-                'version_no' => $nextVersionNo,
-            ]);
-
-            foreach ($template->items()->orderBy('sequence')->get() as $item) {
-                $newTemplate->items()->create([
-                    'standard_version_id' => $item->standard_version_id,
-                    'question' => $item->question,
-                    'sequence' => $item->sequence,
-                ]);
-            }
-
-            return $newTemplate;
-        });
+        return $this->hasMany(self::class, 'code', 'code')->orderByDesc('id');
     }
 }

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('audit_assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('audit_cycle_id')->constrained('audit_cycles')->cascadeOnDelete();
-            $table->foreignId('auditor_position_id')->constrained('user_positions')->cascadeOnDelete();
-            $table->foreignId('organization_unit_id')->constrained('organization_units')->cascadeOnDelete();
+            $table->foreignId('auditor_position_id')->constrained('user_positions')->restrictOnDelete();
+            $table->foreignId('organization_unit_id')->constrained('organization_units')->restrictOnDelete();
             $table->timestamp('assigned_at')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();

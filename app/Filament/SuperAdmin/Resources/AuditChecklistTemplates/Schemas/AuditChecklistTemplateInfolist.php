@@ -2,8 +2,8 @@
 
 namespace App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Schemas;
 
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -13,25 +13,20 @@ class AuditChecklistTemplateInfolist
     {
         return $schema
             ->components([
-                Section::make('Template')
-                    ->columns(3)
+                Section::make('Checklist Template')
                     ->schema([
-                        TextEntry::make('name')->label('Nama Template'),
-                        TextEntry::make('version_no')->label('Versi')->badge(),
-                        TextEntry::make('created_at')->label('Dibuat')->dateTime('d M Y H:i'),
+                        Grid::make(2)->schema([
+                            TextEntry::make('code')->label('Kode'),
+                            TextEntry::make('name')->label('Nama'),
+                            TextEntry::make('version')->label('Versi'),
+                            TextEntry::make('is_active')
+                                ->label('Status')
+                                ->badge()
+                                ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Tidak Aktif')
+                                ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
+                            TextEntry::make('description')->label('Deskripsi')->placeholder('-')->columnSpanFull(),
+                        ]),
                     ]),
-                
-                Section::make('Item Checklist')
-                    ->schema([
-                        RepeatableEntry::make('items')
-                            ->label('')
-                            ->schema([
-                                TextEntry::make('sequence')->label('No.'),
-                                TextEntry::make('question')->label('Pertanyaan')->columnspan(2),
-                                TextEntry::make('standardVersion.standard.name')->label('Standar'),
-                            ])
-                            ->columns(4),
-                    ])
             ]);
     }
 }

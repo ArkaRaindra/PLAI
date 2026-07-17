@@ -12,10 +12,9 @@ class AuditCycle extends Model
     use Blameable;
 
     public const array TRANSITIONS = [
-        'draft' => ['ongoing', 'cancelled'],
-        'ongoing' => ['completed', 'cancelled'],
-        'completed' => [],
-        'cancelled' => [],
+        'draft' => ['active'],
+        'active' => ['closed'],
+        'closed' => [],
     ];
 
     protected $fillable = [
@@ -28,16 +27,6 @@ class AuditCycle extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (AuditCycle $cycle): void {
-            $period = QualityPeriod::query()->find($cycle->quality_period_id);
-
-            if ($period && $period->status?->value !== 'active') {
-                throw new \RuntimeException(
-                   'Audit cycle hanya dapat dibuat untuk periode mutu yang berstatus aktif.'
-                );
-            }
-        });
-
         static::saving(function (AuditCycle $cycle): void {
             if (! $cycle->exists || ! $cycle->isDirty('status')) {
                 return;
@@ -47,16 +36,9 @@ class AuditCycle extends Model
             $to = $cycle->status;
 
             if (! in_array($to, self::TRANSITIONS[$from] ?? [], true)) {
-                throw new \RuntimeException(
-                    "Transisi status dari '{$from}' ke '{$to}' tidak diizinkan"
-                );
+                throw new \RuntimeException("Transisi status audit cycle dari '{$from}' ke '{$to}' tidak diizinkan");
             }
         });
-    }
-
-    public function canTransitionTo(string $status): bool
-    {
-        return in_array($status, self::TRANSITIONS[$this->status] ?? [], true);
     }
 
     public function qualityPeriod(): BelongsTo
@@ -72,5 +54,20 @@ class AuditCycle extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(AuditAssignment::class);
+    }
+
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    public function displayTitle(): string
+    {
+        $this->loadMissing('qualityPeriod', 'checklistTemplate');
+
+        $period = $this->qualityPeriod?->name ?? "Periode #{$this->quality_period_id}";
+        $template = $this->checklistTemplate?->name ?? "Template #{$this->checklist_template_id}";
+
+        return "{$template} — {$period}";
     }
 }

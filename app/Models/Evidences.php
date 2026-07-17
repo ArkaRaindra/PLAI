@@ -112,4 +112,9 @@ class Evidences extends Model
             fn (Builder $inner) => $inner->where('current_status', $status),
         );
     }
+
+    public function auditChecklistResponses(): HasMany
+    {
+        return $this->hasMany(AuditChecklistResponse::class, 'evidence_id');
+    }
 }

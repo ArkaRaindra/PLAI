@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('audit_cycles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('quality_period_id')->constrained('quality_periods')->cascadeOnDelete();
-            $table->foreignId('checklist_template_id')->constrained('audit_checklist_templates')->cascadeOnDelete();
-            $table->enum('status', ['draft', 'ongoing', 'completed','cancelled' ])->default('draft');
+            $table->foreignId('checklist_template_id')->constrained('audit_checklist_templates')->restrictOnDelete();
+            $table->string('status')->default('draft');
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->timestamps();

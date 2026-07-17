@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('audit_checklist_template_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('template_id')->constrained('audit_checklist_templates')->cascadeOnDelete();
-            $table->foreignId('standard_version_id')->constrained('standard_versions')->cascadeOnDelete();
+            $table->foreignId('standard_version_id')->nullable()->constrained('standard_versions')->nullOnDelete();
             $table->text('question');
             $table->unsignedInteger('sequence')->default(1);
             $table->string('created_by')->nullable();

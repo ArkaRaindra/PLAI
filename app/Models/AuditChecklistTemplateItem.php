@@ -29,7 +29,6 @@ class AuditChecklistTemplateItem extends Model
     protected static function booted(): void
     {
         static::creating(function (AuditChecklistTemplateItem $item): void {
-            
             if (blank($item->sequence)) {
                 $item->sequence = (int) self::query()
                     ->where('template_id', $item->template_id)

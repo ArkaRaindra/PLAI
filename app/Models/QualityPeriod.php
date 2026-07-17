@@ -7,6 +7,7 @@ use App\Filament\SuperAdmin\Resources\QualityPeriods\Tables\QualityPeriodStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class QualityPeriod extends Model
 {
@@ -46,5 +47,10 @@ class QualityPeriod extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function auditCycles(): HasMany
+    {
+        return $this->hasMany(AuditCycle::class);
     }
 }

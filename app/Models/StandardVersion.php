@@ -50,4 +50,9 @@ class StandardVersion extends Model
     {
         return $this->belongsTo(QualityPeriod::class, 'quality_period_id');
     }
+
+    public function auditChecklistTemplateItems(): HasMany
+    {
+        return $this->hasMany(AuditChecklistTemplateItem::class);
+    }
 }

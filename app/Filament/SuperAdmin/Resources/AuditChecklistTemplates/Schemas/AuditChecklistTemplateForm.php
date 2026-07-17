@@ -2,10 +2,6 @@
 
 namespace App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Schemas;
 
-use App\Models\StandardVersion;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -16,51 +12,23 @@ class AuditChecklistTemplateForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->label('Nama Template')
+                TextInput::make('code')
+                    ->label('Kode')
                     ->required()
-                    ->maxLength('255')
-                    ->columnSpanFull(),
-                Hidden::make('version_no')
-                    ->default(1.0)
-                    ->dehydrated(fn (string $operation): bool => $operation === 'create'),
-                Repeater::make('items')
-                    ->label('Item Checklist')
-                    ->relationship('items')
-                    ->orderColumn('sequence')
-                    ->visible(fn (string $operation) => $operation === 'create')
-                    ->schema([
-                        Select::make('standard_version_id')
-                            ->label('Versi Standar')
-                            ->relationship('standardVersion', 'id')
-                            ->getOptionLabelFromRecordUsing(
-                                fn (StandardVersion $record): string => "{$record->standard?->name} — {$record->version}" 
-                            )
-                            ->getSearchResultsUsing(function (string $search): array {
-                                return StandardVersion::query()
-                                    ->wirh('standard')
-                                    ->whereHas('standard', fn ($q) => $q->where('name', 'like', "%{$search}%")
-                                        ->orWhere('code', 'like', "%{search}%"))
-                                    ->limit(50)
-                                    ->get()
-                                    ->mapWithKeys(fn (StandardVersion $record): array => [
-                                        $record->id => "{$record->standard?->name} — {$record->version}",
-                                    ])
-                                    ->all();
-                            })
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Textarea::make('question')
-                            ->label('Pertanyaan')
-                            ->required()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(1)
-                    ->reorderable()
-                    ->collapsible()
-                    ->itemLabel(fn (array $state): ?string => $state['question'] ?? 'Item Baru')
-                    ->addActionLabel('Tambah Item')
+                    ->maxLength(255)
+                    ->helperText('Kode dipakai untuk mengelompokkan versi-versi dari checklist yang sama.'),
+                TextInput::make('name')
+                    ->label('Nama Checklist')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('version')
+                    ->label('Versi')
+                    ->default('1.0')
+                    ->required()
+                    ->disabled(fn (string $operation): bool => $operation === 'edit')
+                    ->dehydrated(),
+                Textarea::make('description')
+                    ->label('Deskripsi')
                     ->columnSpanFull(),
             ]);
     }
