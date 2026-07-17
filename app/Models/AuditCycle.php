@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Blameable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AuditCycle extends Model
 {
@@ -47,7 +48,7 @@ class AuditCycle extends Model
 
             if (! in_array($to, self::TRANSITIONS[$from] ?? [], true)) {
                 throw new \RuntimeException(
-                    "Transisi status dari '{from}' ke '{$to}' tidak diizinkan"
+                    "Transisi status dari '{$from}' ke '{$to}' tidak diizinkan"
                 );
             }
         });
@@ -66,5 +67,10 @@ class AuditCycle extends Model
     public function checklistTemplate(): BelongsTo
     {
         return $this->belongsTo(AuditChecklistTemplate::class, 'checklist_template_id');
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(AuditAssignment::class);
     }
 }
