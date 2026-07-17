@@ -55,4 +55,9 @@ class AuditAssignment extends Model
     {
         return $this->hasMany(AuditChecklistResponse::class);
     }
+
+    public function findings(): HasMany
+    {
+        return $this->hasMany(AuditFinding::class);
+    }
 }

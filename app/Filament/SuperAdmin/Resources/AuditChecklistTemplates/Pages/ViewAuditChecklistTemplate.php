@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Pages;
 
+use App\Filament\SuperAdmin\Resources\AuditChecklistTemplateItems\AuditChecklistTemplateItemResource;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\AuditChecklistTemplateResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -24,7 +25,7 @@ class ViewAuditChecklistTemplate extends ViewRecord
             Action::make('manageItems')
                 ->label('Kelola Item')
                 ->icon(Heroicon::ListBullet)
-                ->url(fn (): string => AuditChecklistTemplateResource::getUrl('index')),
+                ->url(fn (): string => AuditChecklistTemplateItemResource::getListUrl($this->record->id)),
             EditAction::make(),
             AuditChecklistTemplateResource::activateAction(),
             AuditChecklistTemplateResource::newVersionAction(),
