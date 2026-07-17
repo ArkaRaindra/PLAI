@@ -10,7 +10,9 @@ use App\Filament\SuperAdmin\Resources\AuditAssignments\Schemas\AuditAssignmentFo
 use App\Filament\SuperAdmin\Resources\AuditAssignments\Schemas\AuditAssignmentInfolist;
 use App\Filament\SuperAdmin\Resources\AuditAssignments\Tables\AuditAssignmentsTable;
 use App\Filament\SuperAdmin\Resources\AuditChecklistResponses\AuditChecklistResponseResource;
+use App\Filament\SuperAdmin\Resources\AuditFindings\AuditFindingResource;
 use App\Models\AuditAssignment;
+use App\Models\AuditFinding;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -41,6 +43,7 @@ class AuditAssignmentResource extends Resource
         return [
             static::getroutebaseName().'.*',
             AuditChecklistResponseResource::getRouteBaseName().'.*',
+            AuditFindingResource::getRouteBaseName().'.*',
         ];
     }
 

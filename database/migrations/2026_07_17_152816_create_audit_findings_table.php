@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('audit_findings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('audit_assignment_id')->constrained('audit_assignmentd')->cascadeOnDelete();
+            $table->foreignId('audit_assignment_id')->constrained('audit_assignments')->cascadeOnDelete();
             $table->foreignId('indicator_id')->nullable()->constrained('indicators')->nullOnDelet();
             $table->string('title');
             $table->string('category');
