@@ -32,6 +32,13 @@ class AuditAssignmentForm
                             ])
                             ->all();
                     })
+                    ->getOptionLabelUsing(function ($value): ?string {
+                        $userPosition = UserPosition::query()->with(['user', 'position'])->find($value);
+
+                        return $userPosition === null
+                            ? null
+                            : "{$userPosition->user?->name} - {$userPosition->position?->name}";
+                    })
                     ->getOptionLabelsUsing(function ($value): ?string {
                         $userPosition = UserPosition::query()->with(['user', 'position'])->find($value);
 

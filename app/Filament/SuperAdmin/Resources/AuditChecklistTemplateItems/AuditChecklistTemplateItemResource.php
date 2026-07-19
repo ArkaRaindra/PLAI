@@ -70,11 +70,11 @@ class AuditChecklistTemplateItemResource extends Resource
     public static function getListUrl(int|string $templateId): string
     {
         return static::getUrl('index').'?'.http_build_query([
-            'templateid' => $templateId,
+            'templateId' => $templateId,
         ]);
     }
 
-    public static function getCreateUrl (int|string $templateId): string
+    public static function getCreateUrl(int|string $templateId): string
     {
         return static::getUrl('create').'?'.http_build_query([
             'templateId' => $templateId,

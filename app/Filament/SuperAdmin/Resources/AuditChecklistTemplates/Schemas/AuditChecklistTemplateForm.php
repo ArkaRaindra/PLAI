@@ -21,12 +21,6 @@ class AuditChecklistTemplateForm
                     ->label('Nama Checklist')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('version')
-                    ->label('Versi')
-                    ->default('1.0')
-                    ->required()
-                    ->disabled(fn (string $operation): bool => $operation === 'edit')
-                    ->dehydrated(),
                 Textarea::make('description')
                     ->label('Deskripsi')
                     ->columnSpanFull(),

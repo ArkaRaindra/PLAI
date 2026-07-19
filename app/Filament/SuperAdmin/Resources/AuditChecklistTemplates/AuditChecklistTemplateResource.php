@@ -109,16 +109,9 @@ class AuditChecklistTemplateResource extends Resource
             ->modalDescription('Semua item pada versi ini akan disalin ke versi baru.')
             ->action(function (AuditChecklistTemplate $record): void {
                 $newVersion = DB::transaction(function () use ($record): AuditChecklistTemplate {
-                    $nextVersion = app(\App\Services\Versioning\VersionGeneratorService::class)->next(
-                        AuditChecklistTemplate::class,
-                        'code',
-                        $record->code,
-                    );
-
                     $new = AuditChecklistTemplate::query()->create([
                         'code' => $record->code,
                         'name' => $record->name,
-                        'version' => $nextVersion,
                         'description' => $record->description,
                         'is_active' => false,
                     ]);

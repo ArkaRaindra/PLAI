@@ -12,7 +12,6 @@ use App\Filament\SuperAdmin\Resources\AuditAssignments\Tables\AuditAssignmentsTa
 use App\Filament\SuperAdmin\Resources\AuditChecklistResponses\AuditChecklistResponseResource;
 use App\Filament\SuperAdmin\Resources\AuditFindings\AuditFindingResource;
 use App\Models\AuditAssignment;
-use App\Models\AuditFinding;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
