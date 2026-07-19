@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('template_id')->constrained('audit_checklist_templates')->cascadeOnDelete();
             $table->foreignId('standard_version_id')->nullable()->constrained('standard_versions')->nullOnDelete();
             $table->text('question');
-            $table->unsignedInteger('sequence')->default(1);
+            $table->integer('sequence');
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->timestamps();

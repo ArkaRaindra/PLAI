@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Blameable;
-use App\Services\Versioning\VersionGeneratorService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -13,11 +11,8 @@ class AuditChecklistTemplate extends Model
     use Blameable;
 
     protected $fillable = [
-        'code',
         'name',
-        'version',
-        'description',
-        'is_active',
+        'version_no',
         'created_by',
         'updated_by',
     ];
@@ -25,21 +20,7 @@ class AuditChecklistTemplate extends Model
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
         ];
-    }
-
-    protected static function booted(): void
-    {
-        static::creating(function (AuditChecklistTemplate $template): void {
-            if (blank($template->version)) {
-                $template->version = app(VersionGeneratorService::class)->next(
-                    self::class,
-                    'code',
-                    $template->code,
-                );
-            }
-        });
     }
 
     public function items(): HasMany
@@ -50,15 +31,5 @@ class AuditChecklistTemplate extends Model
     public function auditCycles(): HasMany
     {
         return $this->hasMany(AuditCycle::class, 'checklist_template_id');
-    }
-
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where('is_active', true);
-    }
-
-    public function versions(): HasMany
-    {
-        return $this->hasMany(self::class, 'code', 'code')->orderByDesc('id');
     }
 }

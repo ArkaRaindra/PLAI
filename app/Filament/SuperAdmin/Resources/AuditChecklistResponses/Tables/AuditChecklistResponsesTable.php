@@ -34,9 +34,6 @@ class AuditChecklistResponsesTable
                     ->wrap()
                     ->limit(80)
                     ->placeholder('-'),
-                TextColumn::make('evidence.title')
-                    ->label('Evidence')
-                    ->placeholder('-'),
             ])
             ->defaultSort('id')
             ->filters([

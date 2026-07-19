@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('audit_assignment_id')->constrained('audit_assignments')->cascadeOnDelete();
             $table->foreignId('checklist_item_id')->constrained('audit_checklist_template_items')->cascadeOnDelete();
-            $table->foreignId('evidence_id')->nullable()->constrained('evidences')->nullOnDelete();
             $table->text('answer')->nullable();
             $table->text('notes')->nullable();
             $table->string('created_by')->nullable();

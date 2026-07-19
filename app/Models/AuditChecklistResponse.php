@@ -13,7 +13,6 @@ class AuditChecklistResponse extends Model
     protected $fillable = [
         'audit_assignment_id',
         'checklist_item_id',
-        'evidence_id',
         'answer',
         'notes',
         'created_by',
@@ -28,10 +27,5 @@ class AuditChecklistResponse extends Model
     public function checklistItem(): BelongsTo
     {
         return $this->belongsTo(AuditChecklistTemplateItem::class, 'checklist_item_id');
-    }
-
-    public function evidence(): BelongsTo
-    {
-        return $this->belongsTo(Evidences::class, 'evidence_id');
     }
 }

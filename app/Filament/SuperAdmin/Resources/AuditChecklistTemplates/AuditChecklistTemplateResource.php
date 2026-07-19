@@ -11,6 +11,7 @@ use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Schemas\AuditCheck
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Schemas\AuditChecklistTemplateInfolist;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Tables\AuditChecklistTemplatesTable;
 use App\Models\AuditChecklistTemplate;
+use App\Services\Versioning\VersionGeneratorService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -76,44 +77,26 @@ class AuditChecklistTemplateResource extends Resource
         ];
     }
 
-    public static function activateAction(): Action
-    {
-        return Action::make('activate')
-            ->label('Aktifkan')
-            ->icon(Heroicon::CheckCircle)
-            ->color('success')
-            ->requiresConfirmation()
-            ->modalDescription('Versi lain dari checklist ini (jika ada) akan dinonaktifkan.')
-            ->visible(fn (AuditChecklistTemplate $record): bool => ! $record->is_active)
-            ->action(function (AuditChecklistTemplate $record): void {
-                DB::transaction(function () use ($record): void {
-                    AuditChecklistTemplate::query()
-                        ->where('code', $record->code)
-                        ->where('id', '!=', $record->id)
-                        ->update(['is_active' => false]);
-
-                    $record->update(['is_active' => true]);
-                });
-
-                Notification::make()->title('Checklist template diaktifkan')->success()->send();
-            });
-    }
-
     public static function newVersionAction(): Action
     {
         return Action::make('newVersion')
-            ->label('Buat Versi Baru')
+            ->label('Buat Versi')
             ->icon(Heroicon::DocumentDuplicate)
             ->color('gray')
             ->requiresConfirmation()
             ->modalDescription('Semua item pada versi ini akan disalin ke versi baru.')
             ->action(function (AuditChecklistTemplate $record): void {
                 $newVersion = DB::transaction(function () use ($record): AuditChecklistTemplate {
+                    $versionNo = app(VersionGeneratorService::class)->next(
+                        AuditChecklistTemplate::class,
+                        'name',
+                        $record->name,
+                        'version_no',
+                    );
+
                     $new = AuditChecklistTemplate::query()->create([
-                        'code' => $record->code,
                         'name' => $record->name,
-                        'description' => $record->description,
-                        'is_active' => false,
+                        'version_no' => $versionNo,
                     ]);
 
                     foreach ($record->items()->get() as $item) {
@@ -128,9 +111,11 @@ class AuditChecklistTemplateResource extends Resource
                 });
 
                 Notification::make()
-                    ->title("Versi baru {$newVersion->version} berhasil dibuat")
+                    ->title("Versi baru v{$newVersion->version_no} berhasil dibuat")
                     ->success()
                     ->send();
+
+                redirect(static::getUrl('edit', ['record' => $newVersion]));
             });
     }
 }

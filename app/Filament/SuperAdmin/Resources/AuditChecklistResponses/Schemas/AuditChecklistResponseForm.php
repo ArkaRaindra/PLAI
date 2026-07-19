@@ -53,15 +53,6 @@ class AuditChecklistResponseForm
                     ->label('Catatan Auditor')
                     ->rows(3)
                     ->columnSpanFull(),
-                Select::make('evidence_id')
-                    ->label('Evidence Pendukung')
-                    ->relationship(
-                        name: 'evidence',
-                        titleAttribute: 'title'
-                    )
-                    ->searchable()
-                    ->preload()
-                    ->helperText('Lampirkan evidence pendukung jawaban ini'),
             ]);
     }
 }

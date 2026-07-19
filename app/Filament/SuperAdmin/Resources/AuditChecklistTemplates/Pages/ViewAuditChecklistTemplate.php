@@ -26,9 +26,8 @@ class ViewAuditChecklistTemplate extends ViewRecord
                 ->label('Kelola Item')
                 ->icon(Heroicon::ListBullet)
                 ->url(fn (): string => AuditChecklistTemplateItemResource::getListUrl($this->record->id)),
-            EditAction::make(),
-            AuditChecklistTemplateResource::activateAction(),
             AuditChecklistTemplateResource::newVersionAction(),
+            EditAction::make(),
         ];
     }
 }

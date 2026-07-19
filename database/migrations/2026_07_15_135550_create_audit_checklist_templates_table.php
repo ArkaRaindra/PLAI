@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('audit_checklist_templates', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
             $table->string('name');
-            $table->string('version');
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(false);
+            $table->string('version_no');
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->timestamps();

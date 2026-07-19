@@ -7,9 +7,11 @@ use App\Filament\SuperAdmin\Resources\AuditChecklistResponses\AuditChecklistResp
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
+use Livewire\Attributes\Url;
 
 class CreateAuditChecklistResponse extends CreateRecord
 {
+    #[Url]
     public ?string $auditAssignmentId = null;
 
     protected static string $resource = AuditChecklistResponseResource::class;

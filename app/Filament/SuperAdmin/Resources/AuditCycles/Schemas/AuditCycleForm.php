@@ -21,12 +21,10 @@ class AuditCycleForm
                 Select::make('checklist_template_id')
                     ->label('Checklist Template')
                     ->options(fn () => AuditChecklistTemplate::query()
-                        ->active()
                         ->get()
                         ->mapWithKeys(fn (AuditChecklistTemplate $template): array => [
-                            $template->id => "{$template->name} (v{$template->version})",
+                            $template->id => "{$template->name} (v{$template->version_no})",
                         ]))
-                    ->helperText('Hanya checklist template yang berstatus aktif yang dapat dipilih.')
                     ->searchable()
                     ->preload()
                     ->required(),

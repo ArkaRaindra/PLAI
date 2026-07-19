@@ -11,9 +11,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class AuditChecklistTemplatesTable
@@ -22,20 +20,13 @@ class AuditChecklistTemplatesTable
     {
         return $table
             ->columns([
-                TextColumn::make('code')
-                    ->label('Kode')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('version')
+                TextColumn::make('version_no')
                     ->label('Versi')
-                    ->badge(),
-                IconColumn::make('is_active')
-                    ->label('Aktif')
-                    ->boolean(),
+                    ->sortable(),
                 TextColumn::make('items_count')
                     ->label('Jumlah Item')
                     ->counts('items')
@@ -45,9 +36,6 @@ class AuditChecklistTemplatesTable
                     ->dateTime()
                     ->sortable(),
             ])
-            ->filters([
-                TernaryFilter::make('is_active')->label('Status Aktif'),
-            ])
             ->recordActions(ActionGroup::make([
                 ViewAction::make(),
                 EditAction::make(),
@@ -55,7 +43,6 @@ class AuditChecklistTemplatesTable
                     ->label('Kelola Item')
                     ->icon(Heroicon::ListBullet)
                     ->url(fn (AuditChecklistTemplate $record): string => AuditChecklistTemplateItemResource::getListUrl($record->id)),
-                AuditChecklistTemplateResource::activateAction(),
                 AuditChecklistTemplateResource::newVersionAction(),
                 DeleteAction::make(),
             ]));

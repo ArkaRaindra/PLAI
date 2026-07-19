@@ -16,15 +16,8 @@ class AuditChecklistTemplateInfolist
                 Section::make('Checklist Template')
                     ->schema([
                         Grid::make(2)->schema([
-                            TextEntry::make('code')->label('Kode'),
                             TextEntry::make('name')->label('Nama'),
-                            TextEntry::make('version')->label('Versi'),
-                            TextEntry::make('is_active')
-                                ->label('Status')
-                                ->badge()
-                                ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Tidak Aktif')
-                                ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
-                            TextEntry::make('description')->label('Deskripsi')->placeholder('-')->columnSpanFull(),
+                            TextEntry::make('version_no')->label('Versi'),
                         ]),
                     ]),
             ]);

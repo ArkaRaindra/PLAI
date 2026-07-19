@@ -27,6 +27,12 @@ class AuditCycle extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (AuditCycle $cycle): void {
+            if (blank($cycle->status)) {
+                $cycle->status = 'draft';
+            }
+        });
+
         static::saving(function (AuditCycle $cycle): void {
             if (! $cycle->exists || ! $cycle->isDirty('status')) {
                 return;
