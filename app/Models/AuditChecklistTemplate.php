@@ -23,6 +23,15 @@ class AuditChecklistTemplate extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function (AuditChecklistTemplate $template): void {
+            if (blank($template->version_no)) {
+                $template->version_no = '1.0';
+            }
+        });
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(AuditChecklistTemplateItem::class, 'template_id')->orderBy('sequence');

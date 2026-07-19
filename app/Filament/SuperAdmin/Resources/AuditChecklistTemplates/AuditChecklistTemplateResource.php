@@ -80,7 +80,7 @@ class AuditChecklistTemplateResource extends Resource
     public static function newVersionAction(): Action
     {
         return Action::make('newVersion')
-            ->label('Buat Versi')
+            ->label('Buat Versi Baru')
             ->icon(Heroicon::DocumentDuplicate)
             ->color('gray')
             ->requiresConfirmation()

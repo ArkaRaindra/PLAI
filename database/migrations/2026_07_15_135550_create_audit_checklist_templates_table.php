@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('audit_checklist_templates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('version_no');
+            $table->string('version_no')->default('1.0');
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->timestamps();

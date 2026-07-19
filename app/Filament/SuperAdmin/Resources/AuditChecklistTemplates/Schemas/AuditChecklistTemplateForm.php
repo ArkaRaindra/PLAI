@@ -15,11 +15,6 @@ class AuditChecklistTemplateForm
                     ->label('Nama Checklist')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('version_no')
-                    ->label('Versi')
-                    ->numeric()
-                    ->default('1.0')
-                    ->required(),
             ]);
     }
 }

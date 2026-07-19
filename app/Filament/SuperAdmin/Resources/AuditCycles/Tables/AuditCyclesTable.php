@@ -21,13 +21,13 @@ class AuditCyclesTable
     {
         return $table
             ->columns([
+                TextColumn::make('checklistTemplate.name')
+                    ->label('Checklist Template')
+                    ->searchable(),
                 TextColumn::make('qualityPeriod.name')
                     ->label('Periode')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('checklistTemplate.name')
-                    ->label('Checklist Template')
-                    ->searchable(),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()

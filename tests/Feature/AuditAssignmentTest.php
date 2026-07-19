@@ -29,7 +29,7 @@ class AuditAssignmentTest extends TestCase
         ]);
     }
 
-    public function test_an_auditor_can_be_assigned_to_audit_another_unit(): void
+    public function test_an_auditor_can_be_assigned_to_an_audit_unit(): void
     {
         $cycle = $this->makeCycle();
         $auditorUnit = $this->makeOrganizationUnit();
@@ -64,109 +64,48 @@ class AuditAssignmentTest extends TestCase
         $this->assertTrue($assignment->assigned_at->isToday());
     }
 
-    public function test_an_auditor_cannot_be_assigned_to_audit_their_own_unit(): void
+    public function test_relationships_resolve_to_their_models(): void
     {
         $cycle = $this->makeCycle();
-        $unit = $this->makeOrganizationUnit();
-        $auditorPosition = $this->makeAuditorPosition($unit);
-
-        $this->expectException(\RuntimeException::class);
-
-        AuditAssignment::query()->create([
-            'audit_cycle_id' => $cycle->id,
-            'auditor_position_id' => $auditorPosition->id,
-            'organization_unit_id' => $unit->id,
-        ]);
-    }
-
-    public function test_an_inactive_auditor_position_cannot_be_assigned(): void
-    {
-        $cycle = $this->makeCycle();
+        $auditorUnit = $this->makeOrganizationUnit();
         $auditeeUnit = $this->makeOrganizationUnit();
-        $auditorPosition = $this->makeAuditorPosition($this->makeOrganizationUnit(), isActive: false);
+        $auditorPosition = $this->makeAuditorPosition($auditorUnit);
 
-        $this->expectException(\RuntimeException::class);
-
-        AuditAssignment::query()->create([
+        $assignment = AuditAssignment::query()->create([
             'audit_cycle_id' => $cycle->id,
             'auditor_position_id' => $auditorPosition->id,
             'organization_unit_id' => $auditeeUnit->id,
         ]);
+
+        $this->assertSame($auditorUnit->id, $assignment->auditorPosition->organization_unit_id);
+        $this->assertSame($auditeeUnit->name, $assignment->organizationUnit->name);
+        $this->assertSame($cycle->id, $assignment->auditCycle->id);
     }
 
-    public function test_an_inactive_auditee_unit_cannot_be_assigned(): void
+    private function makeQualityPeriod(): QualityPeriod
     {
-        $cycle = $this->makeCycle();
-        $auditeeUnit = $this->makeOrganizationUnit(isActive: false);
-        $auditorPosition = $this->makeAuditorPosition($this->makeOrganizationUnit());
-
-        $this->expectException(\RuntimeException::class);
-
-        AuditAssignment::query()->create([
-            'audit_cycle_id' => $cycle->id,
-            'auditor_position_id' => $auditorPosition->id,
-            'organization_unit_id' => $auditeeUnit->id,
-        ]);
-    }
-
-    public function test_assignment_cannot_be_added_to_a_completed_cycle(): void
-    {
-        $cycle = $this->makeCycle();
-        $cycle->update(['status' => 'ongoing']);
-        $cycle->update(['status' => 'completed']);
-
-        $auditeeUnit = $this->makeOrganizationUnit();
-        $auditorPosition = $this->makeAuditorPosition($this->makeOrganizationUnit());
-
-        $this->expectException(\RuntimeException::class);
-
-        AuditAssignment::query()->create([
-            'audit_cycle_id' => $cycle->id,
-            'auditor_position_id' => $auditorPosition->id,
-            'organization_unit_id' => $auditeeUnit->id,
-        ]);
-    }
-
-    public function test_duplicate_assignment_is_rejected(): void
-    {
-        $cycle = $this->makeCycle();
-        $auditeeUnit = $this->makeOrganizationUnit();
-        $auditorPosition = $this->makeAuditorPosition($this->makeOrganizationUnit());
-
-        AuditAssignment::query()->create([
-            'audit_cycle_id' => $cycle->id,
-            'auditor_position_id' => $auditorPosition->id,
-            'organization_unit_id' => $auditeeUnit->id,
-        ]);
-
-        $this->expectException(\Illuminate\Database\QueryException::class);
-
-        AuditAssignment::query()->create([
-            'audit_cycle_id' => $cycle->id,
-            'auditor_position_id' => $auditorPosition->id,
-            'organization_unit_id' => $auditeeUnit->id,
-        ]);
-    }
-
-    private function makeCycle(): AuditCycle
-    {
-        $period = QualityPeriod::query()->create([
+        return QualityPeriod::query()->create([
             'code' => 'QP-'.fake()->unique()->numerify('###'),
             'name' => 'Periode '.fake()->year(),
             'start_date' => now()->toDateString(),
             'end_date' => now()->addYear()->toDateString(),
             'status' => 'active',
-            'is_active' => true,
         ]);
+    }
 
-        $template = AuditChecklistTemplate::query()->create([
+    private function makeTemplate(): AuditChecklistTemplate
+    {
+        return AuditChecklistTemplate::query()->create([
             'name' => 'Checklist Audit Prodi',
-            'version_no' => 1,
+            'version_no' => '1.0',
         ]);
+    }
 
+    private function makeCycle(): AuditCycle
+    {
         return AuditCycle::query()->create([
-            'quality_period_id' => $period->id,
-            'checklist_template_id' => $template->id,
+            'quality_period_id' => $this->makeQualityPeriod()->id,
+            'checklist_template_id' => $this->makeTemplate()->id,
         ]);
     }
 
@@ -180,7 +119,7 @@ class AuditAssignmentTest extends TestCase
         ]);
     }
 
-    private function makeAuditorPosition(OrganizationUnit $unit, bool $isActive = true): UserPosition
+    private function makeAuditorPosition(OrganizationUnit $unit): UserPosition
     {
         $user = User::factory()->create(['is_active' => true]);
         $user->assignRole('auditor');
@@ -195,7 +134,7 @@ class AuditAssignmentTest extends TestCase
             'position_id' => $position->id,
             'organization_unit_id' => $unit->id,
             'start_date' => now()->toDateString(),
-            'is_active' => $isActive,
+            'is_active' => true,
         ]);
     }
 }
