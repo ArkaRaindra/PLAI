@@ -40,7 +40,7 @@ class AuditAssignmentResource extends Resource
     public static function getNavigationItemActiveRoutePattern(): string|array
     {
         return [
-            static::getroutebaseName().'.*',
+            static::getRouteBaseName().'.*',
             AuditChecklistResponseResource::getRouteBaseName().'.*',
             AuditFindingResource::getRouteBaseName().'.*',
         ];

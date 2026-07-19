@@ -16,7 +16,7 @@ class EditAuditCycle extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-           Action::make('back')
+            Action::make('back')
                 ->label('Kembali')
                 ->url($this->getResource()::getUrl('index'))
                 ->button()

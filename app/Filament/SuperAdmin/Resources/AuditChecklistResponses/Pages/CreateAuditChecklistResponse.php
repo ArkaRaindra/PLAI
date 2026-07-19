@@ -78,6 +78,6 @@ class CreateAuditChecklistResponse extends CreateRecord
     protected function getCancelFormAction(): Action
     {
         return parent::getCancelFormAction()
-            ->url(AuditChecklistResponseResource::getlistUrl($this->auditAssignmentId));
+            ->url(AuditChecklistResponseResource::getListUrl($this->auditAssignmentId));
     }
 }

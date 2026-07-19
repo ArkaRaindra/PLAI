@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\Services\Versioning\VersionGeneratorService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -55,7 +56,7 @@ class AuditChecklistTemplate extends Model
     {
         return $query->where('is_active', true);
     }
-    
+
     public function versions(): HasMany
     {
         return $this->hasMany(self::class, 'code', 'code')->orderByDesc('id');

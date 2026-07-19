@@ -9,7 +9,7 @@ class CreateAuditCycle extends CreateRecord
 {
     protected static string $resource = AuditCycleResource::class;
 
-    protected function getRedirecturl(): string
+    protected function getRedirectUrl(): string
     {
         return static::$resource::getUrl('index');
     }

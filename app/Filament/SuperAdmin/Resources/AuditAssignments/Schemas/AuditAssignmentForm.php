@@ -13,10 +13,10 @@ class AuditAssignmentForm
     {
         return $schema
             ->components([
-                Hidden::make('audit_cycle-id'),
+                Hidden::make('audit_cycle_id'),
                 Select::make('auditor_position_id')
                     ->label('Auditor')
-                    ->helpertext('Auditor dipilih berdasarkan jabatan yang sedang aktif')
+                    ->helperText('Auditor dipilih berdasarkan jabatan yang sedang aktif')
                     ->searchable()
                     ->preload()
                     ->required()

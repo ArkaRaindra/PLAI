@@ -9,7 +9,7 @@ class CreateAuditChecklistTemplate extends CreateRecord
 {
     protected static string $resource = AuditChecklistTemplateResource::class;
 
-    protected function getRedirecturl(): string
+    protected function getRedirectUrl(): string
     {
         return static::$resource::getUrl('index');
     }

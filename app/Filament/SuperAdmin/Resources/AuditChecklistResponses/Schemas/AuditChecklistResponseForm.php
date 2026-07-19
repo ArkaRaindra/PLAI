@@ -23,7 +23,7 @@ class AuditChecklistResponseForm
                     ->required()
                     ->searchable()
                     ->options(function (Get $get, ?AuditChecklistResponse $record = null) {
-                        $assignmentId = $get('audit_assignment-id');
+                        $assignmentId = $get('audit_assignment_id');
 
                         if (blank($assignmentId)) {
                             return [];
@@ -36,7 +36,7 @@ class AuditChecklistResponseForm
                         }
 
                         $answered = $assignment->responses()
-                            ->when($record, fn ($query) => $query->where('id', '1=', $record->id))
+                            ->when($record, fn ($query) => $query->where('id', '!=', $record->id))
                             ->pluck('checklist_item_id');
 
                         return AuditChecklistTemplateItem::query()

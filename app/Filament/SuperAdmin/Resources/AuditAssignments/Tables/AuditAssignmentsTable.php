@@ -48,7 +48,7 @@ class AuditAssignmentsTable
                     ->label('Isi Checklist')
                     ->icon(Heroicon::ChatBubbleLeftRight)
                     ->url(fn (AuditAssignment $record): string => AuditChecklistResponseResource::getListUrl($record->id)),
-                 Action::make('manageFindings')
+                Action::make('manageFindings')
                     ->label('Kelola Temuan')
                     ->icon(Heroicon::ExclamationTriangle)
                     ->url(fn (AuditAssignment $record): string => AuditFindingResource::getListUrl($record->id)),
