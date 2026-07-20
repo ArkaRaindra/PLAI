@@ -79,8 +79,12 @@ class SelfAssessmentInfolist
                                             TextEntry::make('realization.target.indicator.code')->label('Kode Indikator')->badge(),
                                             TextEntry::make('realization.target.indicator.name')->label('Indikator'),
                                             TextEntry::make('realization.target.target_value')->label('Nilai Target')->numeric(decimalPlaces: 2),
-                                            TextEntry::make('realization.id')->label('Realisasi #'),
-                                            TextEntry::make('realization.score')->label('Skor Realisasi')->numeric(decimalPlaces: 2),
+                                            TextEntry::make('realization.actual_value')->label('Nilai Realisasi')->numeric(decimalPlaces: 2),
+                                            TextEntry::make('realization_percentage')
+                                                ->label('Persentase Realisasi')
+                                                ->state(fn ($record): float => SelfAssessmentInfolist::realizationPercentage($record))
+                                                ->numeric(decimalPlaces: 2)
+                                                ->suffix('%'),
                                             TextEntry::make('analysis')->label('Analisis')->placeholder('-')->columnSpanFull(),
                                             TextEntry::make('strength')->label('Kekuatan')->placeholder('-')->columnSpanFull(),
                                             TextEntry::make('weakness')->label('Kelemahan')->placeholder('-')->columnSpanFull(),
@@ -90,5 +94,16 @@ class SelfAssessmentInfolist
                         ])->columnSpan(1),
                     ]),
             ]);
+    }
+
+    private static function realizationPercentage($detail): float
+    {
+        $realization = $detail?->realization;
+
+        if (! $realization || $realization->target === null || (float) $realization->target->target_value === 0.0) {
+            return 0.0;
+        }
+
+        return ((float) $realization->actual_value / (float) $realization->target->target_value) * 100;
     }
 }
