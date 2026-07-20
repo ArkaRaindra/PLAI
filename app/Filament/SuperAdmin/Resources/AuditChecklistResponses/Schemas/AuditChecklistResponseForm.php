@@ -6,6 +6,7 @@ use App\Models\AuditAssignment;
 use App\Models\AuditChecklistResponse;
 use App\Models\AuditChecklistTemplateItem;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Utilities\Get;
@@ -19,9 +20,10 @@ class AuditChecklistResponseForm
             ->components([
                 Hidden::make('audit_assignment_id'),
                 Select::make('checklist_item_id')
-                    ->label('Item Checklist')
+                    ->label('Nomor Item Checklist')
                     ->required()
                     ->searchable()
+                    ->reactive()
                     ->options(function (Get $get, ?AuditChecklistResponse $record = null) {
                         $assignmentId = $get('audit_assignment_id');
 
@@ -43,8 +45,22 @@ class AuditChecklistResponseForm
                             ->where('template_id', $assignment->auditCycle->checklist_template_id)
                             ->whereNotIn('id', $answered)
                             ->orderBy('sequence')
-                            ->pluck('question', 'id');
+                            ->pluck('sequence', 'id');
                     }),
+                Placeholder::make('checklist_item_question')
+                    ->label('Pertanyaan')
+                    ->live()
+                    ->visible(fn (Get $get): bool => filled($get('checklist_item_id')))
+                    ->content(function (Get $get): string {
+                        $itemId = $get('checklist_item_id');
+
+                        if (blank($itemId)) {
+                            return '';
+                        }
+
+                        return (string) AuditChecklistTemplateItem::query()->where('id', $itemId)->value('question') ?? '';
+                    })
+                    ->columnSpanFull(),
                 Textarea::make('answer')
                     ->label('Jawaban')
                     ->rows(3)

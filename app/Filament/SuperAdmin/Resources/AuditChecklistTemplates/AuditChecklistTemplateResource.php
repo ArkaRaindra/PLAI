@@ -7,6 +7,7 @@ use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Pages\CreateAuditC
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Pages\EditAuditChecklistTemplate;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Pages\ListAuditChecklistTemplates;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Pages\ViewAuditChecklistTemplate;
+use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\RelationManagers\AuditChecklistTemplateItemsRelationManager;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Schemas\AuditChecklistTemplateForm;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Schemas\AuditChecklistTemplateInfolist;
 use App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\Tables\AuditChecklistTemplatesTable;
@@ -63,7 +64,7 @@ class AuditChecklistTemplateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AuditChecklistTemplateItemsRelationManager::class,
         ];
     }
 

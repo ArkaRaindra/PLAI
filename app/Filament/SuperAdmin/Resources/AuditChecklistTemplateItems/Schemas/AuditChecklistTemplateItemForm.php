@@ -32,7 +32,7 @@ class AuditChecklistTemplateItemForm
                             ->limit(50)
                             ->get()
                             ->mapWithKeys(fn (StandardVersion $version): array => [
-                                $version->id => "{$version->standard?->name} (v{$version->version})",
+                                $version->id => "{$version->standard?->name} ({$version->version})",
                             ])
                             ->all();
                     })

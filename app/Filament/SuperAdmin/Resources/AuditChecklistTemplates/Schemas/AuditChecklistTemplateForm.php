@@ -12,7 +12,7 @@ class AuditChecklistTemplateForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Nama Checklist')
+                    ->label('Nama Template Checklist')
                     ->required()
                     ->maxLength(255),
             ]);

@@ -50,7 +50,7 @@ class CreateAuditChecklistResponse extends CreateRecord
 
         return [
             Action::make('back')
-                ->label('kembali')
+                ->label('Kembali')
                 ->url(AuditChecklistResponseResource::getListUrl($this->auditAssignmentId))
                 ->button()
                 ->color('gray')

@@ -21,7 +21,7 @@ class AuditChecklistTemplatesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama')
+                    ->label('Nama Template')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('version_no')

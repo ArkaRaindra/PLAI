@@ -1,19 +1,27 @@
 <?php
 
-namespace App\Filament\SuperAdmin\Resources\AuditChecklistTemplateItems\Tables;
+namespace App\Filament\SuperAdmin\Resources\AuditChecklistTemplates\RelationManagers;
 
 use App\Models\AuditChecklistTemplateItem;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class AuditChecklistTemplateItemsTable
+class AuditChecklistTemplateItemsRelationManager extends RelationManager
 {
-    public static function configure(Table $table): Table
+    protected static string $relationship = 'items';
+
+    protected static ?string $title = 'Item Checklist';
+
+    public function isReadOnly(): bool
+    {
+        return true;
+    }
+
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('question')
             ->columns([
                 TextColumn::make('sequence')
                     ->label('No.')
@@ -30,10 +38,9 @@ class AuditChecklistTemplateItemsTable
                         : '-'),
             ])
             ->defaultSort('sequence')
-            ->reorderable('sequence')
-            ->recordActions(ActionGroup::make([
-                EditAction::make(),
-                DeleteAction::make(),
-            ]));
+            ->headerActions([])
+            ->recordActions([])
+            ->toolbarActions([])
+            ->bulkActions([]);
     }
 }
