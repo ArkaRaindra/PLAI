@@ -34,14 +34,4 @@ class EditAuditChecklistTemplate extends EditRecord
                 ->icon(Heroicon::Trash),
         ];
     }
-
-    protected function getCancelFormAction(): Action
-    {
-        return parent::getCancelFormAction()->hidden();
-    }
-
-    protected function getSaveFormAction(): Action
-    {
-        return parent::getSaveFormAction()->hidden();
-    }
 }

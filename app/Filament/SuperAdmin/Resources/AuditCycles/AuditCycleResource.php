@@ -7,11 +7,9 @@ use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\CreateAuditCycle;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\EditAuditCycle;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\ListAuditCycles;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Pages\ViewAuditCycle;
-use App\Filament\SuperAdmin\Resources\AuditCycles\RelationManagers\AssignmentsRelationManager;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Schemas\AuditCycleForm;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Schemas\AuditCycleInfolist;
 use App\Filament\SuperAdmin\Resources\AuditCycles\Tables\AuditCyclesTable;
-use App\Models\AuditAssignment;
 use App\Models\AuditCycle;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -20,7 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Override;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 class AuditCycleResource extends Resource
@@ -86,7 +84,7 @@ class AuditCycleResource extends Resource
             ->icon(Heroicon::Play)
             ->color('success')
             ->requiresConfirmation()
-            ->visible(fn (AuditCycle $record): bool => $record->canTransitionTo('active'))
+            ->visible(fn (AuditCycle $record): bool => $record->canTransitionTo('active') || Auth::user()?->hasRole('super-admin') ?? false)
             ->action(function (AuditCycle $record): void {
                 $record->update(['status' => 'active']);
 
@@ -102,7 +100,7 @@ class AuditCycleResource extends Resource
             ->color('danger')
             ->requiresConfirmation()
             ->modalDescription('Siklus audit yang ditutup tidak dapat menerima penugasan baru.')
-            ->visible(fn (AuditCycle $record): bool => $record->canTransitionTo('closed'))
+            ->visible(fn (AuditCycle $record): bool => $record->canTransitionTo('closed') || Auth::user()?->hasRole('super-admin') ?? false)
             ->action(function (AuditCycle $record): void {
                 $record->update(['status' => 'closed']);
 

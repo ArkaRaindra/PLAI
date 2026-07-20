@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class AuditFindingResource extends Resource
 {
@@ -90,7 +91,7 @@ class AuditFindingResource extends Resource
             ->icon(Heroicon::CheckBadge)
             ->color('success')
             ->requiresConfirmation()
-            ->visible(fn (AuditFinding $record): bool => $record->status === 'open')
+            ->visible(fn (AuditFinding $record): bool => $record->status === 'open' || Auth::user()?->hasRole('super-admin') ?? false)
             ->action(function (AuditFinding $record): void {
                 $record->close();
 
