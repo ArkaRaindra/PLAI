@@ -17,6 +17,8 @@ class ListEvidenceReviews extends ListRecords
 
     protected function getTableQuery(): Builder
     {
-        return EvidenceReview::query()->pending();
+        return EvidenceReview::query()
+            ->pending()
+            ->with(['evidence.organizationUnit', 'evidence.createdBy']);
     }
 }

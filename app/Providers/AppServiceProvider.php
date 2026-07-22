@@ -89,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function configureSuperAdminGate(): void
     {
-        Gate::before(function (User $user, string $ability, mixed $result): ?bool {
+        Gate::before(function (User $user, string $ability, mixed $arguments): ?bool {
             if ($user->hasRole('super-admin')) {
                 return true;
             }

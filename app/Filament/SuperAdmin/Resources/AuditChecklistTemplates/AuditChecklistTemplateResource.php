@@ -116,7 +116,7 @@ class AuditChecklistTemplateResource extends Resource
                     ->success()
                     ->send();
 
-                redirect(static::getUrl('edit', ['record' => $newVersion]));
+                redirect(static::getUrl('index', ['record' => $newVersion]));
             });
     }
 }

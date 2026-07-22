@@ -58,7 +58,7 @@ class RealizationForm
                             )
                             ->orderBy('name')
                             ->get()
-                            ->mapWithKeys(fn (OrganizationUnit $record): array => [$record->id => "{$record->code} — {$record->name}"])
+                            ->mapWithKeys(fn (OrganizationUnit $record): array => [$record->id => "{$record->name}"])
                             ->all();
                     })
                     ->searchable(['code', 'name'])
