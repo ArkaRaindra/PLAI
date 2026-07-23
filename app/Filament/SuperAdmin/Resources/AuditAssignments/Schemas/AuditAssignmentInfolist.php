@@ -6,6 +6,7 @@ use App\Filament\SuperAdmin\Resources\AuditAssignments\AuditAssignmentResource;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -15,30 +16,41 @@ class AuditAssignmentInfolist
     {
         return $schema
             ->components([
-                Section::make('Audit Assignment')
+                Grid::make(['default' => 1, 'lg' => 2])
+                    ->columnSpanFull()
                     ->schema([
-                        TextEntry::make('auditorPosition.user.name')->label('Auditor'),
-                        TextEntry::make('auditorPosition.position.name')->label('Jabatan'),
-                        TextEntry::make('organizationUnit.name')->label('Unit Auditee'),
-                        TextEntry::make('assigned_at')->label('Tanggal Penugasan')->dateTime(),
-                    ])
-                    ->columns(2)
-                    ->columnSpanFull(),
-                Section::make('Status Auditor Workflow')
-                    ->schema([
-                        TextEntry::make('workflowInstance.current_status')
-                            ->label('Status Saat ini')
-                            ->badge()
-                            ->formatStateUsing(fn (?string $state): string => $state !== null
-                                ? (AuditAssignmentResource::workflowStatusLabels()[$state] ?? $state )
-                                : '-')
-                            ->color(fn (?string $state): string => $state !== null
-                                ? (AuditAssignmentResource::workflowStatusColors()[$state] ?? 'gray')
-                                : 'gray'),
-                        RepeatableEntry::make('workflowInstance.histories')
-                            ->label('Riwayat')
-                            ->schema([
-                                Grid::make(3)->schema([
+                        Group::make([
+                            Section::make('Audit Assignment')
+                                ->schema([
+                                    Grid::make(2)->schema([
+                                        TextEntry::make('auditorPosition.user.name')->label('Auditor'),
+                                        TextEntry::make('auditorPosition.position.name')->label('Jabatan'),
+                                        TextEntry::make('organizationUnit.name')->label('Unit Auditee'),
+                                        TextEntry::make('assigned_at')->label('Tanggal Penugasan')->dateTime(),
+                                        TextEntry::make('createdBy.name')->label('Dibuat Oleh')->placeholder('-'),
+                                        TextEntry::make('updatedBy.name')->label('Diperbarui Oleh')->placeholder('-'),
+                                        TextEntry::make('created_at')->label('Dibuat')->dateTime(),
+                                        TextEntry::make('updated_at')->label('Diperbarui')->dateTime(),
+                                    ]),
+                                ]),
+                        ])->columnSpan(1),
+
+                        Group::make([
+                            Section::make('Status Auditor Workflow')
+                                ->schema([
+                                    TextEntry::make('workflowInstance.current_status')
+                                        ->label('Status Saat Ini')
+                                        ->badge()
+                                        ->formatStateUsing(fn (?string $state): string => $state !== null
+                                            ? (AuditAssignmentResource::workflowStatusLabels()[$state] ?? $state)
+                                            : '-')
+                                        ->color(fn (?string $state): string => $state !== null
+                                            ? (AuditAssignmentResource::workflowStatusColors()[$state] ?? 'gray')
+                                            : 'gray'),
+                                ]),
+                            RepeatableEntry::make('workflowInstance.histories')
+                                ->label('Riwayat Status')
+                                ->schema([
                                     TextEntry::make('status')
                                         ->label('Status')
                                         ->badge()
@@ -47,11 +59,10 @@ class AuditAssignmentInfolist
                                     TextEntry::make('actor.name')->label('Oleh')->placeholder('-'),
                                     TextEntry::make('acted_at')->label('Pada')->dateTime(),
                                     TextEntry::make('notes')->label('Catatan')->placeholder('-')->columnSpanFull(),
-                                ]),
-                            ])
-                            ->columnSpanFull(),
-                    ])
-                    ->columnSpanFull(),
+                                ])
+                                ->columns(3),
+                        ])->columnSpan(1),
+                    ]),
             ]);
     }
 }
