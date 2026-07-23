@@ -14,7 +14,6 @@ use App\Models\Evidences;
 use App\Models\WorkflowInstance;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -191,6 +190,29 @@ class EvidencesResource extends Resource
                 self::syncReviewNotes($record, $data['notes'], 'rejected');
 
                 Notification::make()->title('Evidence ditolak')->danger()->send();
+            });
+    }
+
+    /**
+     * Send a rejected evidence back to draft so it can be revised and
+     * re-submitted. Requires the "rejected -> draft" transition to be allowed.
+     */
+    public static function reviseAction(): Action
+    {
+        return Action::make('revise')
+            ->label('Kirim Ulang')
+            ->icon(Heroicon::ArrowUturnLeft)
+            ->color('warning')
+            ->requiresConfirmation()
+            ->modalHeading('Kirim Ulang Evidence')
+            ->modalDescription('Evidence akan dikembalikan ke status draft untuk direvisi sebelum diajukan kembali.')
+            ->modalSubmitActionLabel('Ya, Kirim Ulang')
+            ->authorize(fn (Evidences $record): bool => self::authorizeWorkflow('revise', $record))
+            ->action(function (Evidences $record, array $data): void {
+                self::transitionForAction($record, 'draft', $data['notes'] ?? null);
+                self::syncReviewNotes($record, $data['notes'] ?? null, 'pending');
+
+                Notification::make()->title('Evidence dikembalikan ke draft untuk direvisi')->success()->send();
             });
     }
 

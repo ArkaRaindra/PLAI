@@ -63,7 +63,7 @@ class EvidenceRejectedNotification extends Notification implements ShouldQueue
         $message = "Evidence \"{$this->evidence->title}\" yang Anda ajukan ditolak dan perlu direvisi.";
 
         if (filled($this->reason)) {
-            $message = "Alasan: {$this->reason}";
+            $message .= "\n\nAlasan: {$this->reason}";
         }
 
         return FilamentNotification::make()

@@ -62,4 +62,9 @@ class OrganizationUnit extends Model
     {
         return $this->hasMany(Evidences::class, 'organization_unit_id');
     }
+
+    public function auditassignments(): HasMany
+    {
+        return $this->hasMany(AuditAssignment::class);
+    }
 }

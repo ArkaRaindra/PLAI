@@ -18,7 +18,7 @@ class EvidenceLinkForm
                 Hidden::make('evidence_id'),
                 Select::make('reference_type')
                     ->label('Jenis Referensi')
-                    ->options(LinkableTypeRegistry::options())
+                    ->options(LinkableTypeRegistry::selectableOptions())
                     ->native(false)
                     ->required()
                     ->live()

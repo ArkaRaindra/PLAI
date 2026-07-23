@@ -63,4 +63,9 @@ class Indicator extends Model
     {
         return $this->hasMany(Target::class);
     }
+
+    public function auditFindings(): HasMany
+    {
+        return $this->hasMany(AuditFinding::class);
+    }
 }

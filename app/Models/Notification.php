@@ -58,14 +58,20 @@ class Notification extends DatabaseNotification
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * read_at (not is_read) is the source of truth: Filament's built-in
+     * notification bell (mark as read / mark all as read) only ever
+     * updates read_at via raw query updates that bypass model events
+     * entirely, so is_read would otherwise never reflect reality.
+     */
     public function scopeUnread(Builder $query): Builder
     {
-        return $query->where('is_read', false);
+        return $query->whereNull('read_at');
     }
 
     public function markAsRead(): void
     {
-        if (! $this->is_read) {
+        if ($this->read_at === null) {
             $this->forceFill([
                 'is_read' => true,
                 'read_at' => now(),
@@ -75,7 +81,7 @@ class Notification extends DatabaseNotification
 
     public function markAsUnread(): void
     {
-        if ($this->is_read) {
+        if ($this->read_at !== null) {
             $this->forceFill([
                 'is_read' => false,
                 'read_at' => null,

@@ -3,7 +3,6 @@
 namespace App\Filament\SuperAdmin\Resources\Evidences\Tables;
 
 use App\Filament\SuperAdmin\Resources\EvidenceLinks\EvidenceLinkResource;
-use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
 use App\Filament\SuperAdmin\Resources\Evidences\EvidencesResource;
 use App\Models\Evidences;
 use Filament\Actions\Action;
@@ -131,6 +130,7 @@ class EvidencesTable
                     ->icon(Heroicon::Link)
                     ->url(fn (Evidences $record): string => EvidenceLinkResource::getListUrl($record->id)),
                 EvidencesResource::submitAction(),
+                EvidencesResource::reviseAction(),
                 EvidencesResource::startReviewAction(),
                 EvidencesResource::approveAction(),
                 EvidencesResource::rejectAction(),

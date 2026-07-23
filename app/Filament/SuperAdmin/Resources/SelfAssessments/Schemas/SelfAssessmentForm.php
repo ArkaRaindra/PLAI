@@ -13,21 +13,26 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Schemas\Schema;
 use Illuminate\Validation\Rules\Unique;
 
 class SelfAssessmentForm
 {
-    public static function configure(Schema $schema): Schema
+    /**
+     * @return array<int, mixed>
+     */
+    public static function schema(): array
     {
-        return $schema
-            ->components([
-                Grid::make(['default' => 1, 'lg' => 12])
-                    ->columnSpanFull()
-                    ->schema([
-                        Grid::make(1)->columnSpan(5)->schema([
+        return [
+            Grid::make(['default' => 1, 'lg' => 12])
+                ->columnSpanFull()
+                ->schema([
+                    Section::make('Informasi Penilaian')
+                        ->description('Pilih periode dan unit organisasi untuk memuat realisasi yang telah disetujui.')
+                        ->columnSpan(5)
+                        ->schema([
                             Select::make('quality_period_id')
                                 ->label('Periode Penilaian')
                                 ->relationship(
@@ -35,7 +40,7 @@ class SelfAssessmentForm
                                     titleAttribute: 'name'
                                 )
                                 ->getOptionLabelFromRecordUsing(
-                                    fn (QualityPeriod $record): string => "{$record->code} — {$record->name}",
+                                    fn (QualityPeriod $record): string => "{$record->name}",
                                 )
                                 ->searchable(['code', 'name'])
                                 ->preload()
@@ -48,7 +53,7 @@ class SelfAssessmentForm
                                     titleAttribute: 'name'
                                 )
                                 ->getOptionLabelFromRecordUsing(
-                                    fn (OrganizationUnit $record): string => "{$record->code} — {$record->name}",
+                                    fn (OrganizationUnit $record): string => "{$record->name}",
                                 )
                                 ->searchable(['code', 'name'])
                                 ->preload()
@@ -110,41 +115,46 @@ class SelfAssessmentForm
                                 })
                                 ->columnSpanFull(),
                         ]),
-                        Repeater::make('details')
-                            ->label('Penilaian per Realisasi')
-                            ->columnSpan(7)
-                            ->relationship('details')
-                            ->schema([
-                                Hidden::make('realization_id'),
-                                Placeholder::make('realisasi')
-                                    ->label('Realisasi')
-                                    ->content(fn (Get $get): string => self::resolveRealizationLabel($get('realization_id'))),
-                                TextInput::make('score')
-                                    ->label('Skor')
-                                    ->numeric()
-                                    ->required()
-                                    ->minValue(0)
-                                    ->maxValue(100)
-                                    ->step(0.01)
-                                    ->readOnly(),
-                                Textarea::make('analysis')
-                                    ->label('Analisis')
-                                    ->columnSpanFull(),
-                                Textarea::make('strength')
-                                    ->label('Kekuatan')
-                                    ->columnSpanFull(),
-                                Textarea::make('weakness')
-                                    ->label('Kelemahan')
-                                    ->columnSpanFull(),
-                            ])
-                            ->columns(2)
-                            ->reorderable(false)
-                            ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['realization_id'] ?? null
-                                ? 'Realisasi #'.$state['realization_id']
-                                : 'Realisasi Baru'),
-                    ]),
-            ]);
+                    Section::make('Penilaian per Realisasi')
+                        ->description('Isi analisis, kekuatan, dan kelemahan untuk setiap realisasi yang dimuat.')
+                        ->columnSpan(7)
+                        ->schema([
+                            Repeater::make('details')
+                                ->label('Penilaian per Realisasi')
+                                ->hiddenLabel()
+                                ->relationship('details')
+                                ->schema([
+                                    Hidden::make('realization_id'),
+                                    Placeholder::make('realisasi')
+                                        ->label('Realisasi')
+                                        ->content(fn (Get $get): string => self::resolveRealizationLabel($get('realization_id'))),
+                                    TextInput::make('score')
+                                        ->label('Skor')
+                                        ->numeric()
+                                        ->required()
+                                        ->minValue(0)
+                                        ->maxValue(100)
+                                        ->step(0.01)
+                                        ->readOnly(),
+                                    Textarea::make('analysis')
+                                        ->label('Analisis')
+                                        ->columnSpanFull(),
+                                    Textarea::make('strength')
+                                        ->label('Kekuatan')
+                                        ->columnSpanFull(),
+                                    Textarea::make('weakness')
+                                        ->label('Kelemahan')
+                                        ->columnSpanFull(),
+                                ])
+                                ->columns(2)
+                                ->reorderable(false)
+                                ->collapsible()
+                                ->itemLabel(fn (array $state): ?string => $state['realization_id'] ?? null
+                                    ? 'Realisasi '.self::resolveRealizationPercentage($state['realization_id'])
+                                    : 'Realisasi Baru'),
+                        ]),
+                ]),
+        ];
     }
 
     private static function resolveRealizationLabel(?int $realizationId): string
@@ -164,6 +174,25 @@ class SelfAssessmentForm
         $target = $record->target;
         $indicator = $target?->indicator;
 
-        return "Realisasi #{$record->id} — [{$indicator?->code}] {$indicator?->name} — Target: {$target?->target_value}";
+        return 'Realisasi '.self::resolveRealizationPercentage($record->id).' — ['.$indicator?->code.'] '.$indicator?->name.' — Target: '.$target?->target_value;
+    }
+
+    private static function resolveRealizationPercentage(?int $realizationId): string
+    {
+        if ($realizationId === null) {
+            return '0,00%';
+        }
+
+        $record = Realization::query()
+            ->with('target')
+            ->find($realizationId);
+
+        if (! $record || $record->target === null || (float) $record->target->target_value === 0.0) {
+            return '0,00%';
+        }
+
+        $percentage = ((float) $record->actual_value / (float) $record->target->target_value) * 100;
+
+        return number_format($percentage, 2).'%';
     }
 }

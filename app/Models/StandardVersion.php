@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Blameable;
-use App\Enums\QualityPeriodStatus;
+use App\Filament\SuperAdmin\Resources\QualityPeriods\Tables\QualityPeriodStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,5 +49,10 @@ class StandardVersion extends Model
     public function qualityPeriod(): BelongsTo
     {
         return $this->belongsTo(QualityPeriod::class, 'quality_period_id');
+    }
+
+    public function auditChecklistTemplateItems(): HasMany
+    {
+        return $this->hasMany(AuditChecklistTemplateItem::class);
     }
 }

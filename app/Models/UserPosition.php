@@ -50,4 +50,9 @@ class UserPosition extends Model
     {
         return $this->hasMany(IndicatorOwner::class, 'user_position_id');
     }
+
+    public function auditAssignments(): HasMany
+    {
+        return $this->hasMany(AuditAssignment::class, 'auditor_position_id');
+    }
 }

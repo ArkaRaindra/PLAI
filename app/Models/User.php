@@ -76,11 +76,11 @@ class User extends Authenticatable implements FilamentUser
 
     public function unreadNotifications(): HasMany
     {
-        return $this->notifications()->where('is_read', false);
+        return $this->notifications()->whereNull('read_at');
     }
 
     public function readNotifications(): HasMany
     {
-        return $this->notifications()->where('is_read', true);
+        return $this->notifications()->whereNotNull('read_at');
     }
 }

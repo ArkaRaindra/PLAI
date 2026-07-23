@@ -42,7 +42,7 @@ class SelfAssessmentResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return SelfAssessmentForm::configure($schema);
+        return $schema->components(SelfAssessmentForm::schema());
     }
 
     public static function infolist(Schema $schema): Schema

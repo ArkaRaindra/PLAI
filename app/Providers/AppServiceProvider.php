@@ -20,6 +20,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Openplain\FilamentShadcnTheme\Color;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureFilamentIcons();
         $this->configureFilamentRenderHooks();
+        $this->configureSuperAdminGate();
         Relation::enforceMorphMap([
             'indicator' => Indicator::class,
             'organization_unit' => OrganizationUnit::class,
@@ -83,6 +85,17 @@ class AppServiceProvider extends ServiceProvider
             PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
             fn () => view('components.auth-back-to-home'),
         );
+    }
+
+    protected function configureSuperAdminGate(): void
+    {
+        Gate::before(function (User $user, string $ability, mixed $arguments): ?bool {
+            if ($user->hasRole('super-admin')) {
+                return true;
+            }
+
+            return null;
+        });
     }
 
     /**
