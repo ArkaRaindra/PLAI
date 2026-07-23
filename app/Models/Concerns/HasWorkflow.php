@@ -12,9 +12,9 @@ trait HasWorkflow
         return $this->morphOne(WorkflowInstance::class, 'entity');
     }
 
-    public function initializeWorkflow(): void
+    public function initializeWorkflow(string $initialStatus = WorkflowInstance::DEFAULT_INITIAL_STATUS): void
     {
-        WorkflowInstance::initialize($this);
+        WorkflowInstance::initialize($this, $initialStatus);
     }
 
     public function transitionWorkflowTo(string $status, ?string $notes = null, ?int $actedBy = null): void

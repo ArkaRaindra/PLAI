@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\AuditAssignment;
 use App\Models\Evidences;
 use App\Models\Indicator;
 use App\Models\OrganizationUnit;
@@ -11,6 +12,7 @@ use App\Models\Standard;
 use App\Models\StandardSource;
 use App\Models\Target;
 use App\Models\User;
+use App\Models\WorkflowInstance;
 use Carbon\CarbonImmutable;
 use Filament\Panel;
 use Filament\Support\Facades\FilamentIcon;
@@ -54,6 +56,19 @@ class AppServiceProvider extends ServiceProvider
             'self_assessment' => SelfAssessment::class,
             'user' => User::class,
             'evidence' => Evidences::class,
+            'audit_assignment' => AuditAssignment::class,
+        ]);
+        $this->configureAuditorWorkflow();
+    }
+
+    protected function configureAuditorWorkflow(): void
+    {
+        WorkflowInstance::registerTransitions('audit_assignment', [
+            'open' => ['assigned'],
+            'assigned' => ['corrective_action'],
+            'corrective_action' => ['verification'],
+            'verification' => ['closed', 'corrective_action'],
+            'closed' => [],
         ]);
     }
 

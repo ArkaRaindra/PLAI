@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\Models\Concerns\HasWorkflow;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AuditAssignment extends Model
 {
     use Blameable;
+    use HasWorkflow;
+
+    public function getMorphClass(): string
+    {
+        return 'audit_assignment';
+    }
 
     protected $fillable = [
         'audit_cycle_id',
@@ -33,6 +41,10 @@ class AuditAssignment extends Model
             if (blank($assignment->assigned_at)) {
                 $assignment->assigned_at = now();
             }
+        });
+
+        static::created(function (AuditAssignment $assignment): void {
+            $assignment->initializeWorkflow(initialStatus: 'open');
         });
     }
 
@@ -59,5 +71,17 @@ class AuditAssignment extends Model
     public function findings(): HasMany
     {
         return $this->hasMany(AuditFinding::class);
+    }
+
+    public function scopeStatus(Builder $query, ?string $status): Builder
+    {
+        if (blank($status)) {
+            return $query;
+        }
+
+        return $query->whereHas(
+            'workflowInstance',
+            fn (Builder $inner) => $inner->where('current_status', $status),
+        );
     }
 }
