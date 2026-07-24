@@ -18,7 +18,7 @@ class EditAuditChecklistResponse extends EditRecord
     {
         return [
             AuditChecklistResponseResource::getListUrl($this->record->audit_assignment_id) => 'Ausit Response',
-            'ubah Jawaban Checklist'
+            'ubah Jawaban Checklist',
         ];
     }
 
@@ -35,7 +35,7 @@ class EditAuditChecklistResponse extends EditRecord
                 ->successRedirectUrl(AuditChecklistResponseResource::getListUrl($this->record->audit_assignment_id)),
         ];
     }
-    
+
     protected function mutateformdataBeforesave(array $data): array
     {
         $data['audit_assignment_id'] = $this->record->audit_assignment_id;
@@ -48,7 +48,7 @@ class EditAuditChecklistResponse extends EditRecord
         return AuditChecklistResponseResource::getListUrl($this->record->audit_assignment_id);
     }
 
-    protected function  getCancelFormAction(): Action
+    protected function getCancelFormAction(): Action
     {
         return parent::getCancelFormAction()
             ->url(AuditChecklistResponseResource::getListUrl($this->record->audit_assignment_id));

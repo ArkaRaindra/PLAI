@@ -30,8 +30,8 @@ class CorrectiveActionsTable
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => CorrectiveActionResource::statusLabels()[$state] ?? $state)
-                    ->color(fn (string $state): string => CorrectiveActionResource::statusColors()[$state] ?? 'gray')
-                
+                    ->color(fn (string $state): string => CorrectiveActionResource::statusColors()[$state] ?? 'gray'),
+
             ])
             ->filters([
                 //
@@ -43,7 +43,7 @@ class CorrectiveActionsTable
                 CorrectiveActionResource::progressTimelineAction(),
                 CorrectiveActionResource::submitAction(),
                 DeleteAction::make()
-                    ->visible(fn ($record): bool => $record->isEditable())
+                    ->visible(fn ($record): bool => $record->isEditable()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

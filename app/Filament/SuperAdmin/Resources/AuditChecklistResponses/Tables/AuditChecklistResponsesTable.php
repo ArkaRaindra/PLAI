@@ -42,12 +42,12 @@ class AuditChecklistResponsesTable
             ->recordActions(ActionGroup::make([
                 // ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make()
+                DeleteAction::make(),
             ]));
-            // ->toolbarActions([
-            //     BulkActionGroup::make([
-            //         DeleteBulkAction::make(),
-            //     ]),
-            // ]);
+        // ->toolbarActions([
+        //     BulkActionGroup::make([
+        //         DeleteBulkAction::make(),
+        //     ]),
+        // ]);
     }
 }

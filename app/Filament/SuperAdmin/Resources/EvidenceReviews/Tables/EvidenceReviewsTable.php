@@ -3,7 +3,6 @@
 namespace App\Filament\SuperAdmin\Resources\EvidenceReviews\Tables;
 
 use App\Filament\SuperAdmin\Resources\EvidenceReviews\EvidenceReviewResource;
-use App\Filament\SuperAdmin\Resources\Evidences\EvidencesResource;
 use App\Models\EvidenceReview;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;

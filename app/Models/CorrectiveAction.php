@@ -16,8 +16,8 @@ class CorrectiveAction extends Model
         'submitted' => [],
     ];
 
-    public const array EDITABLE_STATUSES =  ['draft', 'submitted'];
-    
+    public const array EDITABLE_STATUSES = ['draft', 'submitted'];
+
     protected $fillable = [
         'audit_finding_id',
         'decision_id',
@@ -47,10 +47,10 @@ class CorrectiveAction extends Model
             $alreadyExists = self::query()
                 ->where('audit_finding_id', $correctiveAction->audit_finding_id)
                 ->exists();
-            
-                if ($alreadyExists) {
-                    throw new \RuntimeException('Audit finding ini sudah memiliki Corrective Action.');
-                }
+
+            if ($alreadyExists) {
+                throw new \RuntimeException('Audit finding ini sudah memiliki Corrective Action.');
+            }
         });
 
         static::saving(function (CorrectiveAction $correctiveAction): void {
@@ -83,7 +83,7 @@ class CorrectiveAction extends Model
         return $this->belongsTo(OrganizationUnit::class);
     }
 
-    public function ownerPosition():  BelongsTo
+    public function ownerPosition(): BelongsTo
     {
         return $this->belongsTo(UserPosition::class, 'owner_position_id');
     }

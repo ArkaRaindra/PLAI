@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Blameable;
+use App\Models\Concerns\HasWorkflow;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class AuditFinding extends Model
 {
     use Blameable;
+    use HasWorkflow;
+
+    public function getMorphClass(): string
+    {
+        return 'audit_finding';
+    }
 
     protected $fillable = [
         'audit_assignment_id',
@@ -32,6 +39,13 @@ class AuditFinding extends Model
         return [
             'due_date' => 'date',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (AuditFinding $finding): void {
+            $finding->initializeWorkflow(initialStatus: 'open');
+        });
     }
 
     public function auditAssignment(): BelongsTo

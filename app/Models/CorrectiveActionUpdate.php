@@ -46,7 +46,7 @@ class CorrectiveActionUpdate extends Model
                 ->where('corrective_action_id', $update->corrective_action_id)
                 ->orderByDesc('id')
                 ->value('progress_percentage');
-            
+
             if ($latest !== null && $update->progress_percentage < $latest) {
                 throw new \RuntimeException("Progress tidak dapat dikurangi (progress terakhir: {$latest}%).");
             }

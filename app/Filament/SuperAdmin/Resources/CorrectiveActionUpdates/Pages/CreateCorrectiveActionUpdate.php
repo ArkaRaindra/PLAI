@@ -109,7 +109,7 @@ class CreateCorrectiveActionUpdate extends CreateRecord
         } catch (\RuntimeException $exception) {
             Notification::make()->title($exception->getMessage())->danger()->send();
 
-            throw new Halt();
+            throw new Halt;
         }
     }
 
@@ -123,7 +123,7 @@ class CreateCorrectiveActionUpdate extends CreateRecord
 
         app(EvidenceService::class)->record(
             reference: $update,
-             organizationUnitId: $this->correctiveAction->organization_unit_id,
+            organizationUnitId: $this->correctiveAction->organization_unit_id,
             title: "Bukti Progress {$update->progress_percentage}% — {$update->updated_at->format('d/m/Y')}",
             description: null,
             type: $this->pendingEvidence['type'],

@@ -36,21 +36,21 @@ class ListCorrectiveActionUpdates extends Page
     public function getBreadcrumbs(): array
     {
         return [
-            'Progress Timeline'
+            'Progress Timeline',
         ];
     }
 
     public function timelineEntries(): Collection
     {
         if (blank($this->correctiveAction)) {
-            return new Collection();
+            return new Collection;
         }
 
         return CorrectiveActionUpdate::query()
             ->where('corrective_action_id', $this->correctiveActionId)
             ->with(['updater', 'evidenceLink.evidence'])
             ->orderByDesc('id')
-            ->get();   
+            ->get();
     }
 
     public function latestProgress(): int

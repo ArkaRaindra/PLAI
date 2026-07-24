@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AuditAssignment;
 use App\Models\AuditChecklistTemplate;
 use App\Models\AuditCycle;
+use App\Models\AuditFinding;
 use App\Models\OrganizationUnit;
 use App\Models\Position;
 use App\Models\QualityPeriod;
@@ -30,80 +31,80 @@ class AuditorWorkflowTest extends TestCase
         ]);
     }
 
-    public function test_audit_assignment_gets_an_open_workflow_instance_on_creation(): void
+    public function test_audit_finding_gets_an_open_workflow_instance_on_creation(): void
     {
-        $assignment = $this->makeAuditAssignment();
+        $finding = $this->makeAuditFinding();
 
-        $this->assertNotNull($assignment->workflowInstance);
-        $this->assertSame('open', $assignment->workflowInstance->current_status);
-        $this->assertCount(1, $assignment->workflowInstance->histories);
-        $this->assertSame('audit_assignment', $assignment->workflowInstance->entity_type);
+        $this->assertNotNull($finding->workflowInstance);
+        $this->assertSame('open', $finding->workflowInstance->current_status);
+        $this->assertCount(1, $finding->workflowInstance->histories);
+        $this->assertSame('audit_finding', $finding->workflowInstance->entity_type);
     }
 
     public function test_workflow_follows_the_full_open_to_closed_chain(): void
     {
         $superAdmin = $this->makeUser('super-admin');
-        $assignment = $this->makeAuditAssignment();
+        $finding = $this->makeAuditFinding();
 
         $this->actingAs($superAdmin);
 
-        $assignment->transitionWorkflowTo('assigned');
-        $this->assertSame('assigned', $assignment->workflowInstance->fresh()->current_status);
+        $finding->transitionWorkflowTo('assigned');
+        $this->assertSame('assigned', $finding->workflowInstance->fresh()->current_status);
 
-        $assignment->transitionWorkflowTo('corrective_action', 'Ditemukan 2 temuan minor.');
-        $this->assertSame('corrective_action', $assignment->workflowInstance->fresh()->current_status);
+        $finding->transitionWorkflowTo('corrective_action', 'Ditemukan 2 temuan minor.');
+        $this->assertSame('corrective_action', $finding->workflowInstance->fresh()->current_status);
 
-        $assignment->transitionWorkflowTo('verification');
-        $this->assertSame('verification', $assignment->workflowInstance->fresh()->current_status);
+        $finding->transitionWorkflowTo('verification');
+        $this->assertSame('verification', $finding->workflowInstance->fresh()->current_status);
 
-        $assignment->transitionWorkflowTo('closed', 'Tindak lanjut terverifikasi.');
-        $this->assertSame('closed', $assignment->workflowInstance->fresh()->current_status);
+        $finding->transitionWorkflowTo('closed', 'Tindak lanjut terverifikasi.');
+        $this->assertSame('closed', $finding->workflowInstance->fresh()->current_status);
 
         // open -> assigned -> corrective_action -> verification -> closed
-        $this->assertCount(5, $assignment->workflowInstance->fresh()->histories);
+        $this->assertCount(5, $finding->workflowInstance->fresh()->histories);
     }
 
     public function test_failed_verification_can_be_sent_back_to_corrective_action(): void
     {
-        $assignment = $this->makeAuditAssignment();
+        $finding = $this->makeAuditFinding();
 
-        $this->fastForward($assignment->workflowInstance, ['assigned', 'corrective_action', 'verification']);
+        $this->fastForward($finding->workflowInstance, ['assigned', 'corrective_action', 'verification']);
 
-        $assignment->workflowInstance->fresh()->transitionTo('corrective_action', 'Tindak lanjut belum memadai.');
+        $finding->workflowInstance->fresh()->transitionTo('corrective_action', 'Tindak lanjut belum memadai.');
 
-        $this->assertSame('corrective_action', $assignment->workflowInstance->fresh()->current_status);
+        $this->assertSame('corrective_action', $finding->workflowInstance->fresh()->current_status);
     }
 
     public function test_open_cannot_jump_directly_to_verification(): void
     {
-        $assignment = $this->makeAuditAssignment();
+        $finding = $this->makeAuditFinding();
 
         $this->expectException(\RuntimeException::class);
 
-        $assignment->workflowInstance->transitionTo('verification');
+        $finding->workflowInstance->transitionTo('verification');
     }
 
     public function test_closed_is_a_terminal_state(): void
     {
-        $assignment = $this->makeAuditAssignment();
+        $finding = $this->makeAuditFinding();
 
-        $this->fastForward($assignment->workflowInstance, ['assigned', 'corrective_action', 'verification', 'closed']);
+        $this->fastForward($finding->workflowInstance, ['assigned', 'corrective_action', 'verification', 'closed']);
 
-        $this->assertFalse($assignment->workflowInstance->fresh()->canTransitionTo('assigned'));
-        $this->assertFalse($assignment->workflowInstance->fresh()->canTransitionTo('corrective_action'));
-        $this->assertFalse($assignment->workflowInstance->fresh()->canTransitionTo('verification'));
+        $this->assertFalse($finding->workflowInstance->fresh()->canTransitionTo('assigned'));
+        $this->assertFalse($finding->workflowInstance->fresh()->canTransitionTo('corrective_action'));
+        $this->assertFalse($finding->workflowInstance->fresh()->canTransitionTo('verification'));
     }
 
     public function test_super_admin_can_force_transition_out_of_sequence(): void
     {
         $superAdmin = $this->makeUser('super-admin');
-        $assignment = $this->makeAuditAssignment();
+        $finding = $this->makeAuditFinding();
 
         $this->actingAs($superAdmin);
 
-        $assignment->workflowInstance->forceTransitionTo('verification', 'Dikoreksi oleh super admin.');
+        $finding->workflowInstance->forceTransitionTo('verification', 'Dikoreksi oleh super admin.');
 
-        $this->assertSame('verification', $assignment->workflowInstance->fresh()->current_status);
+        $this->assertSame('verification', $finding->workflowInstance->fresh()->current_status);
     }
 
     private function makeUser(string $role): User
@@ -148,7 +149,6 @@ class AuditorWorkflowTest extends TestCase
             'start_date' => now()->startOfYear(),
             'end_date' => now()->endOfYear(),
             'status' => 'active',
-            'is_active' => true,
             'created_by' => 'system',
         ]);
 
@@ -169,6 +169,20 @@ class AuditorWorkflowTest extends TestCase
             'audit_cycle_id' => $auditCycle->id,
             'auditor_position_id' => $auditorPosition->id,
             'organization_unit_id' => $unit->id,
+            'created_by' => 'system',
+        ]);
+    }
+
+    private function makeAuditFinding(): AuditFinding
+    {
+        $assignment = $this->makeAuditAssignment();
+
+        return AuditFinding::query()->create([
+            'audit_assignment_id' => $assignment->id,
+            'title' => fake()->sentence(),
+            'category' => 'kts',
+            'severity' => 'major',
+            'description' => fake()->paragraph(),
             'created_by' => 'system',
         ]);
     }
