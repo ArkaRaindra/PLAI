@@ -107,4 +107,14 @@ class CorrectiveAction extends Model
     {
         $this->update(['status' => 'submitted']);
     }
+
+    public function latestProgressPercentage(): int
+    {
+        return (int) ($this->updates()->orderByDesc('id')->value('progress_percentage') ?? 0);
+    }
+
+    public function canBeVerified(): bool
+    {
+        return $this->latestProgressPercentage() === 100;
+    }
 }

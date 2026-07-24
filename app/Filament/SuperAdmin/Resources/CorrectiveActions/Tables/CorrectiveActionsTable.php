@@ -40,6 +40,7 @@ class CorrectiveActionsTable
                 ViewAction::make(),
                 EditAction::make()
                     ->visible(fn ($record): bool => $record->isEditable()),
+                CorrectiveActionResource::progressTimelineAction(),
                 CorrectiveActionResource::submitAction(),
                 DeleteAction::make()
                     ->visible(fn ($record): bool => $record->isEditable())

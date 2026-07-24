@@ -31,6 +31,7 @@ class ViewCorrectiveAction extends ViewRecord
                 ->icon(Heroicon::ArrowLeft),
             EditAction::make()
                 ->visible(fn (): bool => $this->record->isEditable()),
+            CorrectiveActionResource::progressTimelineAction(),
             CorrectiveActionResource::submitAction(),
         ];
     }

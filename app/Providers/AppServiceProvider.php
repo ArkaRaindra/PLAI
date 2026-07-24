@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\AuditAssignment;
+use App\Models\CorrectiveActionUpdate;
 use App\Models\Evidences;
 use App\Models\Indicator;
 use App\Models\OrganizationUnit;
@@ -13,6 +14,7 @@ use App\Models\StandardSource;
 use App\Models\Target;
 use App\Models\User;
 use App\Models\WorkflowInstance;
+use App\Support\EvidenceLink\LinkableTypeRegistry;
 use Carbon\CarbonImmutable;
 use Filament\Panel;
 use Filament\Support\Facades\FilamentIcon;
@@ -57,8 +59,10 @@ class AppServiceProvider extends ServiceProvider
             'user' => User::class,
             'evidence' => Evidences::class,
             'audit_assignment' => AuditAssignment::class,
+            'corrective_action_update' => CorrectiveActionUpdate::class,
         ]);
         $this->configureAuditorWorkflow();
+        $this->configureCorrectiveActionUpdateEvidence();
     }
 
     protected function configureAuditorWorkflow(): void
@@ -70,6 +74,17 @@ class AppServiceProvider extends ServiceProvider
             'verification' => ['closed', 'corrective_action'],
             'closed' => [],
         ]);
+    }
+
+    protected function configureCorrectiveActionUpdateEvidence(): void
+    {
+        LinkableTypeRegistry::register(
+            key: 'corrective_action_update',
+            label: 'Progress Update',
+            model: CorrectiveActionUpdate::class,
+            titleAttribute: 'description',
+            manual: false,
+        );
     }
 
     protected function configureFilamentIcons(): void

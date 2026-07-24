@@ -9,6 +9,7 @@ use App\Filament\SuperAdmin\Resources\CorrectiveActions\Pages\ViewCorrectiveActi
 use App\Filament\SuperAdmin\Resources\CorrectiveActions\Schemas\CorrectiveActionForm;
 use App\Filament\SuperAdmin\Resources\CorrectiveActions\Schemas\CorrectiveActionInfolist;
 use App\Filament\SuperAdmin\Resources\CorrectiveActions\Tables\CorrectiveActionsTable;
+use App\Filament\SuperAdmin\Resources\CorrectiveActionUpdates\CorrectiveActionUpdateResource;
 use App\Models\CorrectiveAction;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -115,5 +116,15 @@ class CorrectiveActionResource extends Resource
 
                 Notification::make()->title('Corrective Action berhasil disubmit')->success()->send();
             });
+    }
+
+    public static function progressTimelineAction(): Action
+    {
+        return Action::make('progressTimeline')
+            ->label('Progress Timeline')
+            ->icon(Heroicon::ChartBar)
+            ->color('info')
+            ->url(fn (CorrectiveAction $record): string => CorrectiveActionUpdateResource::getListUrl($record->id))
+            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'submitted');
     }
 }
