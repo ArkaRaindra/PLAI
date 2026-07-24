@@ -232,16 +232,9 @@ class AuditFindingResource extends Resource
             ->icon(Heroicon::CheckBadge)
             ->color('success')
             ->requiresConfirmation()
-            ->visible(fn (AuditFinding $record): bool => $record->status === 'open' || Auth::user()?->hasRole('super-admin') ?? false || self::workflowStatus($record) === 'verification')
+            ->visible(fn (AuditFinding $record): bool => Auth::user()?->hasRole('super-admin') ?? false || self::workflowStatus($record) === 'verification')
             ->action(function (AuditFinding $record): void {
-                try {
-                    $record->close();
-                } catch (\RuntimeException $exception) {
-                    Notification::make()->title($exception->getMessage())->danger()->send();
-
-                    return;
-                }
-
+                $record->update(['status' => 'closed']);
                 $record->workflowInstance?->forceTransitionTo('closed');
 
                 Notification::make()->title('Temuan ditutup')->success()->send();

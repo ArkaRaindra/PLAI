@@ -10,10 +10,12 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Url;
 
 class ListCorrectiveActions extends ListRecords
 {
-    public ?string $auditFIndingId = null;
+    #[Url]
+    public ?int $auditFindingId = null;
 
     protected static string $resource = CorrectiveActionResource::class;
 
@@ -23,14 +25,16 @@ class ListCorrectiveActions extends ListRecords
 
     public function mount(): void
     {
-        if (blank($this->auditFIndingId)) {
+        $this->auditFindingId = (int) (request()->query('auditFindingId') ?? 0) ?: null;
+
+        if (blank($this->auditFindingId)) {
             $this->redirect(AuditFindingResource::getUrl('index'));
 
             return;
         }
 
         $existing = CorrectiveAction::query()
-            ->where('audit_finding_id', $this->auditFIndingId)
+            ->where('audit_finding_id', $this->auditFindingId)
             ->first();
 
         if ($existing !== null) {
@@ -39,7 +43,7 @@ class ListCorrectiveActions extends ListRecords
             return;
         }
 
-        $this->redirect(CorrectiveActionResource::getCreateUrl($this->auditFIndingId));
+        $this->redirect(CorrectiveActionResource::getCreateUrl($this->auditFindingId));
     }
 
     public function getBreadcrumbs(): array
@@ -51,17 +55,17 @@ class ListCorrectiveActions extends ListRecords
 
     public function getTableQuery(): Builder
     {
-        if (blank($this->auditFIndingId)) {
+        if (blank($this->auditFindingId)) {
             return CorrectiveAction::query()->whereRaw('1 = 0');
         }
 
         return CorrectiveAction::query()
-            ->where('audit_finding_id', (int) $this->auditFIndingId);
+            ->where('audit_finding_id', (int) $this->auditFindingId);
     }
 
     protected function getHeaderActions(): array
     {
-        if (blank($this->auditFIndingId)) {
+        if (blank($this->auditFindingId)) {
             return [];
         }
 
@@ -75,7 +79,7 @@ class ListCorrectiveActions extends ListRecords
             CreateAction::make()
                 ->label('Buat Corrective Action')
                 ->icon(Heroicon::Plus)
-                ->url(CorrectiveActionResource::getCreateUrl($this->auditFIndingId)),
+                ->url(CorrectiveActionResource::getCreateUrl($this->auditFindingId)),
         ];
     }
 }

@@ -33,6 +33,7 @@ class ViewAuditFinding extends ViewRecord
                 ->color('gray')
                 ->icon(Heroicon::ArrowLeft),
             EditAction::make(),
+            AuditFindingResource::manageCorrectiveActionAction(),
             AuditFindingResource::assignAction(),
             AuditFindingResource::moveToCorrectiveAction(),
             AuditFindingResource::startVerificationAction(),

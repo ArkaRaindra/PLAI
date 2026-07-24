@@ -177,7 +177,7 @@ class LhamiReport extends Page implements HasTable
                     ->formatStateUsing(fn (string $state): string => $state === 'major' ? 'Major' : 'Minor')
                     ->color(fn (string $state): string => $state === 'major' ? 'danger' : 'warning'),
                 TextColumn::make('workflowInstance.current_status')
-                    ->label('Status Temuan')
+                    ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state !== null
                         ? (self::workflowStatusLabels()[$state] ?? $state)
@@ -216,7 +216,7 @@ class LhamiReport extends Page implements HasTable
                     ->label('Severity')
                     ->options(self::severityLabels()),
                 SelectFilter::make('status')
-                    ->label('Status Temuan')
+                    ->label('Status')
                     ->options([
                         'open' => 'Terbuka',
                         'closed' => 'Ditutup',

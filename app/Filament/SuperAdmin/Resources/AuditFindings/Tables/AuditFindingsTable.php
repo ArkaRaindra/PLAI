@@ -41,13 +41,8 @@ class AuditFindingsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => ucfirst($state))
                     ->color(fn (string $state): string => $state === 'major' ? 'danger' : 'warning'),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => $state === 'open' ? 'Terbuka' : 'Ditutup')
-                    ->color(fn (string $state): string => $state === 'open' ? 'warning' : 'success'),
                 TextColumn::make('workflowInstance.current_status')
-                    ->label('Status Workflow')
+                    ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state !== null
                         ? (AuditFindingResource::workflowStatusLabels()[$state] ?? $state)
@@ -91,6 +86,7 @@ class AuditFindingsTable
             ->recordActions(ActionGroup::make([
                 ViewAction::make(),
                 EditAction::make(),
+                AuditFindingResource::manageCorrectiveActionAction(),
                 AuditFindingResource::assignAction(),
                 AuditFindingResource::moveToCorrectiveAction(),
                 AuditFindingResource::startVerificationAction(),
