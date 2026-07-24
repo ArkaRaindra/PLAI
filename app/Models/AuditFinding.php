@@ -6,6 +6,7 @@ use App\Blameable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AuditFinding extends Model
 {
@@ -41,6 +42,11 @@ class AuditFinding extends Model
     public function indicator(): BelongsTo
     {
         return $this->belongsTo(Indicator::class);
+    }
+
+    public function correctiveAction(): HasOne
+    {
+        return $this->hasOne(CorrectiveAction::class);
     }
 
     public function scopeOpen(Builder $query): Builder

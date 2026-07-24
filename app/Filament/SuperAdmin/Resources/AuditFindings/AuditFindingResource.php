@@ -9,6 +9,7 @@ use App\Filament\SuperAdmin\Resources\AuditFindings\Pages\ViewAuditFinding;
 use App\Filament\SuperAdmin\Resources\AuditFindings\Schemas\AuditFindingForm;
 use App\Filament\SuperAdmin\Resources\AuditFindings\Schemas\AuditFindingInfolist;
 use App\Filament\SuperAdmin\Resources\AuditFindings\Tables\AuditFindingsTable;
+use App\Filament\SuperAdmin\Resources\CorrectiveActions\CorrectiveActionResource;
 use App\Models\AuditFinding;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -84,6 +85,15 @@ class AuditFindingResource extends Resource
         ]);
     }
 
+    public static function manageCorrectiveActionAction(): Action
+    {
+        return Action::make('manageCorrectiveAction')
+            ->label('Corrective Action')
+            ->icon(Heroicon::ClipboardDocumentCheck)
+            ->color('warning')
+            ->url(fn (AuditFinding $record): string => CorrectiveActionResource::getListUrl($record->id));
+    }
+
     public static function closeAction(): Action
     {
         return Action::make('closeFinding')
@@ -93,7 +103,13 @@ class AuditFindingResource extends Resource
             ->requiresConfirmation()
             ->visible(fn (AuditFinding $record): bool => $record->status === 'open' || Auth::user()?->hasRole('super-admin') ?? false)
             ->action(function (AuditFinding $record): void {
-                $record->close();
+                try {
+                    $record->close();
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->title($exception->getMessage())->danger()->send();
+
+                    return;
+                }
 
                 Notification::make()->title('Temuan ditutup')->success()->send();
             });
