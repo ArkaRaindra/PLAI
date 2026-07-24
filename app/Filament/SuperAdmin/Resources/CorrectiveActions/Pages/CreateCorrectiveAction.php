@@ -79,7 +79,7 @@ class CreateCorrectiveAction extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['audit_finding-id'] = (int) $this->auditFindingId;
+        $data['audit_finding_id'] = (int) $this->auditFindingId;
         $data['organization_unit_id'] = $this->auditFinding?->auditAssignment?->organization_unit_id;
         $data['status'] = 'draft';
 

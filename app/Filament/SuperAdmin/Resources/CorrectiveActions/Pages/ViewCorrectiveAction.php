@@ -23,7 +23,7 @@ class ViewCorrectiveAction extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-           Action::make('back')
+            Action::make('back')
                 ->label('Kembali')
                 ->url(AuditFindingResource::getUrl('view', ['record' => $this->record->audit_finding_id]))
                 ->button()

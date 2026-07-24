@@ -27,7 +27,7 @@ class EditCorrectiveAction extends EditRecord
                 ->warning()
                 ->send();
 
-            $this->redirect(CorrectiveActionResource::getUrl('view',['record' => $this->record->id]));
+            $this->redirect(CorrectiveActionResource::getUrl('view', ['record' => $this->record->id]));
         }
     }
 
@@ -69,6 +69,6 @@ class EditCorrectiveAction extends EditRecord
     protected function getCancelFormAction(): Action
     {
         return parent::getCancelFormAction()
-            ->url(CorrectiveActionResource::getUrl('view', ['record' => $this->record->id]));   
+            ->url(CorrectiveActionResource::getUrl('view', ['record' => $this->record->id]));
     }
 }

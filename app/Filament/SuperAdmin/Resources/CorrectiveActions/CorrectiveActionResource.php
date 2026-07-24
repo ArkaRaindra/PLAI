@@ -28,7 +28,7 @@ class CorrectiveActionResource extends Resource
 
     protected static ?string $modelLabel = 'Corrective Action';
 
-    protected static ?string $pluralModelLabel = 'corrective Actions';
+    protected static ?string $pluralModelLabel = 'Corrective Actions';
 
     protected static ?string $slug = 'corrective-actions';
 
@@ -99,7 +99,7 @@ class CorrectiveActionResource extends Resource
         ];
     }
 
-     public static function submitAction(): Action
+    public static function submitAction(): Action
     {
         return Action::make('submitCorrectiveAction')
             ->label('Submit Corrective Action')
@@ -113,7 +113,7 @@ class CorrectiveActionResource extends Resource
             ->action(function (CorrectiveAction $record): void {
                 $record->submit();
 
-                Notification::make()->title('Corrective action berhasil disubmit')->success()->send();
+                Notification::make()->title('Corrective Action berhasil disubmit')->success()->send();
             });
     }
 }
