@@ -1,7 +1,7 @@
 @php
-    $summary = $this->summary()
-    $assignmentsStatusLabels = static::workflowStatusLabels();
-    $categoryLables = static::categoryLabels();
+    $summary = $this->summary();
+    $assignmentStatusLabels = static::workflowStatusLabels();
+    $categoryLabels = static::categoryLabels();
     $severityLabels = static::severityLabels();
 @endphp
 
@@ -70,4 +70,4 @@
     </x-filament::section>
 
     {{ $this->table }}
-</x-filament-panels::page
+</x-filament-panels::page>

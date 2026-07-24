@@ -55,4 +55,9 @@ class UserPosition extends Model
     {
         return $this->hasMany(AuditAssignment::class, 'auditor_position_id');
     }
+
+    public function correctiveActions(): HasMany
+    {
+        return $this->hasMany(CorrectiveAction::class, 'owner_position_id');
+    }
 }

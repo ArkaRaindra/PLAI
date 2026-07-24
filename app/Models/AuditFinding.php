@@ -50,6 +50,10 @@ class AuditFinding extends Model
 
     public function close(): void
     {
+        if (! $this->correctiveAction()->exists()) {
+            throw new \RuntimeException('Temuan tidak dapat ditutup karena belum memiliki Corrective Action.');
+        }
+
         $this->update(['status' => 'closed']);
     }
 }
