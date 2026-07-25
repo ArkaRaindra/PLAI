@@ -86,7 +86,7 @@ class AppServiceProvider extends ServiceProvider
         WorkflowInstance::registerTransitions('corrective_action', [
             'draft' => ['submitted'],
             'submitted' => ['verification'],
-            'verification'=> ['closed', 'submitted'],
+            'verification' => ['closed', 'submitted'],
             'closed' => ['submitted'],
         ]);
     }

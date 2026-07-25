@@ -78,25 +78,25 @@
 
                                 @if ($evidence !== null)
                                     <div class="mt-2">
-                                        @if ($evidence->type === 'file' && filled($evidence->file_path))
-                                            
-                                                href="{{ route('evidences.download', $evidence) }}"
-                                                target="_blank"
-                                                rel="noopener"
-                                                class="text-xs text-primary-600 underline dark:text-primary-400"
-                                            >
-                                                📎 Lihat Bukti (File)
-                                            </a>
-                                        @elseif ($evidence->type === 'url' && filled($evidence->url_path))
-                                            
-                                                href="{{ $evidence->url_path }}"
-                                                target="_blank"
-                                                rel="noopener"
-                                                class="text-xs text-primary-600 underline dark:text-primary-400"
-                                            >
-                                                🔗 Lihat Bukti (URL)
-                                            </a>
-                                        @endif
+                                @if ($evidence->type === 'file' && filled($evidence->file_path))
+                                    <a
+                                        href="{{ route('evidences.download', $evidence) }}"
+                                        target="_blank"
+                                        rel="noopener"
+                                        class="text-xs text-primary-600 underline dark:text-primary-400"
+                                    >
+                                        📎 Lihat Bukti (File)
+                                    </a>
+                                @elseif ($evidence->type === 'url' && filled($evidence->url_path))
+                                    <a
+                                        href="{{ $evidence->url_path }}"
+                                        target="_blank"
+                                        rel="noopener"
+                                        class="text-xs text-primary-600 underline dark:text-primary-400"
+                                    >
+                                        🔗 Lihat Bukti (URL)
+                                    </a>
+                                @endif
                                     </div>
                                 @endif
                             </div>

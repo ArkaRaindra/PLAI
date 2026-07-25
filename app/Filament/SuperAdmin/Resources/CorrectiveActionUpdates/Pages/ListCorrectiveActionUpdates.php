@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ListCorrectiveActionUpdates extends Page
 {
+    #[Url]
     public ?string $correctiveActionId = null;
 
     protected static string $resource = CorrectiveActionUpdateResource::class;

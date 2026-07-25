@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('corrective_action_updates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('correction_action_id')->constrained('corrective_actions')->cascadeOnDelete();
+            $table->foreignId('corrective_action_id')->constrained('corrective_actions')->cascadeOnDelete();
             $table->unsignedTinyInteger('progress_percentage');
             $table->text('description');
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

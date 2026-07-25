@@ -234,10 +234,22 @@ class AuditFindingResource extends Resource
             ->requiresConfirmation()
             ->visible(fn (AuditFinding $record): bool => Auth::user()?->hasRole('super-admin') ?? false || self::workflowStatus($record) === 'verification')
             ->action(function (AuditFinding $record): void {
-                $record->update(['status' => 'closed']);
-                $record->workflowInstance?->forceTransitionTo('closed');
+                try {
+                    $record->close();
 
-                Notification::make()->title('Temuan ditutup')->success()->send();
+                    $workflowInstance = $record->workflowInstance;
+                    if ($workflowInstance !== null) {
+                        if (Auth::user()?->hasRole('super-admin') ?? false) {
+                            $workflowInstance->forceTransitionTo('closed');
+                        } else {
+                            $workflowInstance->transitionTo('closed');
+                        }
+                    }
+
+                    Notification::make()->title('Temuan ditutup')->success()->send();
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->title($exception->getMessage())->danger()->send();
+                }
             });
     }
 }

@@ -175,6 +175,15 @@ class CorrectiveActionResource extends Resource
             });
     }
 
+    public static function progressTimelineAction(): Action
+    {
+        return Action::make('progressTimeline')
+            ->label('Progress Timeline')
+            ->icon(Heroicon::ChartBar)
+            ->color('gray')
+            ->url(fn (CorrectiveAction $record): string => CorrectiveActionUpdateResource::getListUrl($record->id));
+    }
+
     public static function reopenAction(): Action
     {
         return Action::make('reopenCorrectiveAction')
