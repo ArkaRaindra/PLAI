@@ -70,8 +70,14 @@ class AuditFinding extends Model
 
     public function close(): void
     {
-        if (! $this->correctiveAction()->exists()) {
+        $correctiveAction = $this->correctiveAction;
+
+        if ($correctiveAction === null) {
             throw new \RuntimeException('Temuan tidak dapat ditutup karena belum memiliki Corrective Action.');
+        }
+
+        if ($correctiveAction->status !== 'closed') {
+            throw new \RuntimeException('Temuan tidak dapat ditutup karena Corrective Action belum diverifikasi dan disetujui.');
         }
 
         $this->update(['status' => 'closed']);

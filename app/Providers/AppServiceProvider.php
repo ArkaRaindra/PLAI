@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\AuditAssignment;
 use App\Models\AuditFinding;
+use App\Models\CorrectiveAction;
 use App\Models\CorrectiveActionUpdate;
 use App\Models\Evidences;
 use App\Models\Indicator;
@@ -61,8 +63,10 @@ class AppServiceProvider extends ServiceProvider
             'audit_assignment' => AuditAssignment::class,
             'audit_finding' => AuditFinding::class,
             'corrective_action_update' => CorrectiveActionUpdate::class,
+            'corrective_action' => CorrectiveAction::class,
         ]);
         $this->configureAuditorWorkflow();
+        $this->configureCorrectiveActionWorkflow();
         $this->configureCorrectiveActionUpdateEvidence();
     }
 
@@ -74,6 +78,16 @@ class AppServiceProvider extends ServiceProvider
             'corrective_action' => ['verification'],
             'verification' => ['closed', 'corrective_action'],
             'closed' => [],
+        ]);
+    }
+
+    protected function configureCorrectiveActionWorkflow(): void
+    {
+        WorkflowInstance::registerTransitions('corrective_action', [
+            'draft' => ['submitted'],
+            'submitted' => ['verification'],
+            'verification'=> ['closed', 'submitted'],
+            'closed' => ['submitted'],
         ]);
     }
 

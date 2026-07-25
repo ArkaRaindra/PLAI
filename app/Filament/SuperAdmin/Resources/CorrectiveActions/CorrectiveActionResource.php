@@ -13,11 +13,13 @@ use App\Filament\SuperAdmin\Resources\CorrectiveActionUpdates\CorrectiveActionUp
 use App\Models\CorrectiveAction;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class CorrectiveActionResource extends Resource
 {
@@ -89,6 +91,8 @@ class CorrectiveActionResource extends Resource
         return [
             'draft' => 'Draft',
             'submitted' => 'Diajukan',
+            'verification' => 'Verifikasi',
+            'closed' => 'Selesai',
         ];
     }
 
@@ -96,35 +100,100 @@ class CorrectiveActionResource extends Resource
     {
         return [
             'draft' => 'gray',
-            'submitted' => 'success',
+            'submitted' => 'warning',
+            'verification' => 'primary',
+            'closed' => 'success',
         ];
     }
 
-    public static function submitAction(): Action
+    public static function startVerificationAction(): Action
     {
-        return Action::make('submitCorrectiveAction')
-            ->label('Submit Corrective Action')
-            ->icon(Heroicon::PaperAirplane)
+        return Action::make('startVerification')
+            ->label('Mulai Verifikasi')
+            ->icon(Heroicon::MagnifyingGlass)
             ->color('primary')
             ->requiresConfirmation()
-            ->modalHeading('Submit Corrective Action')
-            ->modalDescription('Setelah disubmit, rencana tindak lanjut ini akan diajukan untuk verifikasi auditor.')
-            ->modalSubmitActionLabel('Ya, Submit')
-            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'draft')
+            ->modalHeading('Mulai Verifikasi Corrective Action')
+            ->modalDescription('Auditor akan memverifikasi bukti pelaksanaan tindak lanjut ini.')
+            ->modalSubmitActionLabel('Ya, Mulai Verifikasi')
+            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'submitted')
+            ->authorize(fn (): bool => Auth::user()?->hasRole('super-admin') ?? false)
             ->action(function (CorrectiveAction $record): void {
-                $record->submit();
+                try {
+                    $record->startVerification();
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->title($exception->getMessage())->danger()->send();
 
-                Notification::make()->title('Corrective Action berhasil disubmit')->success()->send();
+                    return;
+                }
+
+                Notification::make()->title('Corrective action masuk tahap verifikasi')->success()->send();
             });
     }
 
-    public static function progressTimelineAction(): Action
+    public static function approveAction(): Action
     {
-        return Action::make('progressTimeline')
-            ->label('Progress Timeline')
-            ->icon(Heroicon::ChartBar)
-            ->color('info')
-            ->url(fn (CorrectiveAction $record): string => CorrectiveActionUpdateResource::getListUrl($record->id))
-            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'submitted');
+        return Action::make('approveCorrectiveAction')
+            ->label('Approve')
+            ->icon(Heroicon::CheckCircle)
+            ->color('success')
+            ->requiresConfirmation()
+            ->modalHeading('Approve Corrective Action')
+            ->modalDescription('Bukti pelaksanaan dinyatakan memadai dan corrective action akan ditutup.')
+            ->modalSubmitActionLabel('Ya, Approve')
+            ->schema([
+                Textarea::make('notes')->label('Catatan Verifikasi')->columnSpanFull(),
+            ])
+            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'verification')
+            ->authorize(fn (): bool => Auth::user()?->hasRole('super-admin') ?? false)
+            ->action(function (CorrectiveAction $record, array $data): void {
+                $record->approve($data['notes'] ?? null);
+
+                Notification::make()->title('Corrective action disetujui dan ditutup')->success()->send();
+            });
+    }
+
+    public static function rejectAction(): Action
+    {
+        return Action::make('rejectCorrectiveAction')
+            ->label('Reject')
+            ->icon(Heroicon::XCircle)
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Reject Corrective Action')
+            ->modalDescription('Bukti pelaksanaan dinilai belum memadai dan akan dikembalikan ke PIC.')
+            ->modalSubmitActionLabel('Ya, Reject')
+            ->schema([
+                Textarea::make('notes')->label('Alasan Penolakan')->required()->minLength(5)->columnSpanFull(),
+            ])
+            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'verification')
+            ->authorize(fn (): bool => Auth::user()?->hasRole('super-admin') ?? false)
+            ->action(function (CorrectiveAction $record, array $data): void {
+                $record->reject($data['notes']);
+
+                Notification::make()->title('Corrective action dikembalikan ke PIC')->warning()->send();
+            });
+    }
+
+    public static function reopenAction(): Action
+    {
+        return Action::make('reopenCorrectiveAction')
+            ->label('Reopen CAPA')
+            ->icon(Heroicon::ArrowPath)
+            ->color('warning')
+            ->requiresConfirmation()
+            ->modalHeading('Buka Kembali Corrective Action')
+            ->modalDescription('Corrective action yang sudah ditutup akan dibuka kembali untuk tindak lanjut lebih lanjut.')
+            ->modalSubmitActionLabel('Ya, Reopen')
+            ->schema([
+                Textarea::make('notes')->label('Alasan Reopen')->required()->minLength(5)->columnSpanFull(),
+            ])
+            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'closed')
+            ->authorize(fn (): bool => Auth::user()?->hasRole('super-admin') ?? false)
+            ->action(function (CorrectiveAction $record, array $data): void {
+                $record->reopen($data['notes']);
+
+                Notification::make()->title('Corrective action dibuka kembali')->warning()->send();
+            });
     }
 }
