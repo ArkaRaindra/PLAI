@@ -70,7 +70,7 @@ class LhamiReport extends Page implements HasTable
             ->whereHas('auditAssignment', fn (Builder $q) => $q->when(
                 $cycleId,
                 fn (Builder $q, int $id) => $q->where('audit_cycle_id', $id),
-            ))->with('workflowInstance');
+            ));
 
         $findingsTotal = $findingsBase()->count();
 
@@ -89,12 +89,7 @@ class LhamiReport extends Page implements HasTable
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        $findingsByWorkflowStatus = (clone $findingsBase())
-            ->get()
-            ->groupBy(fn (AuditFinding $finding) => $finding->workflowInstance?->current_status ?? 'none')
-            ->map(fn ($group) => $group->count());
-
-        $closed = (int) ($findingsByStatus['closed'] ?? 0);
+        $closed = (int) ($assignmentsByStatus['closed'] ?? 0);
 
         return [
             'assignments_total' => $assignmentsTotal,
@@ -103,9 +98,8 @@ class LhamiReport extends Page implements HasTable
             'findings_by_category' => $findingsByCategory,
             'findings_by_severity' => $findingsBySeverity,
             'findings_by_status' => $findingsByStatus,
-            'findings_by_workflow_status' => $findingsByWorkflowStatus,
-            'completion_percentage' => $findingsTotal > 0
-                ? round(($closed / $findingsTotal) * 100, 1)
+            'completion_percentage' => $assignmentsTotal > 0
+                ? round(($closed / $assignmentsTotal) * 100, 1)
                 : 0.0,
         ];
     }
@@ -145,7 +139,7 @@ class LhamiReport extends Page implements HasTable
                 AuditFinding::query()->with([
                     'auditAssignment.organizationUnit',
                     'auditAssignment.auditorPosition.user',
-                    'workflowInstance',
+                    'auditAssignment.workflowInstance',
                 ])
             )
             ->heading('Rekap Temuan')
@@ -176,8 +170,8 @@ class LhamiReport extends Page implements HasTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => $state === 'major' ? 'Major' : 'Minor')
                     ->color(fn (string $state): string => $state === 'major' ? 'danger' : 'warning'),
-                TextColumn::make('workflowInstance.current_status')
-                    ->label('Status')
+                TextColumn::make('auditAssignment.workflowInstance.current_status')
+                    ->label('Status Assignment')
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state !== null
                         ? (self::workflowStatusLabels()[$state] ?? $state)
@@ -242,7 +236,7 @@ class LhamiReport extends Page implements HasTable
             ->with([
                 'auditAssignment.organizationUnit',
                 'auditAssignment.auditorPosition.user',
-                'workflowInstance',
+                'auditAssignment.workflowInstance',
             ])
             ->get();
 
@@ -258,6 +252,7 @@ class LhamiReport extends Page implements HasTable
                 'Kategori',
                 'Severity',
                 'Status Temuan',
+                'Status Assignment',
                 'Batas Waktu',
                 'Deskripsi',
             ]);
@@ -269,7 +264,8 @@ class LhamiReport extends Page implements HasTable
                     $finding->title,
                     self::categoryLabels()[$finding->category] ?? $finding->category,
                     self::severityLabels()[$finding->severity] ?? $finding->severity,
-                    self::workflowStatusLabels()[$finding->workflowInstance?->current_status ?? ''] ?? '-',
+                    $finding->status === 'open' ? 'Terbuka' : 'Ditutup',
+                    self::workflowStatusLabels()[$finding->auditAssignment?->workflowInstance?->current_status ?? ''] ?? '-',
                     $finding->due_date?->format('Y-m-d') ?? '-',
                     (string) Str::of($finding->description)->squish(),
                 ]);

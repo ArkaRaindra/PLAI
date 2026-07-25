@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\CorrectiveActionUpdates\Pages;
 
+use App\Filament\SuperAdmin\Resources\AuditFindings\AuditFindingResource;
 use App\Filament\SuperAdmin\Resources\CorrectiveActions\CorrectiveActionResource;
 use App\Filament\SuperAdmin\Resources\CorrectiveActionUpdates\CorrectiveActionUpdateResource;
 use App\Models\CorrectiveAction;
@@ -11,6 +12,7 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Url;
 
 class ListCorrectiveActionUpdates extends Page
 {
@@ -48,7 +50,7 @@ class ListCorrectiveActionUpdates extends Page
         }
 
         return CorrectiveActionUpdate::query()
-            ->where('corrective_action_id', $this->correctiveActionId)
+            ->where('corrective_action_id', $this->correctiveAction->id)
             ->with(['updater', 'evidenceLink.evidence'])
             ->orderByDesc('id')
             ->get();
@@ -62,7 +64,14 @@ class ListCorrectiveActionUpdates extends Page
     protected function getHeaderActions(): array
     {
         if ($this->correctiveAction === null) {
-            return [];
+            return [
+                Action::make('back')
+                    ->label('Kembali')
+                    ->url(AuditFindingResource::getUrl('index'))
+                    ->button()
+                    ->color('gray')
+                    ->icon(Heroicon::ArrowLeft),
+            ];
         }
 
         return [

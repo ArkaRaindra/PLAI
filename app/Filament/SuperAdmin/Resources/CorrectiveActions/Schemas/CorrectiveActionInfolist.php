@@ -31,7 +31,6 @@ class CorrectiveActionInfolist
                     ->columns(2)
                     ->columnSpanFull(),
                 Section::make('Verification History')
-                    ->description('CAPA-003: riwayat setiap transisi status Corrective Action, tersimpan otomatis oleh workflow engine.')
                     ->schema([
                         RepeatableEntry::make('workflowInstance.histories')
                             ->label('Riwayat Verifikasi')

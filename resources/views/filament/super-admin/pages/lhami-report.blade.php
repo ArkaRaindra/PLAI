@@ -1,6 +1,6 @@
 @php
     $summary = $this->summary();
-    $findingStatusLabels = static::workflowStatusLabels();
+    $assignmentStatusLabels = static::workflowStatusLabels();
     $categoryLabels = static::categoryLabels();
     $severityLabels = static::severityLabels();
 @endphp
@@ -30,9 +30,9 @@
             </div>
 
             <div class="rounded-xl border border-gray-200 p-4 dark:border-white/10">
-                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">Status Temuan</p>
+                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">Status Assignment</p>
                 <div class="flex flex-wrap gap-1">
-                    @foreach ($findingStatusLabels as $key => $label)
+                    @foreach ($assignmentStatusLabels as $key => $label)
                         <x-filament::badge :color="match ($key) {
                             'open' => 'gray',
                             'assigned' => 'info',
@@ -41,7 +41,7 @@
                             'closed' => 'success',
                             default => 'gray',
                         }">
-                            {{ $label }}: {{ $summary['findings_by_workflow_status'][$key] ?? 0 }}
+                            {{ $label }}: {{ $summary['assignments_by_status'][$key] ?? 0 }}
                         </x-filament::badge>
                     @endforeach
                 </div>

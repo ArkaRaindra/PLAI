@@ -54,7 +54,6 @@ class AuditFindingInfolist
                                         ->color(fn (string $state): string => $state === 'open' ? 'warning' : 'success'),
                                 ]),
                             Section::make('Corrective Action')
-                                ->description('Ringkasan CAPA yang terhubung ke temuan ini. Kelola lewat tombol "Corrective Action".')
                                 ->schema([
                                     TextEntry::make('correctiveAction.status')
                                         ->label('Status CAPA')

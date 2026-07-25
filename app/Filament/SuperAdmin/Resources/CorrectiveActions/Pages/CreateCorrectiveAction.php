@@ -81,8 +81,10 @@ class CreateCorrectiveAction extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $auditFinding = AuditFinding::query()->with('auditAssignment')->find($this->auditFindingId);
+
         $data['audit_finding_id'] = (int) $this->auditFindingId;
-        $data['organization_unit_id'] = $this->auditFinding?->auditAssignment?->organization_unit_id;
+        $data['organization_unit_id'] = $auditFinding?->auditAssignment?->organization_unit_id;
         $data['status'] = 'draft';
 
         return $data;
