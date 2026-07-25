@@ -43,6 +43,11 @@ class ViewAuditAssignment extends ViewRecord
                 ->label('Kelola Temuan')
                 ->icon(Heroicon::ExclamationTriangle)
                 ->url(fn (AuditAssignment $record): string => AuditFindingResource::getListUrl($record->id)),
+            AuditAssignmentResource::assignAction(),
+            AuditAssignmentResource::moveToCorrectiveActionAction(),
+            AuditAssignmentResource::startVerificationAction(),
+            AuditAssignmentResource::returnToCorrectiveActionAction(),
+            AuditAssignmentResource::closeAssignmentAction(),
             EditAction::make(),
         ];
     }

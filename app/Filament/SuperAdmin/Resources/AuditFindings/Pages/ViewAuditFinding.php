@@ -34,10 +34,6 @@ class ViewAuditFinding extends ViewRecord
                 ->icon(Heroicon::ArrowLeft),
             EditAction::make(),
             AuditFindingResource::manageCorrectiveActionAction(),
-            AuditFindingResource::assignAction(),
-            AuditFindingResource::moveToCorrectiveAction(),
-            AuditFindingResource::startVerificationAction(),
-            AuditFindingResource::returnToCorrectiveActionAction(),
             AuditFindingResource::closeAction(),
         ];
     }

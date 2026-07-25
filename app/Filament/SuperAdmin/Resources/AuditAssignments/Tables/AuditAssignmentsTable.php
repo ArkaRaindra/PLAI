@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources\AuditAssignments\Tables;
 
+use App\Filament\SuperAdmin\Resources\AuditAssignments\AuditAssignmentResource;
 use App\Filament\SuperAdmin\Resources\AuditChecklistResponses\AuditChecklistResponseResource;
 use App\Filament\SuperAdmin\Resources\AuditFindings\AuditFindingResource;
 use App\Models\AuditAssignment;
@@ -12,7 +13,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AuditAssignmentsTable
 {
@@ -40,6 +43,28 @@ class AuditAssignmentsTable
                     ->label('Temuan')
                     ->counts('findings')
                     ->badge(),
+                TextColumn::make('workflowInstance.current_status')
+                    ->label('Status Workflow')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state !== null
+                        ? (AuditAssignmentResource::workflowStatusLabels()[$state] ?? $state)
+                        : '-')
+                    ->color(fn (?string $state): string => $state !== null
+                        ? (AuditAssignmentResource::workflowStatusColors()[$state] ?? 'gray')
+                        : 'gray'),
+            ])
+            ->filters([
+                SelectFilter::make('workflow_status')
+                    ->label('Status Workflow')
+                    ->options(AuditAssignmentResource::workflowStatusLabels())
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        return $query->whereHas(
+                            'workflowInstance',
+                            fn (Builder $inner) => $value ? $inner->where('current_status', $value) : $inner,
+                        );
+                    }),
             ])
             ->recordActions(ActionGroup::make([
                 ViewAction::make(),
@@ -52,6 +77,11 @@ class AuditAssignmentsTable
                     ->label('Kelola Temuan')
                     ->icon(Heroicon::ExclamationTriangle)
                     ->url(fn (AuditAssignment $record): string => AuditFindingResource::getListUrl($record->id)),
+                AuditAssignmentResource::assignAction(),
+                AuditAssignmentResource::moveToCorrectiveActionAction(),
+                AuditAssignmentResource::startVerificationAction(),
+                AuditAssignmentResource::returnToCorrectiveActionAction(),
+                AuditAssignmentResource::closeAssignmentAction(),
                 DeleteAction::make(),
             ]));
     }

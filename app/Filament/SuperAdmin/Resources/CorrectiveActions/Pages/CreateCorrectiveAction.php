@@ -9,9 +9,11 @@ use App\Models\CorrectiveAction;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Icons\Heroicon;
+use Livewire\Attributes\Url;
 
 class CreateCorrectiveAction extends CreateRecord
 {
+    #[Url]
     public ?string $auditFindingId = null;
 
     protected static string $resource = CorrectiveActionResource::class;

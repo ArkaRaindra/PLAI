@@ -3,6 +3,7 @@
 namespace App\Filament\SuperAdmin\Resources\AuditFindings\Tables;
 
 use App\Filament\SuperAdmin\Resources\AuditFindings\AuditFindingResource;
+use App\Filament\SuperAdmin\Resources\CorrectiveActions\CorrectiveActionResource;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -10,7 +11,6 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class AuditFindingsTable
 {
@@ -41,20 +41,20 @@ class AuditFindingsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => ucfirst($state))
                     ->color(fn (string $state): string => $state === 'major' ? 'danger' : 'warning'),
-                TextColumn::make('workflowInstance.current_status')
-                    ->label('Status')
-                    ->badge()
-                    ->formatStateUsing(fn (?string $state): string => $state !== null
-                        ? (AuditFindingResource::workflowStatusLabels()[$state] ?? $state)
-                        : '-')
-                    ->color(fn (?string $state): string => $state !== null
-                        ? (AuditFindingResource::workflowStatusColors()[$state] ?? 'gray')
-                        : 'gray'),
                 TextColumn::make('due_date')
                     ->label('Batas Waktu')
                     ->date()
                     ->placeholder('-')
                     ->sortable(),
+                TextColumn::make('correctiveAction.status')
+                    ->label('Corrective Action')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state !== null
+                        ? (CorrectiveActionResource::statusLabels()[$state] ?? $state)
+                        : 'Belum Ada')
+                    ->color(fn (?string $state): string => $state !== null
+                        ? (CorrectiveActionResource::statusColors()[$state] ?? 'gray')
+                        : 'danger'),
             ])
             ->filters([
                 SelectFilter::make('category')
@@ -70,27 +70,11 @@ class AuditFindingsTable
                         'open' => 'Terbuka',
                         'closed' => 'Ditutup',
                     ]),
-                SelectFilter::make('workflow_status')
-                    ->label('Status Workflow')
-                    ->options(AuditFindingResource::workflowStatusLabels())
-                    ->query(function (Builder $query, array $data): Builder {
-                        $value = $data['value'] ?? null;
-
-                        if (blank($value)) {
-                            return $query;
-                        }
-
-                        return $query->whereHas('workflowInstance', fn (Builder $inner) => $inner->where('current_status', $value));
-                    }),
             ])
             ->recordActions(ActionGroup::make([
                 ViewAction::make(),
                 EditAction::make(),
                 AuditFindingResource::manageCorrectiveActionAction(),
-                AuditFindingResource::assignAction(),
-                AuditFindingResource::moveToCorrectiveAction(),
-                AuditFindingResource::startVerificationAction(),
-                AuditFindingResource::returnToCorrectiveActionAction(),
                 AuditFindingResource::closeAction(),
                 DeleteAction::make(),
             ]));

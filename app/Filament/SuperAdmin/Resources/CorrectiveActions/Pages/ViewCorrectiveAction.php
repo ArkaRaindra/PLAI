@@ -33,6 +33,10 @@ class ViewCorrectiveAction extends ViewRecord
                 ->visible(fn (): bool => $this->record->isEditable()),
             CorrectiveActionResource::progressTimelineAction(),
             CorrectiveActionResource::submitAction(),
+            CorrectiveActionResource::startVerificationAction(),
+            CorrectiveActionResource::approveAction(),
+            CorrectiveActionResource::rejectAction(),
+            CorrectiveActionResource::reopenAction(),
         ];
     }
 }

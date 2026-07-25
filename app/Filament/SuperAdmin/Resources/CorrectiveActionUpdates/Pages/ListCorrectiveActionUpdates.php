@@ -61,6 +61,10 @@ class ListCorrectiveActionUpdates extends Page
 
     protected function getHeaderActions(): array
     {
+        if ($this->correctiveAction === null) {
+            return [];
+        }
+
         return [
             Action::make('back')
                 ->label('Kembali')

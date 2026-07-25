@@ -4,6 +4,7 @@ namespace App\Filament\SuperAdmin\Resources\CorrectiveActionUpdates\Pages;
 
 use App\Filament\SuperAdmin\Resources\CorrectiveActionUpdates\CorrectiveActionUpdateResource;
 use App\Models\CorrectiveAction;
+use App\Models\CorrectiveActionUpdate;
 use App\Services\Evidence\EvidenceService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -12,20 +13,24 @@ use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Url;
 
 class CreateCorrectiveActionUpdate extends CreateRecord
 {
+    #[Url]
     public ?string $correctiveActionId = null;
 
     protected static string $resource = CorrectiveActionUpdateResource::class;
 
     protected static ?string $title = 'Tambah Progress';
 
+    protected ?CorrectiveAction $correctiveAction = null;
+
     protected ?array $pendingEvidence = null;
 
     public function mount(): void
     {
-        if (blank($this->correctiveactionId)) {
+        if (blank($this->correctiveActionId)) {
             $this->redirect(CorrectiveActionUpdateResource::getUrl('index'));
 
             return;
@@ -52,6 +57,9 @@ class CreateCorrectiveActionUpdate extends CreateRecord
         parent::mount();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getBreadcrumbs(): array
     {
         return [
@@ -59,7 +67,7 @@ class CreateCorrectiveActionUpdate extends CreateRecord
         ];
     }
 
-    protected function getheaderActions(): array
+    protected function getHeaderActions(): array
     {
         if (blank($this->correctiveActionId)) {
             return [];
@@ -83,6 +91,10 @@ class CreateCorrectiveActionUpdate extends CreateRecord
         ]);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $evidenceType = $data['evidence_type'] ?? 'none';
@@ -102,6 +114,9 @@ class CreateCorrectiveActionUpdate extends CreateRecord
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function handleRecordCreation(array $data): Model
     {
         try {
@@ -119,6 +134,7 @@ class CreateCorrectiveActionUpdate extends CreateRecord
             return;
         }
 
+        /** @var CorrectiveActionUpdate $update */
         $update = $this->getRecord();
 
         app(EvidenceService::class)->record(

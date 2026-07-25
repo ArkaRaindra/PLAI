@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\AuditAssignment;
-use App\Models\AuditFinding;
 use App\Models\CorrectiveAction;
 use App\Models\CorrectiveActionUpdate;
 use App\Models\Evidences;
@@ -61,7 +60,6 @@ class AppServiceProvider extends ServiceProvider
             'user' => User::class,
             'evidence' => Evidences::class,
             'audit_assignment' => AuditAssignment::class,
-            'audit_finding' => AuditFinding::class,
             'corrective_action_update' => CorrectiveActionUpdate::class,
             'corrective_action' => CorrectiveAction::class,
         ]);
@@ -72,7 +70,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function configureAuditorWorkflow(): void
     {
-        WorkflowInstance::registerTransitions('audit_finding', [
+        WorkflowInstance::registerTransitions('audit_assignment', [
             'open' => ['assigned'],
             'assigned' => ['corrective_action'],
             'corrective_action' => ['verification'],

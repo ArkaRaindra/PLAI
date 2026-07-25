@@ -42,6 +42,10 @@ class CorrectiveActionsTable
                     ->visible(fn ($record): bool => $record->isEditable()),
                 CorrectiveActionResource::progressTimelineAction(),
                 CorrectiveActionResource::submitAction(),
+                CorrectiveActionResource::startVerificationAction(),
+                CorrectiveActionResource::approveAction(),
+                CorrectiveActionResource::rejectAction(),
+                CorrectiveActionResource::reopenAction(),
                 DeleteAction::make()
                     ->visible(fn ($record): bool => $record->isEditable()),
             ])

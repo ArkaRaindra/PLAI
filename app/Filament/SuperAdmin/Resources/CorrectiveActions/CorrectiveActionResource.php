@@ -106,6 +106,27 @@ class CorrectiveActionResource extends Resource
         ];
     }
 
+    /**
+     * "Submit Corrective Action" — draft -> submitted.
+     */
+    public static function submitAction(): Action
+    {
+        return Action::make('submitCorrectiveAction')
+            ->label('Submit Corrective Action')
+            ->icon(Heroicon::PaperAirplane)
+            ->color('primary')
+            ->requiresConfirmation()
+            ->modalHeading('Submit Corrective Action')
+            ->modalDescription('Setelah disubmit, rencana tindak lanjut ini akan diajukan untuk verifikasi auditor.')
+            ->modalSubmitActionLabel('Ya, Submit')
+            ->visible(fn (CorrectiveAction $record): bool => $record->status === 'draft')
+            ->action(function (CorrectiveAction $record): void {
+                $record->submit();
+
+                Notification::make()->title('Corrective action berhasil disubmit')->success()->send();
+            });
+    }
+
     public static function startVerificationAction(): Action
     {
         return Action::make('startVerification')
@@ -175,13 +196,18 @@ class CorrectiveActionResource extends Resource
             });
     }
 
+    /**
+     * CAPA-002 (Issue #44): entry point into the Progress Timeline for
+     * this corrective action.
+     */
     public static function progressTimelineAction(): Action
     {
         return Action::make('progressTimeline')
             ->label('Progress Timeline')
             ->icon(Heroicon::ChartBar)
-            ->color('gray')
-            ->url(fn (CorrectiveAction $record): string => CorrectiveActionUpdateResource::getListUrl($record->id));
+            ->color('info')
+            ->url(fn (CorrectiveAction $record): string => CorrectiveActionUpdateResource::getListUrl($record->id))
+            ->visible(fn (CorrectiveAction $record): bool => $record->status !== 'draft');
     }
 
     public static function reopenAction(): Action
